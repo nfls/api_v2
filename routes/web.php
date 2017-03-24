@@ -11,4 +11,4 @@
 |
 */
 
-Route::post('alumni/auth/{step}',"AlumniController@Auth");
+Route::post('alumni/auth/{step}/{method}',"AlumniController@Auth");
