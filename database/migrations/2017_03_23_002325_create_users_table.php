@@ -14,7 +14,7 @@ class CreateUsersTable extends Migration
     public function up()
     {
         if (!Schema::hasTable('user_auth')) {
-            Schema::create('user_auth', function (Blueprint $table) {
+            Schema::connection('mysql-alumni')->create('user_auth', function (Blueprint $table) {
                 $table->unsignedBigInteger('id')->unique();
                 $table->json('auth_info')->nullable();
                 $table->json('primary_school')->nullable();
@@ -35,6 +35,6 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_auth');
+        Schema::connection('mysql-alumni')->dropIfExists('user_auth');
     }
 }
