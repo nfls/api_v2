@@ -14,7 +14,7 @@ class AddDirectoryInfo extends Migration
     public function up()
     {
         Schema::connection('mysql_alumni')->table('user_auth', function (Blueprint $table) {
-            $table->json('directory_info')->comment("校友录索引，仅包含初高中6位数班级号");
+            $table->json('directory_info')->comment("校友录索引，仅包含初高中6位数班级号")->nullable();
         });
     }
 
