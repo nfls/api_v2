@@ -221,14 +221,14 @@ class AlumniController extends Controller
                         remark：备注
                 */
                 if(@self::isEmpty($info->{'senior_school'}))
-                    array_push($message,'请选择您所就读的初中。');
+                    array_push($message,'请选择您所就读的高中。');
                 else
                 {
                     switch($info->senior_school)
                     {
                         case self::OTHER_SENIOR:
                             if(@self::isEmpty($info->{'senior_school_name'}))
-                                array_push($message, '请填写您所就读的初中全名。请不要使用任何简写。');
+                                array_push($message, '请填写您所就读的高中全名。请不要使用任何简写。');
                             if(count((array)$info)!=3)
                                 array_push($message, '您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。');
                             break;
@@ -236,40 +236,44 @@ class AlumniController extends Controller
                             $passed = true;
                             if(@self::isEmpty($info->{'senior_school_enter_year'}))
                             {
-                                array_push($message, '请填写您初中的入学年份。');
+                                array_push($message, '请填写您高中的入学年份。');
                                 $passed = false;
                             }
                             if(@self::isEmpty($info->{'senior_school_graduated_year'}))
                             {
-                                array_push($message, '请填写您初中的毕业年份。'); 
+                                array_push($message, '请填写您高中的毕业年份。'); 
                                 $passed = false;
                             }
                             if(@self::isEmpty($info->{'senior_class'}))
                             {
-                                array_push($message, '请填写您初中的班级号。'); 
+                                array_push($message, '请填写您高中的班级号。'); 
                                 $passed = false;
                             }
                             if($passed)
                             {
                                 $valid  = new Between(['min' => 1963, 'max' => date('Y') - 6]);
                                 if(!$valid->isValid($info->{'senior_school_enter_year'}) || !is_int($info->{'senior_school_enter_year'}))
-                                    array_push($message, '初中入学年份不正确！请检查您的入学年份。目前允许的最大年份为'.(String)(date('Y') - 6).'年');
+                                    array_push($message, '高中入学年份不正确！请检查您的入学年份。目前允许的最大年份为'.(String)(date('Y') - 6).'年');
                                 unset($valid);
                                 $valid  = new Between(['min' => 1963, 'max' => date('Y') - 3]);
                                 if(!$valid->isValid($info->{'senior_school_graduated_year'}) || !is_integer($info->{'senior_school_graduated_year'}))
-                                    array_push($message, '初中毕业年份不正确！请检查您的毕业年份。目前允许的最大年份为'.(String)(date('Y') - 3).'年');
+                                    array_push($message, '高中毕业年份不正确！请检查您的毕业年份。目前允许的最大年份为'.(String)(date('Y') - 3).'年');
                                 if($info->{'senior_school_enter_year'} + 3 != $info->{'senior_school_graduated_year'} && (@self::isEmpty($info->{'remark'})))
-                                    array_push($message, '初中毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。');
+                                    array_push($message, '高中毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。');
                                 unset($valid);
                                 $valid = new Between(['min' => 1, 'max' => 12]);
                                 if(!$valid->isValid($info->{'senior_class'}) || !is_integer($info->{'senior_class'}))
-                                    array_push($message, '初中班级号不正确！请检查您的初中班级号是否为1-12之间的任何一个整数。');
+                                    array_push($message, '高中班级号不正确！请检查您的高中班级号是否为1-12之间的任何一个整数。');
                             }
                             if(count((array)$info)!=5)
                                 array_push($message, '您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。');
                             break;
+                        case NFLS_SENIOR_AUSTRALIA:
+                        case NFLS_SENIOR_BCA:
+                        case NFLS_SENIOR_ALEVEL:
+                        case NFLS_SENIOR_IB:
                         default:
-                            array_push($message,'初中信息不正确！请重新选择。');
+                            array_push($message,'高中信息不正确！请重新选择。');
                             break;
                     }
                 }
