@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\UserCenterController;
-use Illuminate\Http\Request;;
+use Illuminate\Http\Request;
+use Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Zend\Validator\Between;
@@ -51,36 +52,36 @@ class AlumniController extends Controller
                         primary_school_graduated_year：毕业年份
                         remark：备注
                 */
-                if(@self::EmptyCheck($info->{'primary_school'}))
+                if(@self::EmptyCheck($info->{"primary_school"}))
                     array_push($message,"请选择您所就读的小学。");
                 else
                 {
                     switch($info->primary_school)
                     {
                         case self::OTHER_PRIMARY:
-                            if(@self::EmptyCheck($info->{'primary_school_name'}))
+                            if(@self::EmptyCheck($info->{"primary_school_name"}))
                                 array_push($message, "请填写您所就读的小学全名。请不要使用任何简写。");
                             break;
                         case self::NFLS_PRIMARY:
                             $passed = true;
-                            if(@self::EmptyCheck($info->{'primary_school_enter_year'}))
+                            if(@self::EmptyCheck($info->{"primary_school_enter_year"}))
                             {
                                 array_push($message, "请填写您小学的入学年份。");
                                 $passed = false;
                             }
-                            if(@self::EmptyCheck($info->{'primary_school_graduated_year'}))
+                            if(@self::EmptyCheck($info->{"primary_school_graduated_year"}))
                             {
                                 array_push($message, "请填写您小学的毕业年份。"); 
                                 $passed = false;
                             }
                             if($passed)
                             {
-                                $valid  = new Between(['min' => 1963, 'max' => 1983]);//enter before 1979
-                                if(!$valid->isValid($info->{'primary_school_enter_year'}) || !is_integer()($info->{'primary_school_enter_year'}))
+                                $valid  = new Between(["min" => 1963, "max" => 1983]);//enter before 1979
+                                if(!$valid->isValid($info->{"primary_school_enter_year"}) || !is_integer($info->{"primary_school_enter_year"}))
                                     array_push($message, "小学入学年份不正确！请检查您的入学年份。此项仅支持1979年之前入学校友填写，并请不要输入非数字内容。");
-                                if(!$valid->isValid($info->{'primary_school_graduated_year'}) || !is_integer()($info->{'primary_school_graduated_year'}))
+                                if(!$valid->isValid($info->{"primary_school_graduated_year"}) || !is_integer($info->{"primary_school_graduated_year"}))
                                     array_push($message, "小学毕业年份不正确！请检查您的毕业年份。此项仅支持1979年之前入学校友填写，并请不要输入非数字内容。");
-                                if($info->{'primary_school_enter_year'} + 4 != $info->{'primary_school_graduated_year'} && (@self::EmptyCheck($info->{'remark'})))
+                                if($info->{"primary_school_enter_year"} + 4 != $info->{"primary_school_graduated_year"} && (@self::EmptyCheck($info->{"remark"})))
                                     array_push($message, "小学毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。");
                             }
                             break;
@@ -100,46 +101,47 @@ class AlumniController extends Controller
                         junior_class：班级号
                         remark：备注
                 */
-                if(@self::EmptyCheck($info->{'junior_school'}))
+                if(@self::EmptyCheck($info->{"junior_school"}))
                     array_push($message,"请选择您所就读的初中。");
                 else
                 {
                     switch($info->junior_school)
                     {
                         case self::OTHER_JUNIOR:
-                            if(@self::EmptyCheck($info->{'junior_school_name'}))
+                            if(@self::EmptyCheck($info->{"junior_school_name"}))
                                 array_push($message, "请填写您所就读的初中全名。请不要使用任何简写。");
                             break;
                         case self::NFLS_JUNIOR:
                             $passed = true;
-                            if(@self::EmptyCheck($info->{'junior_school_enter_year'}))
+                            if(@self::EmptyCheck($info->{"junior_school_enter_year"}))
                             {
                                 array_push($message, "请填写您初中的入学年份。");
                                 $passed = false;
                             }
-                            if(@self::EmptyCheck($info->{'junior_school_graduated_year'}))
+                            if(@self::EmptyCheck($info->{"junior_school_graduated_year"}))
                             {
                                 array_push($message, "请填写您初中的毕业年份。"); 
                                 $passed = false;
                             }
-                            if(@self::EmptyCheck($info->{'junior_class'}))
+                            if(@self::EmptyCheck($info->{"junior_class"}))
                             {
                                 array_push($message, "请填写您初中的班级号。"); 
                                 $passed = false;
                             }
                             if($passed)
                             {
-                                $valid  = new Between(['min' => 1963, 'max' => date('Y') - 6]);
-                                if(!$valid->isValid($info->{'junior_school_enter_year'}) || !is_integer($info->{'junior_school_enter_year'}))
-                                    array_push($message, "初中入学年份不正确！请检查您的入学年份。目前允许的最大年份为".(String)(date('Y') - 6)."年");
-                                $valid  = new Between(['min' => 1963, 'max' => date('Y') - 3]);
-                                if(!$valid->isValid($info->{'junior_school_graduated_year'}) || !is_integer($info->{'junior_school_graduated_year'}))
-                                    array_push($message, "初中毕业年份不正确！请检查您的毕业年份。目前允许的最大年份为".(String)(date('Y') - 3)."年");
-                                if($info->{'junior_school_enter_year'} + 3 != $info->{'junior_school_graduated_year'} && (@self::EmptyCheck($info->{'remark'})))
+                                $valid  = new Between(["min" => 1963, "max" => date("Y") - 6]);
+                                if(!$valid->isValid($info->{"junior_school_enter_year"}) || !is_int($info->{"junior_school_enter_year"}))
+                                    array_push($message, "初中入学年份不正确！请检查您的入学年份。目前允许的最大年份为".(String)(date("Y") - 6)."年");
+                                unset($valid);
+                                $valid  = new Between(["min" => 1963, "max" => date("Y") - 3]);
+                                if(!$valid->isValid($info->{"junior_school_graduated_year"}) || !is_integer($info->{"junior_school_graduated_year"}))
+                                    array_push($message, "初中毕业年份不正确！请检查您的毕业年份。目前允许的最大年份为".(String)(date("Y") - 3)."年");
+                                if($info->{"junior_school_enter_year"} + 3 != $info->{"junior_school_graduated_year"} && (@self::EmptyCheck($info->{"remark"})))
                                     array_push($message, "初中毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。");
                                 unset($valid);
-                                $valid = new Between(['min' => 1, 'max' => 12]);
-                                if(!$valid->isValid($info->{'junior_class'}) || !is_integer($info->{'junior_class'}))
+                                $valid = new Between(["min" => 1, "max" => 12]);
+                                if(!$valid->isValid($info->{"junior_class"}) || !is_integer($info->{"junior_class"}))
                                     array_push($message, "初中班级号不正确！请检查您的初中班级号是否为1-12之间的任何一个整数。");
                             }
                             break;
@@ -174,12 +176,13 @@ class AlumniController extends Controller
     }
 
     function InsertId($id){
-        DB::connection("mysql_alumni")->table("user_auth")->insert('insert into student (name) values(?)',[$id]);
+        DB::connection("mysql_alumni")->table("user_auth")->insert(["id" => $id]);
     }
 
     function auth(Request $request,$step,$method){
     	if(is_numeric($step)==true){
-    		$id = UserCenterController::GetUserId($request->input("token"));
+    		$id = UserCenterController::GetUserId(Cookie::get("token"));
+            return $request;
             //$action = $request->input("action");
             $user = DB::connection("mysql_alumni")->table("user_auth")->where("id", $id)->first();
             if(is_null($user))
@@ -190,13 +193,13 @@ class AlumniController extends Controller
                 switch($step){
                     case 1:
 
-                        $return_array['username'] = UserCenterController::GetUserNickname($id);
-                        $return_array['email'] = UserCenterController::GetUserEmail($id);
+                        $return_array["username"] = UserCenterController::GetUserNickname($id);
+                        $return_array["email"] = UserCenterController::GetUserEmail($id);
                         if(is_null($user->personal_info))
-                            $return_array['status'] = self::NOT_START;
+                            $return_array["status"] = self::NOT_START;
                         else if (self::StepCheck(1,$user->personal_info)==true)
-                            $return_array['status'] = self::FINISHED;
-                        else $return_array['status'] = self::IN_PROGRESS;
+                            $return_array["status"] = self::FINISHED;
+                        else $return_array["status"] = self::IN_PROGRESS;
                         break;
                     case 2:
                         break;
@@ -215,12 +218,22 @@ class AlumniController extends Controller
                 }
 
                 $return_array = array();
-                $return_array['id'] = $id;
+                $return_array["id"] = $id;
             }
             else if($method == "update")
             {
                 $content = file_get_contents("php://input");
                 $return_array = self::StepCheck($step,$content);
+                if(count($return_array)!=1)
+                {
+                    return Response::json(array("code" => "403.1" , "message" => $return_array));
+
+                }
+                else
+                {
+                    DB::connection("mysql_alumni")->table("user_auth")->where("id", $id)->update(["junior_school" => $content]);
+                    return Response::json(array("code" => "200"));
+                }
             }
             else 
             {
