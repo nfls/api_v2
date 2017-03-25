@@ -28,6 +28,7 @@ class AlumniController extends Controller
     const NFLS_SENIOR_BCA = 4;
     const NFLS_SENIOR_AUSTRALIA = 5; //No longer exist after 2010
     const OTHER_SENIOR = -1;
+    const NO_SENIOR = -2;
 
     const BASIC_INFO = 1;
     const PRIMARY_INFO = 2;
