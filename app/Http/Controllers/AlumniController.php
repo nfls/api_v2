@@ -329,7 +329,41 @@ class AlumniController extends Controller
                         array_push($message, '您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。');
                     break;
                 case NFLS_SENIOR_ALEVEL:
-                    
+                    $passed = true;
+                    if(@self::isEmpty($info->{'junior_school_enter_year'}))
+                    {
+                        array_push($message, '请填写您初中的入学年份。');
+                        $passed = false;
+                    }
+                    if(@self::isEmpty($info->{'junior_school_graduated_year'}))
+                    {
+                        array_push($message, '请填写您初中的毕业年份。'); 
+                        $passed = false;
+                    }
+                    if(@self::isEmpty($info->{'junior_class'}))
+                    {
+                        array_push($message, '请填写您初中的班级号。'); 
+                        $passed = false;
+                    }
+                    if($passed)
+                    {
+                        $valid  = new Between(['min' => 1963, 'max' => date('Y') - 6]);
+                        if(!$valid->isValid($info->{'junior_school_enter_year'}) || !is_int($info->{'junior_school_enter_year'}))
+                            array_push($message, '初中入学年份不正确！请检查您的入学年份。目前允许的最大年份为'.(String)(date('Y') - 6).'年');
+                        unset($valid);
+                        $valid  = new Between(['min' => 1963, 'max' => date('Y') - 3]);
+                        if(!$valid->isValid($info->{'junior_school_graduated_year'}) || !is_integer($info->{'junior_school_graduated_year'}))
+                            array_push($message, '初中毕业年份不正确！请检查您的毕业年份。目前允许的最大年份为'.(String)(date('Y') - 3).'年');
+                        if($info->{'junior_school_enter_year'} + 3 != $info->{'junior_school_graduated_year'} && (@self::isEmpty($info->{'remark'})))
+                            array_push($message, '初中毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。');
+                        unset($valid);
+                        $valid = new Between(['min' => 1, 'max' => 12]);
+                        if(!$valid->isValid($info->{'junior_class'}) || !is_integer($info->{'junior_class'}))
+                            array_push($message, '初中班级号不正确！请检查您的初中班级号是否为1-12之间的任何一个整数。');
+                    }
+                    if(count((array)$info)!=5)
+                        array_push($message, '您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。');
+                    break;
                 case NFLS_SENIOR_BCA:
                 
                 case NFLS_SENIOR_IB:
