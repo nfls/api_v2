@@ -38,7 +38,7 @@ class AlumniController extends Controller
     const SCHOOL_NO = 1;
     const ENTER_YAER = 2;
     const GRADUATED_YEAR = 3;
-    
+    const SCHOOL_NAME = 4;
     //const ERR_STRUCTURE =  TO-DO: Add language
     function AuthUpdate(Request $request,$step){
         if(is_numeric($step)==true){
@@ -108,14 +108,39 @@ class AlumniController extends Controller
 
     function EmptyCheck($type,$info,$name,&$message)
     {
-        if(self::isEmpty($info)){
-            array_push($message, '请填写您所就读的'.$name.'全名。请不要使用任何简写。');
-            return true;
+        switch($type){
+            case self::SCHOOL_NO:
+                if(self::isEmpty($info)){
+                    array_push($message, '请选择您所就读的'.$name.'。');
+                    return false;
+                }
+                break;
+            case self::ENTER_YAER:
+                if(self::isEmpty($info)){
+                    array_push($message, '请填写您'.$name.'的入学年份。');
+                    return false;
+                }
+                break;
+            case self::GRADUATED_YEAR:
+                if(self::isEmpty($info)){
+                    array_push($message, '请填写您'.$name.'的毕业年份。');
+                    return false;
+                }
+                break;
+            case self::SCHOOL_NAME:
+                if(self::isEmpty($info)){
+                    array_push($message, '请填写您所就读的'.$name.'全名。请不要使用任何简写。');
+                    return false;
+                }
+                break;
         }
-        else return false;
+        return true;
     }
 
-    function SchoolYear
+    function SchoolYear()
+    {
+
+    }
     //auth data
     function AuthStep2($info)
     {
@@ -128,26 +153,16 @@ class AlumniController extends Controller
                 primary_school_graduated_year：毕业年份
                 remark：备注
         */
-        if(!@self::SchoolIdEmptyCheck($info->primary_school,"小学",$message))
+        if(!@self::EmptyCheck(self::SCHOOL_NO,$info->primary_school,"小学",$message))
         {
             switch($info->primary_school)
             {
                 case self::OTHER_PRIMARY:
-                    if(@self::isEmpty($info->primary_school_name))
-                        array_push($message, '请填写您所就读的小学全名。请不要使用任何简写。');
+                    @self::EmptyCheck(self::SCHOOL_NAME,$info->primary_enter_year,"小学",$message);
                     break;
                 case self::NFLS_PRIMARY:
-                    $passed = true;
-                    if(@self::isEmpty($info->primary_school_enter_year))
-                    {
-                        array_push($message, '请填写您小学的入学年份。');
-                        $passed = false;
-                    }
-                    if(@self::isEmpty($info->primary_school_graduated_year))
-                    {
-                        array_push($message, '请填写您小学的毕业年份。'); 
-                        $passed = false;
-                    }
+                    $passed = @self::EmptyCheck(self::ENTER_YAER,$info->primary_enter_year,"小学",$message);
+                    $passed = @self::EmptyCheck(self::GRADUATED_YEAR,$info->primary_graduated_year,"小学",$message);
                     if($passed)
                     {
                         $valid  = new Between(['min' => 1963, 'max' => 1982]);//enter before 1979
