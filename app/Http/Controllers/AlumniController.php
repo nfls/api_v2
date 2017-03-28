@@ -40,6 +40,13 @@ class AlumniController extends Controller
     const GRADUATED_YEAR = 3;
     const SCHOOL_NAME = 4;
     //const ERR_STRUCTURE =  TO-DO: Add language
+
+    const SCHOOL_START_YEAR = 1963;
+    const PRIMARY_END_YEAR = 1979;
+    const IB_START_YEAR = 2011;
+    const ALEVEL_START_YEAR = 2000; // Not Sure.
+    const BCA_START_YEAR = 2000;
+    const AUSTRALIA_START_YEAR = 2000;
     function AuthUpdate(Request $request,$step){
         if(is_numeric($step)==true){
             $id = UserCenterController::GetUserId(Cookie::get('token'));
@@ -137,9 +144,17 @@ class AlumniController extends Controller
         return true;
     }
 
-    function SchoolYear()
+    function SchoolYearCheck($enter_year,$graduated_year,$minimum_year,$maximum_year,$interval,$remark,$name,&$message)
     {
-
+        $valid = new Between(['min' => $minimum_year, 'max' => $maximum_year]);
+        if(!$valid->isValid($enter_year) || !is_integer($enter_year))
+            array_push($message, $name.'入学年份不正确！请检查您的入学年份，并请不要输入非数字内容。');
+        unset($valid);
+        $valid = new Between(['min' => $minimum_year + $interval, 'max' => $maximum_year + $interval]);
+        if(!$valid->isValid($info->primary_school_graduated_year) || !is_integer($info->primary_school_graduated_year))
+            array_push($message, $name.'毕业年份不正确！请检查您的毕业年份，并请不要输入非数字内容。');
+        if($enter_year + $interval != $graduated_year && (@self::isEmpty($remark)))
+            array_push($message, $name.'毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。');
     }
     //auth data
     function AuthStep2($info)
@@ -164,15 +179,7 @@ class AlumniController extends Controller
                     $passed = @self::EmptyCheck(self::ENTER_YAER,$info->primary_enter_year,"小学",$message);
                     $passed = @self::EmptyCheck(self::GRADUATED_YEAR,$info->primary_graduated_year,"小学",$message);
                     if($passed)
-                    {
-                        $valid  = new Between(['min' => 1963, 'max' => 1982]);//enter before 1979
-                        if(!$valid->isValid($info->primary_school_enter_year) || !is_integer($info->primary_school_enter_year))
-                            array_push($message, '小学入学年份不正确！请检查您的入学年份。此项仅支持1979年之前入学校友填写，并请不要输入非数字内容。');
-                        if(!$valid->isValid($info->primary_school_graduated_year) || !is_integer($info->primary_school_graduated_year))
-                            array_push($message, '小学毕业年份不正确！请检查您的毕业年份。此项仅支持1979年之前入学校友填写，并请不要输入非数字内容。');
-                        if($info->primary_school_enter_year + 4 != $info->primary_school_graduated_year && (@self::isEmpty($info->remark)))
-                            array_push($message, '小学毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。');
-                    }
+                        self::SchoolYearCheck($info->primary_school_enter_year,$info->primary_school_graduated_year,self::SCHOOL_START_YEAR,self::PRIMARY_END_YEAR,4,$info->remark,"小学",$message);
                     break;
                 default:
                     array_push($message,'小学信息不正确！请重新选择。');
