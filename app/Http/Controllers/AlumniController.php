@@ -39,6 +39,7 @@ class AlumniController extends Controller
     const ENTER_YAER = 2;
     const GRADUATED_YEAR = 3;
     const SCHOOL_NAME = 4;
+    const CLASS_NO = 5;
     //const ERR_STRUCTURE =  TO-DO: Add language
 
     const SCHOOL_START_YEAR = 1963;
@@ -47,6 +48,10 @@ class AlumniController extends Controller
     const ALEVEL_START_YEAR = 2000; // Not Sure.
     const BCA_START_YEAR = 2000;
     const AUSTRALIA_START_YEAR = 2000;
+    /*
+    const JUNIOR_END_YEAR = date('Y') - 6;
+    const SENIOR_END_YEAR = date('Y') - 3;
+    */
     function AuthUpdate(Request $request,$step){
         if(is_numeric($step)==true){
             $id = UserCenterController::GetUserId(Cookie::get('token'));
@@ -140,28 +145,47 @@ class AlumniController extends Controller
                     return false;
                 }
                 break;
+            case self::CLASS_NO:
+                if(self::isEmpty($info)){
+                    array_push($message, '请填写您的'.$name.'初中班级号。');
+                    return false;
+                }
+                break;
         }
         return true;
     }
+
+    function ClassNoCheck($info,$min,$max,$name,&$message)
+    {
+    $valid = new Between(['min' => $min, 'max' => $max]);
+    if(!$valid->isValid($info) || !is_integer($info))
+        array_push($message, $name.'班级号不正确。');
+
+    }
+
 
     function SchoolYearCheck($enter_year,$graduated_year,$minimum_year,$maximum_year,$interval,$remark,$name,&$message)
     {
         $valid = new Between(['min' => $minimum_year, 'max' => $maximum_year]);
         if(!$valid->isValid($enter_year) || !is_integer($enter_year))
-            array_push($message, $name.'入学年份不正确！请检查您的入学年份，并请不要输入非数字内容。');
+            array_push($message, $name.'入学年份不正确。');
         unset($valid);
         $valid = new Between(['min' => $minimum_year + $interval, 'max' => $maximum_year + $interval]);
         if(!$valid->isValid($graduated_year) || !is_integer($graduated_year))
-            array_push($message, $name.'毕业年份不正确！请检查您的毕业年份，并请不要输入非数字内容。');
+            array_push($message, $name.'毕业年份不正确。');
         if($enter_year + $interval != $graduated_year && (@self::isEmpty($remark)))
             array_push($message, $name.'毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。');
     }
 
+    function StructureCheck($info,$count,&$message)
+    {
+        if(count((array)$info)!=$count)
+            array_push($message, '您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。');
+    }
 
     //auth data
     function AuthStep2($info)
     {
-
         $message = array();
         /*
             JSON格式：
@@ -170,20 +194,22 @@ class AlumniController extends Controller
                 primary_school_enter_year：入学年份
                 primary_school_graduated_year：毕业年份
                 remark：备注
-        */
-                
+        */         
         if(@self::EmptyCheck(self::SCHOOL_NO,$info->primary_school,"小学",$message))
         {
+            //两年毕业 ！！！
             switch($info->primary_school)
             {
                 case self::OTHER_PRIMARY:
-                    @self::EmptyCheck(self::SCHOOL_NAME,$info->primary_school_enter_year,"小学",$message);
+                    @self::EmptyCheck(self::SCHOOL_NAME,$info->primary_school_name,"小学",$message);
+                    self::StructureCheck($info,2,$message);
                     break;
                 case self::NFLS_PRIMARY:
                     $passed = @self::EmptyCheck(self::ENTER_YAER,$info->primary_school_enter_year,"小学",$message);
                     $passed = @self::EmptyCheck(self::GRADUATED_YEAR,$info->primary_school_graduated_year,"小学",$message);
                     if($passed)
                         @self::SchoolYearCheck($info->primary_school_enter_year,$info->primary_school_graduated_year,self::SCHOOL_START_YEAR,self::PRIMARY_END_YEAR,4,$info->remark,"小学",$message);
+                    self::StructureCheck($info,4,$message);
                     break;
                 default:
                     array_push($message,'小学信息不正确！请重新选择。');
@@ -205,54 +231,23 @@ class AlumniController extends Controller
                 junior_class：班级号
                 remark：备注
         */
-        if(@self::isEmpty($info->junior_school))
-            array_push($message,'请选择您所就读的初中。');
-        else
+        if(@self::EmptyCheck(self::SCHOOL_NO,$info->junior_school,"初中",$message))
         {
             switch($info->junior_school)
             {
                 case self::OTHER_JUNIOR:
-                    if(@self::isEmpty($info->junior_school_name))
-                        array_push($message, '请填写您所就读的初中全名。请不要使用任何简写。');
-                    if(count((array)$info)!=3)
-                        array_push($message, '您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。');
-                    break;
+                    @self::EmptyCheck(self::SCHOOL_NAME,$info->junior_school_name,"初中",$message);
+                    self::StructureCheck($info,3,$message);
                 case self::NFLS_JUNIOR:
-                    $passed = true;
-                    if(@self::isEmpty($info->junior_school_enter_year))
-                    {
-                        array_push($message, '请填写您初中的入学年份。');
-                        $passed = false;
-                    }
-                    if(@self::isEmpty($info->junior_school_graduated_year))
-                    {
-                        array_push($message, '请填写您初中的毕业年份。'); 
-                        $passed = false;
-                    }
-                    if(@self::isEmpty($info->junior_class))
-                    {
-                        array_push($message, '请填写您初中的班级号。'); 
-                        $passed = false;
-                    }
+                    $passed = @self::EmptyCheck(self::SCHOOL_START_YEAR,$info->junior_school_enter_year,"初中",$message);
+                    $passed = @self::EmptyCheck(self::SCHOOL_START_YEAR,$info->junior_school_graduated_year,"初中",$message);
+                    $passed = @self::EmptyCheck(self::CLASS_NO,$info->junior_class,"初中",$message);
                     if($passed)
                     {
-                        $valid  = new Between(['min' => 1963, 'max' => date('Y') - 6]);
-                        if(!$valid->isValid($info->junior_school_enter_year) || !is_int($info->junior_school_enter_year))
-                            array_push($message, '初中入学年份不正确！请检查您的入学年份。目前允许的最大年份为'.(String)(date('Y') - 6).'年');
-                        unset($valid);
-                        $valid  = new Between(['min' => 1963, 'max' => date('Y') - 3]);
-                        if(!$valid->isValid($info->junior_school_graduated_year) || !is_integer($info->junior_school_graduated_year))
-                            array_push($message, '初中毕业年份不正确！请检查您的毕业年份。目前允许的最大年份为'.(String)(date('Y') - 3).'年');
-                        if($info->junior_school_enter_year + 3 != $info->junior_school_graduated_year && (@self::isEmpty($info->remark)))
-                            array_push($message, '初中毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。');
-                        unset($valid);
-                        $valid = new Between(['min' => 1, 'max' => 12]);
-                        if(!$valid->isValid($info->junior_class) || !is_integer($info->junior_class))
-                            array_push($message, '初中班级号不正确！请检查您的初中班级号是否为1-12之间的任何一个整数。');
+                        @self::SchoolYearCheck($info->junior_school_enter_year,$info->junior_school_graduated_year,self::SCHOOL_START_YEAR,date('Y') - 6,3,$info->remark,"初中",$message);
+                        @self::ClassNoCheck($info->junior_class,1,12,"初中",$message);
                     }
-                    if(count((array)$info)!=5)
-                        array_push($message, '您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。');
-                    break;
+                    self::StructureCheck($info,5,$message);
                 default:
                     array_push($message,'初中信息不正确！请重新选择。');
                     break;
