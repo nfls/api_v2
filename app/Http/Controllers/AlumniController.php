@@ -63,15 +63,15 @@ class AlumniController extends Controller
 
                 case self::PRIMARY_INFO:
                     $message = self::AuthStep2($info);
-                    return self::DataCheck($message,$id,$content,'primary_info');
+                    return self::DataCheck($message,$id,$info,'primary_info');
                     break;
                 case self::JUNIOR_INFO:
                     $message = self::AuthStep3($info);
-                    return self::DataCheck($message,$id,$content,'junior_info');
+                    return self::DataCheck($message,$id,$info,'junior_info');
                     break;
                 case self::SENIOR_INFO:
                     $message = self::AuthStep4($info);
-                    return self::DataCheck($message,$id,$content,'senior_info');
+                    return self::DataCheck($message,$id,$info,'senior_info');
                     break;
             }
         }
@@ -94,7 +94,7 @@ class AlumniController extends Controller
         {
             array_push($message,'恭喜您，所有当前的数据均符合要求！');
             if($insert)
-                DB::connection('mysql_alumni')->table($name)->where('id', $id)->update(['junior_school' => $content]);
+                //DB::connection('mysql_alumni')->table($name)->where('id', $id)->update(['junior_school' => $content]);
             return Response::json(array('code' => '200', 'message' => $message));
         }
         else
@@ -151,14 +151,17 @@ class AlumniController extends Controller
             array_push($message, $name.'入学年份不正确！请检查您的入学年份，并请不要输入非数字内容。');
         unset($valid);
         $valid = new Between(['min' => $minimum_year + $interval, 'max' => $maximum_year + $interval]);
-        if(!$valid->isValid($info->primary_school_graduated_year) || !is_integer($info->primary_school_graduated_year))
+        if(!$valid->isValid($graduated_year) || !is_integer($graduated_year))
             array_push($message, $name.'毕业年份不正确！请检查您的毕业年份，并请不要输入非数字内容。');
         if($enter_year + $interval != $graduated_year && (@self::isEmpty($remark)))
             array_push($message, $name.'毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。');
     }
+
+
     //auth data
     function AuthStep2($info)
     {
+
         $message = array();
         /*
             JSON格式：
@@ -168,18 +171,19 @@ class AlumniController extends Controller
                 primary_school_graduated_year：毕业年份
                 remark：备注
         */
-        if(!@self::EmptyCheck(self::SCHOOL_NO,$info->primary_school,"小学",$message))
+                
+        if(@self::EmptyCheck(self::SCHOOL_NO,$info->primary_school,"小学",$message))
         {
             switch($info->primary_school)
             {
                 case self::OTHER_PRIMARY:
-                    @self::EmptyCheck(self::SCHOOL_NAME,$info->primary_enter_year,"小学",$message);
+                    @self::EmptyCheck(self::SCHOOL_NAME,$info->primary_school_enter_year,"小学",$message);
                     break;
                 case self::NFLS_PRIMARY:
-                    $passed = @self::EmptyCheck(self::ENTER_YAER,$info->primary_enter_year,"小学",$message);
-                    $passed = @self::EmptyCheck(self::GRADUATED_YEAR,$info->primary_graduated_year,"小学",$message);
+                    $passed = @self::EmptyCheck(self::ENTER_YAER,$info->primary_school_enter_year,"小学",$message);
+                    $passed = @self::EmptyCheck(self::GRADUATED_YEAR,$info->primary_school_graduated_year,"小学",$message);
                     if($passed)
-                        self::SchoolYearCheck($info->primary_school_enter_year,$info->primary_school_graduated_year,self::SCHOOL_START_YEAR,self::PRIMARY_END_YEAR,4,$info->remark,"小学",$message);
+                        @self::SchoolYearCheck($info->primary_school_enter_year,$info->primary_school_graduated_year,self::SCHOOL_START_YEAR,self::PRIMARY_END_YEAR,4,$info->remark,"小学",$message);
                     break;
                 default:
                     array_push($message,'小学信息不正确！请重新选择。');
