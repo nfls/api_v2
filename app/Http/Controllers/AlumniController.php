@@ -57,6 +57,10 @@ class AlumniController extends Controller
     function AuthUpdate(Request $request,$step){
         if(is_numeric($step)==true){
             $id = UserCenterController::GetUserId(Cookie::get('token'));
+            if($id<0)
+            {
+                return Response::json(array("code"=>"23333"));
+            }
             $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
             if(is_null($user))
                 self::InsertId($id);

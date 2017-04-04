@@ -10,7 +10,7 @@ class UserCenterController extends Controller
     public static function GetUserId($token){
     	$user = DB::connection("mysql_user")->table("user_list")->where("token", $token)->first();
     	if(is_null($user))
-    		return false;
+    		return -1;
     	return $user->id;
     }
 
@@ -22,5 +22,9 @@ class UserCenterController extends Controller
     public static function GetUserEmail($id){
     	$user = DB::connection("mysql_forum")->table("nfls_users")->where("id", $id)->first();
     	return $user->email;
+    }
+
+        
+        
     }
 }
