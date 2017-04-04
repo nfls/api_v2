@@ -46,9 +46,10 @@ class AlumniController extends Controller
     const SCHOOL_START_YEAR = 1963;
     const PRIMARY_END_YEAR = 1979;
     const IB_START_YEAR = 2011;
-    const ALEVEL_START_YEAR = 2000; // Not Sure.
-    const BCA_START_YEAR = 2000;
-    const AUSTRALIA_START_YEAR = 2000;
+    const ALEVEL_4_START_YEAR = 2006;
+    const ALEVEL_2_START_YEAR = 2011;
+    const BCA_START_YEAR = 2002;
+    const AUSTRALIA_START_YEAR = 2007;
     /*
     const JUNIOR_END_YEAR = date('Y') - 6;
     const SENIOR_END_YEAR = date('Y') - 3;
@@ -94,13 +95,13 @@ class AlumniController extends Controller
         $return_array['id'] = $id;
     }
 
-    function DataCheck($message,$name,$id,$content,$insert=true)
+    function DataCheck($message,$id,$content,$name,$insert=true)
     {
         if(empty($message))
         {
             array_push($message,'恭喜您，所有当前的数据均符合要求！');
             if($insert)
-                //DB::connection('mysql_alumni')->table($name)->where('id', $id)->update(['junior_school' => $content]);
+                DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => $content]);
             return Response::json(array('code' => '200', 'message' => $message));
         }
         else
@@ -115,9 +116,11 @@ class AlumniController extends Controller
         return @(is_null($content)|| empty($content));
     }
 
-    function InsertId($id){
+    function InsertId($id)
+    {
         DB::connection('mysql_alumni')->table('user_auth')->insert(['id' => $id]);
     }
+
 
     function EmptyCheck($type,$info,$name,&$message)
     {
@@ -185,6 +188,13 @@ class AlumniController extends Controller
     }
 
     //auth data
+
+    function AuthStep1($info)
+    {
+        /*
+            JSON格式：
+                */
+    }
     function AuthStep2($info)
     {
         $message = array();
@@ -280,7 +290,7 @@ class AlumniController extends Controller
                 senior_class_22：班级号（高二下）
                 senior_class_31：班级号（高三上）
                 senior_class_32：班级号（高三下）
-                graduate_info: 1[保送] 2[高考] 3[提前高考] 4[出国] 5[提前出国]
+                graduate_info: 1[保送] 2[高考] 3[提前高考] 4[出国] 5[提前出国] 6[其他]
                 remark：备注
         */
         if(@self::isEmpty($info->senior_school))
@@ -314,6 +324,7 @@ class AlumniController extends Controller
                     }
                     self::StructureCheck($info,10,$message);
                     break;
+                /*
                 case NFLS_SENIOR_AUSTRALIA:
                     $passed = self::EmptyCheck(self::ENTER_YAER,$info->senior_school_enter_year,"高中",$message);
                     $passed = self::EmptyCheck(self::GRADUATED_YEAR,$info->senior_school_graduated_year,"高中",$message);
@@ -321,20 +332,45 @@ class AlumniController extends Controller
                         @self::SchoolYearCheck($info->senior_school_enter_year,$info->senior_school_graduated_year,self::SCHOOL_START_YEAR,date('Y') - 3,3,$info->remark,"高中",$message);
                     self::StructureCheck($info,4,$message);
                     break;
+                */
                 case NFLS_SENIOR_ALEVEL:
+                    $passed = self::EmptyCheck(self::ENTER_YAER,$info->senior_school_enter_year,"高中",$message);
+                    $passed = self::EmptyCheck(self::GRADUATED_YEAR,$info->senior_school_graduated_year,"高中",$message);
+                    if($passed)
+                    {
+                        if($info->senior_school_enter_year>self::ALEVEL_2_START_YEAR)
+                        {
+                            @self::SchoolYearCheck($info->senior_school_enter_year,$info->senior_school_graduated_year,self::ALEVEL_2_START_YEAR,date('Y') - 3,3,$info->remark,"高中",$message);
+                            @self::ClassNoCheck($info->junior_class,1,2,"高中",$message);
+                        }
+                        else
+                        {
+                            @self::SchoolYearCheck($info->senior_school_enter_year,$info->senior_school_graduated_year,self::ALEVEL_4_START_YEAR,date('Y') - 3,3,$info->remark,"高中",$message);
+                            @self::ClassNoCheck($info->junior_class,1,4,"高中",$message);
+                        }
+                    }
+                    self::StructureCheck($info,5,$message);
+                    break;
                 case NFLS_SENIOR_IB:
                     $passed = self::EmptyCheck(self::ENTER_YAER,$info->senior_school_enter_year,"高中",$message);
                     $passed = self::EmptyCheck(self::GRADUATED_YEAR,$info->senior_school_graduated_year,"高中",$message);
                     if($passed)
                     {
-                        @self::SchoolYearCheck($info->senior_school_enter_year,$info->senior_school_graduated_year,self::SCHOOL_START_YEAR,date('Y') - 3,3,$info->remark,"高中",$message);
-                        @self::ClassNoCheck($info->junior_class,1,4,"高中",$message);
+                        @self::SchoolYearCheck($info->senior_school_enter_year,$info->senior_school_graduated_year,self::IB_START_YEAR,date('Y') - 3,3,$info->remark,"高中",$message);
+                        @self::ClassNoCheck($info->junior_class,1,2,"高中",$message);
                     }
                     self::StructureCheck($info,5,$message);
                     break;
                 case NFLS_SENIOR_BCA:
-                    
-                
+                    $passed = self::EmptyCheck(self::ENTER_YAER,$info->senior_school_enter_year,"高中",$message);
+                    $passed = self::EmptyCheck(self::GRADUATED_YEAR,$info->senior_school_graduated_year,"高中",$message);
+                    if($passed)
+                    {
+                        @self::SchoolYearCheck($info->senior_school_enter_year,$info->senior_school_graduated_year,self::BCA_START_YEAR,date('Y') - 3,3,$info->remark,"高中",$message);
+                        @self::ClassNoCheck($info->junior_class,1,6,"高中",$message);
+                    }
+                    self::StructureCheck($info,5,$message);
+                    break;
                 default:
                     array_push($message,'高中信息不正确！请重新选择。');
                     break;
