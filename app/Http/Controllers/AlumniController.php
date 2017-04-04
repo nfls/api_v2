@@ -16,7 +16,8 @@ class AlumniController extends Controller
     const IN_PROGRESS = 1;
     const FINISHED = 2;
 
-    const NFLS_PRIMARY = 1;
+    const NFLS_PRIMARY_4 = 1;
+    const NFLS_PRIMARY_2 = 1;
     const OTHER_PRIMARY = -1;
 
     const NFLS_JUNIOR = 1;
@@ -204,7 +205,14 @@ class AlumniController extends Controller
                     @self::EmptyCheck(self::SCHOOL_NAME,$info->primary_school_name,"小学",$message);
                     self::StructureCheck($info,2,$message);
                     break;
-                case self::NFLS_PRIMARY:
+                case self::NFLS_PRIMARY_2:
+                    $passed = @self::EmptyCheck(self::ENTER_YAER,$info->primary_school_enter_year,"小学",$message);
+                    $passed = @self::EmptyCheck(self::GRADUATED_YEAR,$info->primary_school_graduated_year,"小学",$message);
+                    if($passed)
+                        @self::SchoolYearCheck($info->primary_school_enter_year,$info->primary_school_graduated_year,self::SCHOOL_START_YEAR,self::PRIMARY_END_YEAR,4,$info->remark,"小学",$message);
+                    self::StructureCheck($info,2,$message);
+                    break;
+                case self::NFLS_PRIMARY_4:
                     $passed = @self::EmptyCheck(self::ENTER_YAER,$info->primary_school_enter_year,"小学",$message);
                     $passed = @self::EmptyCheck(self::GRADUATED_YEAR,$info->primary_school_graduated_year,"小学",$message);
                     if($passed)
@@ -288,96 +296,41 @@ class AlumniController extends Controller
                 case self::NFLS_SENIOR_GENERAL:
                     $passed = self::EmptyCheck(self::ENTER_YAER,$info->senior_school_enter_year,"高中",$message);
                     $passed = self::EmptyCheck(self::GRADUATED_YEAR,$info->senior_school_graduated_year,"高中",$message);
-                    $passed = self::EmptyCheck(self::CLASS_NO,$info->senior_class_11,"高中",$message);
-                    $passed = self::EmptyCheck(self::CLASS_NO,$info->senior_class_12,"高中",$message);
-                    $passed = self::EmptyCheck(self::CLASS_NO,$info->senior_class_21,"高中",$message);
-                    $passed = self::EmptyCheck(self::CLASS_NO,$info->senior_class_22,"高中",$message);
-                    $passed = self::EmptyCheck(self::CLASS_NO,$info->senior_class_31,"高中",$message);
-                    $passed = self::EmptyCheck(self::CLASS_NO,$info->senior_class_32,"高中",$message);
+                    $passed = self::EmptyCheck(self::CLASS_NO,$info->senior_class_11,"高一上",$message);
+                    $passed = self::EmptyCheck(self::CLASS_NO,$info->senior_class_12,"高一下",$message);
+                    $passed = self::EmptyCheck(self::CLASS_NO,$info->senior_class_21,"高二上",$message);
+                    $passed = self::EmptyCheck(self::CLASS_NO,$info->senior_class_22,"高二下",$message);
+                    $passed = self::EmptyCheck(self::CLASS_NO,$info->senior_class_31,"高三上",$message);
+                    $passed = self::EmptyCheck(self::CLASS_NO,$info->senior_class_32,"高三下",$message);
                     if($passed)
                     {
-                        @self::SchoolYearCheck($info->senior_school_enter_year,$info->senior_school_graduated_year,self::SCHOOL_START_YEAR,date('Y') - 3,3,$info->remark,"高中",$message);
-                        $valid = new Between(['min' => 0, 'max' => 8]);
-                        if(!$valid->isValid($info->senior_class_11) || !is_integer($info->senior_class_11))
-                            array_push($message, '高一上班级号不正确！请检查您的高一上班级号是否为1-8之间的任何一个整数。');
-                        if(!$valid->isValid($info->senior_class_12) || !is_integer($info->senior_class_12))
-                            array_push($message, '高一下班级号不正确！请检查您的高一下班级号是否为1-8之间的任何一个整数。');
-                        if(!$valid->isValid($info->senior_class_21) || !is_integer($info->senior_class_21))
-                            array_push($message, '高二上班级号不正确！请检查您的高二上班级号是否为1-8之间的任何一个整数。');
-                        if(!$valid->isValid($info->senior_class_22) || !is_integer($info->senior_class_22))
-                            array_push($message, '高二下班级号不正确！请检查您的高二下班级号是否为1-8之间的任何一个整数。');
-                        if(!$valid->isValid($info->senior_class_31) || !is_integer($info->senior_class_31))
-                            array_push($message, '高三上班级号不正确！请检查您的高三上班级号是否为1-8之间的任何一个整数。');
-                        if(!$valid->isValid($info->senior_class_32) || !is_integer($info->senior_class_32))
-                            array_push($message, '高三下班级号不正确！请检查您的高三下班级号是否为1-8之间的任何一个整数。');
+                        @self::SchoolYearCheck($info->senior_school_enter_year,$info->senior_school_graduated_year,self::SCHOOL_START_YEAR,date('Y') - 3,3,$info->remark,"高中",$message);//
+                        @self::ClassNoCheck($info->senior_class_11,1,8,"高一上",$message);
+                        @self::ClassNoCheck($info->senior_class_12,0,8,"高一下",$message);
+                        @self::ClassNoCheck($info->senior_class_21,0,8,"高二上",$message);
+                        @self::ClassNoCheck($info->senior_class_22,0,8,"高二下",$message);
+                        @self::ClassNoCheck($info->senior_class_31,0,8,"高三上",$message);
+                        @self::ClassNoCheck($info->senior_class_32,0,8,"高三下",$message);
                     }
-                    if(count((array)$info)!=10)
-                        array_push($message, '您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。');
+                    self::StructureCheck($info,10,$message);
                     break;
                 case NFLS_SENIOR_AUSTRALIA:
-                    $passed = true;
-                    if(@self::isEmpty($info->senior_school_enter_year))
-                    {
-                        array_push($message, '请填写您高中的入学年份。');
-                        $passed = false;
-                    }
-                    if(@self::isEmpty($info->senior_school_graduated_year))
-                    {
-                        array_push($message, '请填写您高中的毕业年份。'); 
-                        $passed = false;
-                    }
+                    $passed = self::EmptyCheck(self::ENTER_YAER,$info->senior_school_enter_year,"高中",$message);
+                    $passed = self::EmptyCheck(self::GRADUATED_YEAR,$info->senior_school_graduated_year,"高中",$message);
                     if($passed)
-                    {
-                        $valid  = new Between(['min' => 1963, 'max' => 2010]);
-                        if(!$valid->isValid($info->senior_school_enter_year) || !is_int($info->senior_school_enter_year))
-                            array_push($message, '高中入学年份不正确！请检查您的入学年份。目前允许的最大年份为2010年');
-                        unset($valid);
-                        $valid  = new Between(['min' => 1963, 'max' => 2013]);
-                        if(!$valid->isValid($info->senior_school_graduated_year) || !is_int($info->senior_school_graduated_year))
-                            array_push($message, '高中入学年份不正确！请检查您的入学年份。目前允许的最大年份为2013年');
-                        unset($valid);
-                        if($info->senior_school_enter_year + 3 != $info->senior_school_graduated_year && (@self::isEmpty($info->remark)))
-                            array_push($message, '高中毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。');
-                    }
-                    if(count((array)$info)!=4)
-                        array_push($message, '您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。');
+                        @self::SchoolYearCheck($info->senior_school_enter_year,$info->senior_school_graduated_year,self::SCHOOL_START_YEAR,date('Y') - 3,3,$info->remark,"高中",$message);
+                    self::StructureCheck($info,4,$message);
                     break;
                 case NFLS_SENIOR_ALEVEL:
                 case NFLS_SENIOR_IB:
-                    $passed = true;
-                    if(@self::isEmpty($info->junior_school_enter_year))
-                    {
-                        array_push($message, '请填写您高中的入学年份。');
-                        $passed = false;
-                    }
-                    if(@self::isEmpty($info->junior_school_graduated_year))
-                    {
-                        array_push($message, '请填写您高中的毕业年份。'); 
-                        $passed = false;
-                    }
-                    if(@self::isEmpty($info->junior_class))
-                    {
-                        array_push($message, '请填写您高中的班级号。'); 
-                        $passed = false;
-                    }
+                    $passed = self::EmptyCheck(self::ENTER_YAER,$info->senior_school_enter_year,"高中",$message);
+                    $passed = self::EmptyCheck(self::GRADUATED_YEAR,$info->senior_school_graduated_year,"高中",$message);
                     if($passed)
                     {
-                        $valid  = new Between(['min' => 1963, 'max' => date('Y') - 3]);
-                        if(!$valid->isValid($info->junior_school_enter_year) || !is_int($info->junior_school_enter_year))
-                            array_push($message, '高中入学年份不正确！请检查您的入学年份。目前允许的最大年份为'.(String)(date('Y') - 3).'年');
-                        unset($valid);
-                        $valid  = new Between(['min' => 1963, 'max' => date('Y') - 3]);
-                        if(!$valid->isValid($info->junior_school_graduated_year) || !is_integer($info->junior_school_graduated_year))
-                            array_push($message, '高中毕业年份不正确！请检查您的毕业年份。目前允许的最大年份为'.(String)(date('Y') - 3).'年');
-                        if($info->junior_school_enter_year + 3 != $info->junior_school_graduated_year && (@self::isEmpty($info->remark)))
-                            array_push($message, '高中毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。');
-                        unset($valid);
-                        $valid = new Between(['min' => 1, 'max' => 4]);
-                        if(!$valid->isValid($info->junior_class) || !is_integer($info->junior_class))
-                            array_push($message, '高中班级号不正确！请检查您的高中班级号是否为1-4之间的任何一个整数。');
+                        @self::SchoolYearCheck($info->senior_school_enter_year,$info->senior_school_graduated_year,self::SCHOOL_START_YEAR,date('Y') - 3,3,$info->remark,"高中",$message);
+                        @self::ClassNoCheck($info->junior_class,1,4,"高中",$message);
                     }
-                    if(count((array)$info)!=5)
-                        array_push($message, '您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。');
+                    self::StructureCheck($info,5,$message);
                     break;
                 case NFLS_SENIOR_BCA:
                     
