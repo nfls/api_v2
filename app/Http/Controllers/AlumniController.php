@@ -27,7 +27,7 @@ class AlumniController extends Controller
     const NFLS_SENIOR_IB = 2;
     const NFLS_SENIOR_ALEVEL = 3;
     const NFLS_SENIOR_BCA = 4;
-    const NFLS_SENIOR_AUSTRALIA = 5; //No longer exist after 201?
+    const NFLS_SENIOR_AUSTRALIA = 5;
     const OTHER_SENIOR = -1;
     const NO_SENIOR = -2;
 
@@ -50,11 +50,8 @@ class AlumniController extends Controller
     const ALEVEL_2_START_YEAR = 2011;
     const BCA_START_YEAR = 2002;
     const AUSTRALIA_START_YEAR = 2007;
+    const AUSTRALIA_END_YEAR = 2012;
 
-    /*
-    const JUNIOR_END_YEAR = date('Y') - 6;
-    const SENIOR_END_YEAR = date('Y') - 3;
-    */
     function AuthUpdate(Request $request, $step)
     {
         if (is_numeric($step) == true) {
@@ -194,6 +191,21 @@ class AlumniController extends Controller
     {
         /*
             JSON格式：
+                username：用户名
+                email：邮箱
+                realname：真实姓名
+                phone_domestic：中国手机号
+                phone_international：外国手机号（含区号）［二选一］
+                nickname：英文名或绰号
+                birthday：出生日期
+                gender：性别
+                ［选填内容，至少填一个］
+                wechat：微信号
+                qq：QQ号
+                telegram：telegram账户
+                whatsapp：whatsapp账户
+        ...TO-DO：ADD MORE
+
         */
     }
 
