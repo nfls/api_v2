@@ -110,10 +110,11 @@ class AlumniController extends Controller
         $return_array = array();
         $return_array['id'] = self::getUser(Cookie::get('token'));
         $return_array['code']=200;
+        $return_array['message']="一切正常";
         switch ($step) {
             case 1:
-                $return_array['email']=UserCenterController::GetUserEmail($return_array['id']);
-                $return_array['nickname']=UserCenterController::GetUserNickname($return_array['id']);
+                $return_array['info']['email']=UserCenterController::GetUserEmail($return_array['id']);
+                $return_array['info']['username']=UserCenterController::GetUserNickname($return_array['id']);
                 return Response::json($return_array);
             default:
                 break;
