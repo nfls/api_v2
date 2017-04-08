@@ -107,13 +107,19 @@ class AlumniController extends Controller
 
     function AuthQuery(Request $request, $step)
     {
+        $return_array = array();
+        $return_array['id'] = self::getUser(Cookie::get('token'));
+        $return_array['code']=200;
         switch ($step) {
+            case 1:
+                $return_array['email']=UserCenterController::GetUserEmail($return_array['id']);
+                $return_array['nickname']=UserCenterController::GetUserNickname($return_array['id']);
+                return Response::json($return_array);
             default:
                 break;
         }
 
-        $return_array = array();
-        $return_array['id'] = $id;
+
     }
 
     function DataCheck($message, $id, $content, $name, $insert = true)
@@ -209,24 +215,7 @@ class AlumniController extends Controller
 
     function AuthStep1($info)
     {
-        /*
-            JSON格式：
-                username：用户名
-                email：邮箱
-                realname：真实姓名
-                phone_domestic：中国手机号
-                phone_international：外国手机号（含区号）［二选一］
-                nickname：英文名或绰号
-                birthday：出生日期
-                gender：性别
-                ［选填内容，至少填一个］
-                wechat：微信号
-                qq：QQ号
-                telegram：telegram账户
-                whatsapp：whatsapp账户
-        ...TO-DO：ADD MORE
 
-        */
     }
 
     function AuthStep2($info)
@@ -400,3 +389,21 @@ class AlumniController extends Controller
     }
 }
 
+/*
+    JSON格式：
+        username：用户名
+        email：邮箱
+        realname：真实姓名
+        phone_domestic：中国手机号
+        phone_international：外国手机号（含区号）［二选一］
+        nickname：英文名或绰号
+        birthday：出生日期
+        gender：性别
+        ［选填内容，至少填一个］
+        wechat：微信号
+        qq：QQ号
+        telegram：telegram账户
+        whatsapp：whatsapp账户
+...TO-DO：ADD MORE
+
+*/
