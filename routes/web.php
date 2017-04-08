@@ -13,3 +13,4 @@
 
 Route::post('alumni/auth/{step}/update',"AlumniController@AuthUpdate");
 Route::get('alumni/auth/{step}/query',"AlumniController@AuthQuery");
+Route::get('alumni/auth/getCurrentStep',"AlumniController@getCurrentStep");

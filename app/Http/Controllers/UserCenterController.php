@@ -24,7 +24,4 @@ class UserCenterController extends Controller
     	return $user->email;
     }
 
-        
-        
-    }
 }

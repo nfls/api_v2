@@ -52,6 +52,26 @@ class AlumniController extends Controller
     const AUSTRALIA_START_YEAR = 2007;
     const AUSTRALIA_END_YEAR = 2012;
 
+
+    function getCurrentStep(Request $request)
+    {
+        $id = self::getUser(Cookie::get('token'));
+        $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
+        return Response::json(array('code' => '200', 'step' => $user->current_step));
+    }
+
+    function getUser($token)
+    {
+        $id = UserCenterController::GetUserId($token);
+        if ($id < 0) {
+            abort(403);
+            return false;
+        }
+        $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
+        if (is_null($user))
+            self::InsertId($id);
+        return $id;
+    }
     function AuthUpdate(Request $request, $step)
     {
         if (is_numeric($step) == true) {
