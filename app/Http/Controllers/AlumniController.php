@@ -41,6 +41,7 @@ class AlumniController extends Controller
     const GRADUATED_YEAR = 3;
     const SCHOOL_NAME = 4;
     const CLASS_NO = 5;
+    const OTHER = -1;
     //const ERR_STRUCTURE =  TO-DO: Add language
 
     const SCHOOL_START_YEAR = 1963;
@@ -52,12 +53,33 @@ class AlumniController extends Controller
     const AUSTRALIA_START_YEAR = 2007;
     const AUSTRALIA_END_YEAR = 2012;
 
+    const GENDER_NOT_CHOOSE = 0;
+    const GENDER_MALE = 1;
+    const GENDER_FEMALE = 2;
+    const GENDER_OTHER = 3;
 
+    const STEP1 = [
+        '填写此表格前请确认您的用户名及邮箱是否正确',
+        '生日请使用yyyy/mm/dd的格式填写，即如果你的生日在2000年1月1日，就请填写2000/01/01，注意符号为半角符号',
+        '昵称或英文名请填写在南外期间常用的，如英语课上的英文名，或者是同学之间的昵称，如有多个请用半角逗号","分割；如果更改过姓名请填写曾用名',
+        '手机号请务必填写正确，在未来可能会启用手机号验证系统',
+        '出国的同学请填写自己的国外手机号，并请加上正确的国际区号，以便联系',
+        '本页除"曾用名"项外均为必填项目，"手机号码（国外）"仅需要长期不在国内的校友（如读书或工作等）填写'
+    ];
     function getCurrentStep(Request $request)
     {
         $id = self::getUser(Cookie::get('token'));
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
-        return Response::json(array('code' => '200', 'step' => $user->current_step));
+
+        switch ($user->current_step){
+            case 1:
+                $instructions = self::STEP1;
+                break;
+            default:
+                $instructions = [];
+                break;
+        }
+        return Response::json(array('code' => '200', 'instructions'=>$instructions, 'step' => $user->current_step));
     }
 
     function getUser($token)
@@ -72,6 +94,7 @@ class AlumniController extends Controller
             self::InsertId($id);
         return $id;
     }
+
     function AuthUpdate(Request $request, $step)
     {
         if (is_numeric($step) == true) {
@@ -88,7 +111,8 @@ class AlumniController extends Controller
                 abort("404", "Check your input!");
             switch ($step) {
                 case self::BASIC_INFO:
-
+                    $message = self::AuthStep1($info);
+                    return self::DataCheck($message, $id, $info, 'personal_info');
                 case self::PRIMARY_INFO:
                     $message = self::AuthStep2($info);
                     return self::DataCheck($message, $id, $info, 'primary_info');
@@ -109,18 +133,16 @@ class AlumniController extends Controller
     {
         $return_array = array();
         $return_array['id'] = self::getUser(Cookie::get('token'));
-        $return_array['code']=200;
-        $return_array['message']="一切正常";
+        $return_array['code'] = 200;
+        $return_array['message'] = "一切正常";
         switch ($step) {
             case 1:
-                $return_array['info']['email']=UserCenterController::GetUserEmail($return_array['id']);
-                $return_array['info']['username']=UserCenterController::GetUserNickname($return_array['id']);
+                $return_array['info']['email'] = UserCenterController::GetUserEmail($return_array['id']);
+                $return_array['info']['username'] = UserCenterController::GetUserNickname($return_array['id']);
                 return Response::json($return_array);
             default:
                 break;
         }
-
-
     }
 
     function DataCheck($message, $id, $content, $name, $insert = true)
@@ -147,39 +169,50 @@ class AlumniController extends Controller
     }
 
 
-    function EmptyCheck($type, $info, $name, &$message)
+    function EmptyCheck($type, $info, $name, &$message, $addMessage = true)
     {
         switch ($type) {
             case self::SCHOOL_NO:
                 if (self::isEmpty($info)) {
-                    array_push($message, '请选择您所就读的' . $name . '。');
+                    if ($addMessage)
+                        array_push($message, '请选择您所就读的' . $name . '。');
                     return false;
                 }
                 break;
             case self::ENTER_YAER:
                 if (self::isEmpty($info)) {
-                    array_push($message, '请填写您' . $name . '的入学年份。');
+                    if ($addMessage)
+                        array_push($message, '请填写您' . $name . '的入学年份。');
                     return false;
                 }
                 break;
             case self::GRADUATED_YEAR:
                 if (self::isEmpty($info)) {
-                    array_push($message, '请填写您' . $name . '的毕业年份。');
+                    if ($addMessage)
+                        array_push($message, '请填写您' . $name . '的毕业年份。');
                     return false;
                 }
                 break;
             case self::SCHOOL_NAME:
                 if (self::isEmpty($info)) {
-                    array_push($message, '请填写您所就读的' . $name . '全名。请不要使用任何简写。');
+                    if ($addMessage)
+                        array_push($message, '请填写您所就读的' . $name . '全名。请不要使用任何简写。');
                     return false;
                 }
                 break;
             case self::CLASS_NO:
                 if (self::isEmpty($info)) {
-                    array_push($message, '请填写您的' . $name . '初中班级号。');
+                    if ($addMessage)
+                        array_push($message, '请填写您的' . $name . '初中班级号。');
                     return false;
                 }
                 break;
+            default:
+                if (self::isEmpty($info)) {
+                    if ($addMessage)
+                        array_push($message, '请填写您的' . $name . '。');
+                    return false;
+                }
         }
         return true;
     }
@@ -216,7 +249,35 @@ class AlumniController extends Controller
 
     function AuthStep1($info)
     {
+        /*
+            JSON格式：
+                username：用户名
+                email：邮箱
+                usedname：曾用名
+                realname：真实姓名
+                phone_domestic：中国手机号
+                phone_international：外国手机号（含区号）［二选一］
+                nickname：英文名或绰号
+                birthday：出生日期
+                gender：性别
+abandoned
+                ［选填内容，至少填一个］
+                wechat：微信号
+                qq：QQ号
+                telegram：telegram账户
+                whatsapp：whatsapp账户
+        ...TO-DO：ADD MORE
 
+        */
+        $message = array();
+        @self::EmptyCheck(self::OTHER, $info->realname, '真实姓名', $message);
+        @self::EmptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message);
+        @self::EmptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message);
+        @self::EmptyCheck(self::OTHER, $info->nickname, '昵称或英文名', $message);
+        @self::EmptyCheck(self::OTHER, $info->birthday, '出生日期', $message);
+        @self::EmptyCheck(self::OTHER, $info->gender, '性别', $message);
+        @self::EmptyCheck(self::OTHER, $info->usedname, '曾用名', $message, false);
+        return $message;
     }
 
     function AuthStep2($info)
@@ -390,21 +451,3 @@ class AlumniController extends Controller
     }
 }
 
-/*
-    JSON格式：
-        username：用户名
-        email：邮箱
-        realname：真实姓名
-        phone_domestic：中国手机号
-        phone_international：外国手机号（含区号）［二选一］
-        nickname：英文名或绰号
-        birthday：出生日期
-        gender：性别
-        ［选填内容，至少填一个］
-        wechat：微信号
-        qq：QQ号
-        telegram：telegram账户
-        whatsapp：whatsapp账户
-...TO-DO：ADD MORE
-
-*/
