@@ -8,6 +8,7 @@ use Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Zend\Validator\Between;
+use Zend\Validator\Date;
 use Response;
 
 class AlumniController extends Controller
@@ -271,12 +272,55 @@ abandoned
         */
         $message = array();
         @self::EmptyCheck(self::OTHER, $info->realname, '真实姓名', $message);
-        @self::EmptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message);
-        @self::EmptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message);
+        if(mb_strlen($info->realname) >=2 || mb_strlen($info->realname) <=4) {
+            $len = mb_strlen($info->realname);
+            $width = mb_strwidth($info->realname);
+            if($len*2 != $width)
+                array_push($message,'真实姓名内容不符合要求。请输入2-4个中文字符');
+        }
+        else
+        {
+            array_push($message,'真实姓名内容不符合要求。请输入2-4个中文字符');
+        }
+        if(@self::EmptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message)){
+            if(!preg_match("/^1[34578]\d{9}$/", (int)($info->phone_domestic))){
+                array_push($message, '国内手机号码不正确！');
+            }
+        }
+        if(@self::EmptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message)){
+            $phone_validate = \libphonenumber\PhoneNumberUtil::
+        }
         @self::EmptyCheck(self::OTHER, $info->nickname, '昵称或英文名', $message);
-        @self::EmptyCheck(self::OTHER, $info->birthday, '出生日期', $message);
-        @self::EmptyCheck(self::OTHER, $info->gender, '性别', $message);
-        @self::EmptyCheck(self::OTHER, $info->usedname, '曾用名', $message, false);
+        if(@self::EmptyCheck(self::OTHER, $info->birthday, '出生日期', $message)){
+            $validator = new Date(['format' => 'Y/m/d']);
+            if(!$validator->isValid($info->birthday)){
+                array_push($message,'出生日期格式不符合要求。');
+            }
+            if(date('Y',strtotime($info->birthday)) + 18 > date('Y')){
+                array_push($message,'请在高中毕业后填写此表格。');
+            }
+            if(date('Y',strtotime($info->birthday)) + 18 < 1963){
+                array_push($message,'您的年龄不符合最低入学要求。');
+            }
+        }
+        if(@self::EmptyCheck(self::OTHER, $info->gender, '性别', $message)){
+            $info->gender = (int)($info->gender);
+            $valid = new Between(['min' => self::GENDER_MALE, 'max' => self::GENDER_OTHER]);
+            if (!$valid->isValid($info->gender))
+                array_push($message , '性别不正确。');
+        }
+        if(@self::EmptyCheck(self::OTHER, $info->usedname, '曾用名', $message, false)){
+            if(mb_strlen($info->usedname) >=2 || mb_strlen($info->usedname) <=4) {
+                $len = mb_strlen($info->usedname);
+                $width = mb_strwidth($info->usedname);
+                if($len*2 != $width)
+                    array_push($message,'曾用名内容不符合要求。请输入2-4个中文字符');
+            }
+            else
+            {
+                array_push($message,'曾用名内容不符合要求。请输入2-4个中文字符');
+            }
+        }
         return $message;
     }
 
