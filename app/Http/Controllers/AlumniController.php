@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use League\Flysystem\Exception;
+use libphonenumber\NumberParseException;
 use Zend\Validator\Between;
 use Zend\Validator\Date;
 use Response;
@@ -113,7 +115,7 @@ class AlumniController extends Controller
             switch ($step) {
                 case self::BASIC_INFO:
                     $message = self::AuthStep1($info);
-                    return self::DataCheck($message, $id, $info, 'personal_info');
+                    return self::DataCheck($message, $id, $info, 'auth_info');
                 case self::PRIMARY_INFO:
                     $message = self::AuthStep2($info);
                     return self::DataCheck($message, $id, $info, 'primary_info');
@@ -140,6 +142,9 @@ class AlumniController extends Controller
             case 1:
                 $return_array['info']['email'] = UserCenterController::GetUserEmail($return_array['id']);
                 $return_array['info']['username'] = UserCenterController::GetUserNickname($return_array['id']);
+                $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->auth_info;
+                if(!is_null($info))
+                    $return_array['info'] = array_merge(json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->auth_info,true),$return_array['info']);
                 return Response::json($return_array);
             default:
                 break;
@@ -151,7 +156,7 @@ class AlumniController extends Controller
         if (empty($message)) {
             array_push($message, '恭喜您，所有当前的数据均符合要求！');
             if ($insert)
-                DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => $content]);
+                DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => json_encode($content)]);
             return Response::json(array('code' => '200', 'message' => $message));
         } else {
             array_unshift($message, '非常抱歉，您提交的数据在以下部分存在问题：');
@@ -287,10 +292,23 @@ abandoned
                 array_push($message, '国内手机号码不正确！');
             }
         }
-        if(@self::EmptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message)){
-            $phone_validate = \libphonenumber\PhoneNumberUtil::
+        if(@self::EmptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message, false)){
+            try {
+                $phone_validate = \libphonenumber\PhoneNumberUtil::getInstance();
+                $phone_number = $phone_validate->parse($info->phone_international, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
+                if($phone_validate->isValidNumber($phone_number)){
+                    array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
+                }
+            } catch (NumberParseException $e) {
+                array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
+            }
         }
-        @self::EmptyCheck(self::OTHER, $info->nickname, '昵称或英文名', $message);
+        if(@self::EmptyCheck(self::OTHER, $info->nickname, '昵称或英文名', $message)){
+            $names = explode(',', $info->nickname);
+            if(count($names) <= 0 ){
+                array_push($message, "昵称或英文名分割错误，请检查您的输入内容。");
+            }
+        }
         if(@self::EmptyCheck(self::OTHER, $info->birthday, '出生日期', $message)){
             $validator = new Date(['format' => 'Y/m/d']);
             if(!$validator->isValid($info->birthday)){
