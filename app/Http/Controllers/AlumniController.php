@@ -156,6 +156,11 @@ class AlumniController extends Controller
                 if(!is_null($info))
                     $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->junior_school,true);
                 return Response::json($return_array);
+            case 4:
+                $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->senior_school;
+                if(!is_null($info))
+                    $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->senior_school,true);
+                return Response::json($return_array);
             default:
                 break;
         }
