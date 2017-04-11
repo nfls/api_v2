@@ -115,18 +115,18 @@ class AlumniController extends Controller
             switch ($step) {
                 case self::BASIC_INFO:
                     $message = self::AuthStep1($info);
-                    return self::DataCheck($message, $id, $info, 'auth_info');
+                    return self::DataCheck($message, $id, $info, self::BASIC_INFO, 'auth_info');
                 case self::PRIMARY_INFO:
                     $message = self::AuthStep2($info);
-                    return self::DataCheck($message, $id, $info, 'primary_info');
+                    return self::DataCheck($message, $id, $info, self::PRIMARY_INFO, 'primary_info');
                     break;
                 case self::JUNIOR_INFO:
                     $message = self::AuthStep3($info);
-                    return self::DataCheck($message, $id, $info, 'junior_info');
+                    return self::DataCheck($message, $id, $info, self::JUNIOR_INFO, 'junior_info');
                     break;
                 case self::SENIOR_INFO:
                     $message = self::AuthStep4($info);
-                    return self::DataCheck($message, $id, $info, 'senior_info');
+                    return self::DataCheck($message, $id, $info, self::SENIOR_INFO, 'senior_info');
                     break;
             }
         }
@@ -146,17 +146,24 @@ class AlumniController extends Controller
                 if(!is_null($info))
                     $return_array['info'] = array_merge(json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->auth_info,true),$return_array['info']);
                 return Response::json($return_array);
+            case 2:
+                $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->primary_school;
+                if(!is_null($info))
+                    $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->primary_school,true);
+                return Response::json($return_array);
             default:
                 break;
         }
     }
 
-    function DataCheck($message, $id, $content, $name, $insert = true)
+    function DataCheck($message, $id, $content, $step, $name, $insert = true)
     {
         if (empty($message)) {
             array_push($message, '恭喜您，所有当前的数据均符合要求！');
-            if ($insert)
-                DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => json_encode($content)]);
+            if ($insert) {
+                DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => json_encode($content),'current_step' => $step+1]);
+            }
+
             return Response::json(array('code' => '200', 'message' => $message));
         } else {
             array_unshift($message, '非常抱歉，您提交的数据在以下部分存在问题：');
