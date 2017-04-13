@@ -240,8 +240,9 @@ class AlumniController extends Controller
         return true;
     }
 
-    function ClassNoCheck($info, $min, $max, $name, &$message)
+    function ClassNoCheck(&$info, $min, $max, $name, &$message)
     {
+        $info = (int)($info);
         $valid = new Between(['min' => $min, 'max' => $max]);
         if (!$valid->isValid($info) || !is_integer($info))
             array_push($message, $name . '班级号不正确。');
@@ -249,8 +250,10 @@ class AlumniController extends Controller
     }
 
 
-    function SchoolYearCheck($enter_year, $graduated_year, $minimum_year, $maximum_year, $interval, $remark, $name, &$message)
+    function SchoolYearCheck(&$enter_year, &$graduated_year, $minimum_year, $maximum_year, $interval, $remark, $name, &$message)
     {
+        $enter_year = (int)($enter_year);
+        $graduated_year = (int)($graduated_year);
         $valid = new Between(['min' => $minimum_year, 'max' => $maximum_year]);
         if (!$valid->isValid($enter_year) || !is_integer($enter_year))
             array_push($message, $name . '入学年份不正确。');
