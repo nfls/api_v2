@@ -61,6 +61,10 @@ class AlumniController extends Controller
     const GENDER_FEMALE = 2;
     const GENDER_OTHER = 3;
 
+
+    const GENERAL_INSTRCTION = [
+        ''
+    ];
     const STEP1 = [
         '填写此表格前请确认您的用户名及邮箱是否正确',
         '生日请使用yyyy/mm/dd的格式填写，即如果你的生日在2000年1月1日，就请填写2000/01/01，注意符号为半角符号',
@@ -68,6 +72,18 @@ class AlumniController extends Controller
         '手机号请务必填写正确，在未来可能会启用手机号验证系统',
         '出国的同学请填写自己的国外手机号，并请加上正确的国际区号，以便联系',
         '本页除"曾用名"项外均为必填项目，"手机号码（国外）"仅需要长期不在国内的校友（如读书或工作等）填写'
+    ];
+
+    const STEP2 = [
+        '请在本页填写您的小学信息',
+        '如果您在'
+    ];
+
+    const STEP3 = [
+        '请在本页填写您的初中信息',
+        '挂靠请按照实际情况填写对应的班级号',
+        '病假／休学等特殊情况导致在校时间超过3年或者存在多个o班级号的情况',
+        '班级号请填写纯数字1-12',
     ];
     function getCurrentStep(Request $request)
     {
@@ -437,7 +453,7 @@ abandoned
                         @self::SchoolYearCheck($info->junior_school_enter_year, $info->junior_school_graduated_year, self::SCHOOL_START_YEAR, date('Y') - 6, 3, $info->junior_remark, "初中", $message);
                         @self::ClassNoCheck($info->junior_class, 1, 12, "初中", $message);
                     }
-                    self::StructureCheck($info, 6, $message);
+                    self::StructureCheck($info, 5, $message);
                     break;
                 default:
                     array_push($message, '初中信息不正确！请重新选择。');
@@ -510,10 +526,10 @@ abandoned
                     if ($passed) {
                         if ($info->senior_school_enter_year > self::ALEVEL_2_START_YEAR) {
                             @self::SchoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::ALEVEL_2_START_YEAR, date('Y') - 3, 3, $info->remark, "高中", $message);
-                            @self::ClassNoCheck($info->junior_class, 1, 2, "高中", $message);
+                            @self::ClassNoCheck($info->senior_class, 1, 2, "高中", $message);
                         } else {
                             @self::SchoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::ALEVEL_4_START_YEAR, date('Y') - 3, 3, $info->remark, "高中", $message);
-                            @self::ClassNoCheck($info->junior_class, 1, 4, "高中", $message);
+                            @self::ClassNoCheck($info->senior_class, 1, 4, "高中", $message);
                         }
                     }
                     self::StructureCheck($info, 5, $message);
@@ -523,7 +539,7 @@ abandoned
                     $passed = self::EmptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, "高中", $message);
                     if ($passed) {
                         @self::SchoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::IB_START_YEAR, date('Y') - 3, 3, $info->remark, "高中", $message);
-                        @self::ClassNoCheck($info->junior_class, 1, 2, "高中", $message);
+                        @self::ClassNoCheck($info->senior_class, 1, 2, "高中", $message);
                     }
                     self::StructureCheck($info, 5, $message);
                     break;
@@ -532,7 +548,7 @@ abandoned
                     $passed = self::EmptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, "高中", $message);
                     if ($passed) {
                         @self::SchoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::BCA_START_YEAR, date('Y') - 3, 3, $info->remark, "高中", $message);
-                        @self::ClassNoCheck($info->junior_class, 1, 6, "高中", $message);
+                        @self::ClassNoCheck($info->senior_class, 1, 6, "高中", $message);
                     }
                     self::StructureCheck($info, 5, $message);
                     break;

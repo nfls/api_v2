@@ -10,7 +10,11 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-//header('Access-Control-Allow-Origin: http://localhost:63344');
+//header("Access-Control-Allow-Origin: http://localhost:63343");
 Route::post('alumni/auth/{step}/update',"AlumniController@AuthUpdate");
 Route::get('alumni/auth/{step}/query',"AlumniController@AuthQuery");
 Route::get('alumni/auth/getCurrentStep',"AlumniController@getCurrentStep");
+Route::get('media/gallery/list/{id}',"AlbumController@getPhotoList");
+Route::get('media/gallery/info/{id}',"AlbumController@getAlbumInfo");
+Route::get('media/gallery/getlist',"AlbumController@getAlbumList");
+Route::any('media/gallery/update',"AlbumController@updateAnAlbum");

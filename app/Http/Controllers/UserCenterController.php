@@ -24,4 +24,8 @@ class UserCenterController extends Controller
     	return $user->email;
     }
 
+    public static function checkAdmin($id){
+        return true;
+    }
+
 }
