@@ -62,8 +62,8 @@ class AlumniController extends Controller
     const GENDER_OTHER = 3;
 
 
-    const GENERAL_INSTRCTION = [
-        ''
+    const GENERAL_INSTRUCTION = [
+        '表格所有符号均为半角符号，请在输入相关符号时切换至英文输入法，否则服务器可能将无法识别您输入的内容！'
     ];
     const STEP1 = [
         '填写此表格前请确认您的用户名及邮箱是否正确',
@@ -76,15 +76,19 @@ class AlumniController extends Controller
 
     const STEP2 = [
         '请在本页填写您的小学信息',
-        '如果您在'
+        '如果您就读过南外小学部，请在“小学就读学校”处填写就读的小学；毕业和入学日期均是指离开或是进入南外小学部的年份。',
+        '小学名称请使用完整的官方名称，不要使用任何简写、简拼等。非南京市的请注明所在城市。',
+        '如果存在其他特殊情况，请在备注中详细注明具体情况'
     ];
 
     const STEP3 = [
         '请在本页填写您的初中信息',
         '挂靠请按照实际情况填写对应的班级号',
-        '病假／休学等特殊情况导致在校时间超过3年或者存在多个o班级号的情况',
-        '班级号请填写纯数字1-12',
+        '病假／休学等特殊情况导致在校时间超过3年或者存在多个班级号的情况，请在备注中详细注明相关情况（包括两个班级的班级号，发生改动的学期等等）',
+        '班级号请填写纯数字1-12，请不要填写英语小班分班号',
     ];
+
+
     function getCurrentStep(Request $request)
     {
         $id = self::getUser(Cookie::get('token'));
@@ -93,6 +97,12 @@ class AlumniController extends Controller
         switch ($user->current_step){
             case 1:
                 $instructions = self::STEP1;
+                break;
+            case 2:
+                $instructions = self::STEP2;
+                break;
+            case 3:
+                $instructions = self::STEP3;
                 break;
             default:
                 $instructions = [];
@@ -324,7 +334,7 @@ abandoned
             array_push($message,'真实姓名内容不符合要求。请输入2-4个中文字符');
         }
         if(@self::EmptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message)){
-            if(!preg_match("/^1[34578]\d{9}$/", (int)($info->phone_domestic))){
+            if(!preg_match("/^1[34578]\d{9}$/", (string)($info->phone_domestic))){
                 array_push($message, '国内手机号码不正确！');
             }
         }
@@ -559,5 +569,12 @@ abandoned
         }
         return $message;
     }
+
+    function AuthStep5($info){
+
+    }
+
+
+
 }
 
