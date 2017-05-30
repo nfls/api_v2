@@ -97,7 +97,7 @@ class AlumniController extends Controller
         $id = self::getUser(Cookie::get('token'));
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
 
-        switch ($user->current_step){
+        switch ($user->current_step) {
             case 1:
                 $instructions = self::STEP1;
                 break;
@@ -111,20 +111,42 @@ class AlumniController extends Controller
                 $instructions = [];
                 break;
         }
-        return Response::json(array('code' => '200', 'instructions'=>$instructions, 'step' => $user->current_step));
+        return Response::json(array('code' => '200', 'instructions' => $instructions, 'step' => $user->current_step));
     }
 
     function backStep(Request $request)
     {
         $id = self::getUser(Cookie::get('token'));
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
-        if($user->current_step>1){
-            DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(["current_step"=>(int)$user->current_step-1]);
-            return Response::json(array('code' => '200', 'message'=>"已成功返回至上一步"));
+        if ($user->current_step > 1) {
+            DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(["current_step" => (int)$user->current_step - 1]);
+            return Response::json(array('code' => '200', 'message' => "已成功返回至上一步"));
+        } else {
+            return Response::json(array('code' => '403', 'message' => "您已经在第一步，无法再返回了"));
         }
-        else {
-            return Response::json(array('code' => '403', 'message'=>"您已经在第一步，无法再返回了"));
-        }
+    }
+
+    function getCurrentStatus(Request $request)
+    {
+        $id = $this->getUser(Cookie::get('token'));
+        $return = array();
+        $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
+        if ($user->status == false )//未通过
+            array_push($return, "状态：未实名认证");
+        else
+            array_push($return, "状态：已实名认证");
+        if (!is_null($user->edit_time))
+            array_push($return,"最近一次编辑时间：".$user->edit_time);
+        if (is_null($user->submit_time))
+            array_push($return,"是否提交：未提交");
+        else
+            array_push($return,"是否提交：已提交，提交时间为".$user->submit_time);
+        if (!is_null($user->status_change_time))
+            array_push($return,"审核时间：".$user->status_change_time);
+        if (!is_null($user->operator))
+            array_push($return,"审核员：".$user->operator);
+        return Response::json(array("code" => "200", "message" => $return));
+
     }
 
     function getUser($token)
@@ -185,23 +207,23 @@ class AlumniController extends Controller
                 $return_array['info']['email'] = UserCenterController::GetUserEmail($return_array['id']);
                 $return_array['info']['username'] = UserCenterController::GetUserNickname($return_array['id']);
                 $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->auth_info;
-                if(!is_null($info))
-                    $return_array['info'] = array_merge(json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->auth_info,true),$return_array['info']);
+                if (!is_null($info))
+                    $return_array['info'] = array_merge(json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->auth_info, true), $return_array['info']);
                 return Response::json($return_array);
             case 2:
                 $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->primary_school;
-                if(!is_null($info))
-                    $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->primary_school,true);
+                if (!is_null($info))
+                    $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->primary_school, true);
                 return Response::json($return_array);
             case 3:
                 $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->junior_school;
-                if(!is_null($info))
-                    $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->junior_school,true);
+                if (!is_null($info))
+                    $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->junior_school, true);
                 return Response::json($return_array);
             case 4:
                 $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->senior_school;
-                if(!is_null($info))
-                    $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->senior_school,true);
+                if (!is_null($info))
+                    $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->senior_school, true);
                 return Response::json($return_array);
             case self::CHECK_INFO:
                 $this->formStep5Info($return_array['id']);
@@ -215,7 +237,7 @@ class AlumniController extends Controller
         if (empty($message)) {
             array_push($message, '恭喜您，所有当前的数据均符合要求！');
             if ($insert) {
-                DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => json_encode($content),'current_step' => $step+1]);
+                DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => json_encode($content), 'current_step' => $step + 1]);
             }
 
             return Response::json(array('code' => '200', 'message' => $message));
@@ -342,66 +364,62 @@ abandoned
         */
         $message = array();
         @self::EmptyCheck(self::OTHER, $info->realname, '真实姓名', $message);
-        if(mb_strlen($info->realname) >=2 || mb_strlen($info->realname) <=4) {
+        if (mb_strlen($info->realname) >= 2 || mb_strlen($info->realname) <= 4) {
             $len = mb_strlen($info->realname);
             $width = mb_strwidth($info->realname);
-            if($len*2 != $width)
-                array_push($message,'真实姓名内容不符合要求。请输入2-4个中文字符');
+            if ($len * 2 != $width)
+                array_push($message, '真实姓名内容不符合要求。请输入2-4个中文字符');
+        } else {
+            array_push($message, '真实姓名内容不符合要求。请输入2-4个中文字符');
         }
-        else
-        {
-            array_push($message,'真实姓名内容不符合要求。请输入2-4个中文字符');
-        }
-        if(@self::EmptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message)){
-            if(!preg_match("/^1[34578]\d{9}$/", (string)($info->phone_domestic))){
+        if (@self::EmptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message)) {
+            if (!preg_match("/^1[34578]\d{9}$/", (string)($info->phone_domestic))) {
                 array_push($message, '国内手机号码不正确！');
             }
         }
-        if(@self::EmptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message, false)){
+        if (@self::EmptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message, false)) {
             try {
                 $phone_validate = \libphonenumber\PhoneNumberUtil::getInstance();
                 $phone_number = $phone_validate->parse($info->phone_international, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
-                if($phone_validate->isValidNumber($phone_number)){
+                if ($phone_validate->isValidNumber($phone_number)) {
                     array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
                 }
             } catch (NumberParseException $e) {
                 array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
             }
         }
-        if(@self::EmptyCheck(self::OTHER, $info->nickname, '昵称或英文名', $message)){
+        if (@self::EmptyCheck(self::OTHER, $info->nickname, '昵称或英文名', $message)) {
             $names = explode(',', $info->nickname);
-            if(count($names) <= 0 ){
+            if (count($names) <= 0) {
                 array_push($message, "昵称或英文名分割错误，请检查您的输入内容。");
             }
         }
-        if(@self::EmptyCheck(self::OTHER, $info->birthday, '出生日期', $message)){
+        if (@self::EmptyCheck(self::OTHER, $info->birthday, '出生日期', $message)) {
             $validator = new Date(['format' => 'Y/m/d']);
-            if(!$validator->isValid($info->birthday)){
-                array_push($message,'出生日期格式不符合要求。');
+            if (!$validator->isValid($info->birthday)) {
+                array_push($message, '出生日期格式不符合要求。');
             }
-            if(date('Y',strtotime($info->birthday)) + 18 > date('Y')){
-                array_push($message,'请在高中毕业后填写此表格。');
+            if (date('Y', strtotime($info->birthday)) + 18 > date('Y')) {
+                array_push($message, '请在高中毕业后填写此表格。');
             }
-            if(date('Y',strtotime($info->birthday)) + 18 < 1963){
-                array_push($message,'您的年龄不符合最低入学要求。');
+            if (date('Y', strtotime($info->birthday)) + 18 < 1963) {
+                array_push($message, '您的年龄不符合最低入学要求。');
             }
         }
-        if(@self::EmptyCheck(self::OTHER, $info->gender, '性别', $message)){
+        if (@self::EmptyCheck(self::OTHER, $info->gender, '性别', $message)) {
             $info->gender = (int)($info->gender);
             $valid = new Between(['min' => self::GENDER_MALE, 'max' => self::GENDER_OTHER]);
             if (!$valid->isValid($info->gender))
-                array_push($message , '性别不正确。');
+                array_push($message, '性别不正确。');
         }
-        if(@self::EmptyCheck(self::OTHER, $info->usedname, '曾用名', $message, false)){
-            if(mb_strlen($info->usedname) >=2 || mb_strlen($info->usedname) <=4) {
+        if (@self::EmptyCheck(self::OTHER, $info->usedname, '曾用名', $message, false)) {
+            if (mb_strlen($info->usedname) >= 2 || mb_strlen($info->usedname) <= 4) {
                 $len = mb_strlen($info->usedname);
                 $width = mb_strwidth($info->usedname);
-                if($len*2 != $width)
-                    array_push($message,'曾用名内容不符合要求。请输入2-4个中文字符');
-            }
-            else
-            {
-                array_push($message,'曾用名内容不符合要求。请输入2-4个中文字符');
+                if ($len * 2 != $width)
+                    array_push($message, '曾用名内容不符合要求。请输入2-4个中文字符');
+            } else {
+                array_push($message, '曾用名内容不符合要求。请输入2-4个中文字符');
             }
         }
         return $message;
@@ -429,8 +447,7 @@ abandoned
                     @self::EmptyCheck(self::SCHOOL_NAME, $info->primary_school_name, "其他小学", $message);
                     $passed = @self::EmptyCheck(self::ENTER_YAER, $info->primary_school_enter_year, "小学", $message);
                     $passed = @self::EmptyCheck(self::GRADUATED_YEAR, $info->primary_school_graduated_year, "小学", $message);
-                    if ($passed)
-                    {
+                    if ($passed) {
                         $info->primary_school_enter_year = (int)($info->primary_school_enter_year);
                         $info->primary_school_graduated_year = (int)($info->primary_school_graduated_year);
                         @self::SchoolYearCheck($info->primary_school_enter_year, $info->primary_school_graduated_year, self::SCHOOL_START_YEAR, self::PRIMARY_END_YEAR, 2, $info->primary_remark, "小学", $message);
@@ -441,7 +458,7 @@ abandoned
                     @self::EmptyCheck(self::SCHOOL_NAME, $info->primary_school_name, "其他小学", $message);
                     $passed = @self::EmptyCheck(self::ENTER_YAER, $info->primary_school_enter_year, "小学", $message);
                     $passed = @self::EmptyCheck(self::GRADUATED_YEAR, $info->primary_school_graduated_year, "小学", $message);
-                    if ($passed){
+                    if ($passed) {
                         $info->primary_school_enter_year = (int)($info->primary_school_enter_year);
                         $info->primary_school_graduated_year = (int)($info->primary_school_graduated_year);
                         @self::SchoolYearCheck($info->primary_school_enter_year, $info->primary_school_graduated_year, self::SCHOOL_START_YEAR, self::PRIMARY_END_YEAR, 4, $info->remark, "小学", $message);
@@ -590,11 +607,11 @@ abandoned
     }
 
 
-    function formStep5Info($id){
+    function formStep5Info($id)
+    {
         $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
 
     }
-
 
 
 }
