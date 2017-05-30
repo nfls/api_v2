@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\UserCenterController;
 use Illuminate\Http\Request;
 use Cookie;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use League\Flysystem\Exception;
@@ -38,6 +39,7 @@ class AlumniController extends Controller
     const PRIMARY_INFO = 2;
     const JUNIOR_INFO = 3;
     const SENIOR_INFO = 4;
+    const CHECK_INFO = 5;
 
     const SCHOOL_NO = 1;
     const ENTER_YAER = 2;
@@ -63,7 +65,9 @@ class AlumniController extends Controller
 
 
     const GENERAL_INSTRUCTION = [
-        '表格所有符号均为半角符号，请在输入相关符号时切换至英文输入法，否则服务器可能将无法识别您输入的内容！'
+        '表格所有符号均为半角符号，请在输入相关符号时切换至英文输入法，否则服务器可能将无法识别您输入的内容',
+        '所有入学/毕业年份请用4位阿拉伯数字填写，所有班级号请用1位或者2位阿拉伯数字，或者是一个英文字母填写（仅限国际部）',
+        '所有学校名称请使用完整的官方名称，不要使用任何简写、简拼等。非南京市的请注明所在城市。'
     ];
     const STEP1 = [
         '填写此表格前请确认您的用户名及邮箱是否正确',
@@ -77,7 +81,6 @@ class AlumniController extends Controller
     const STEP2 = [
         '请在本页填写您的小学信息',
         '如果您就读过南外小学部，请在“小学就读学校”处填写就读的小学；毕业和入学日期均是指离开或是进入南外小学部的年份。',
-        '小学名称请使用完整的官方名称，不要使用任何简写、简拼等。非南京市的请注明所在城市。',
         '如果存在其他特殊情况，请在备注中详细注明具体情况'
     ];
 
@@ -109,6 +112,19 @@ class AlumniController extends Controller
                 break;
         }
         return Response::json(array('code' => '200', 'instructions'=>$instructions, 'step' => $user->current_step));
+    }
+
+    function backStep(Request $request)
+    {
+        $id = self::getUser(Cookie::get('token'));
+        $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
+        if($user->current_step>1){
+            DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(["current_step"=>(int)$user->current_step-1]);
+            return Response::json(array('code' => '200', 'message'=>"已成功返回至上一步"));
+        }
+        else {
+            return Response::json(array('code' => '403', 'message'=>"您已经在第一步，无法再返回了"));
+        }
     }
 
     function getUser($token)
@@ -187,6 +203,8 @@ class AlumniController extends Controller
                 if(!is_null($info))
                     $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->senior_school,true);
                 return Response::json($return_array);
+            case self::CHECK_INFO:
+                $this->formStep5Info($return_array['id']);
             default:
                 break;
         }
@@ -296,6 +314,7 @@ class AlumniController extends Controller
         if (count((array)$info) != $count)
             array_push($message, '您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。');
     }
+
 
     //auth data
 
@@ -570,7 +589,9 @@ abandoned
         return $message;
     }
 
-    function AuthStep5($info){
+
+    function formStep5Info($id){
+        $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
 
     }
 

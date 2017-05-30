@@ -14,6 +14,7 @@
 Route::post('alumni/auth/{step}/update',"AlumniController@AuthUpdate");
 Route::get('alumni/auth/{step}/query',"AlumniController@AuthQuery");
 Route::get('alumni/auth/getCurrentStep',"AlumniController@getCurrentStep");
+Route::get('alumni/auth/back',"AlumniController@backStep");
 Route::get('media/gallery/list/{id}',"AlbumController@getPhotoList");
 Route::get('media/gallery/info/{id}',"AlbumController@getAlbumInfo");
 Route::get('media/gallery/getlist',"AlbumController@getAlbumList");
