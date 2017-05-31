@@ -65,10 +65,16 @@ class AlumniController extends Controller
 
 
     const GENERAL_INSTRUCTION = [
-        '表格所有符号均为半角符号，请在输入相关符号时切换至英文输入法，否则服务器可能将无法识别您输入的内容',
+		'本认证共八步，前五步将确认您的校友信息，提交并审核通过后无法修改，后三步为后续经历填写，可随时修改',
+		'单击上一步可返回，单击下一步将把您填写的信息发送至服务器保存，单击重置可将当前表格恢复至最近一次保存的内容，单击清空可以将表格填写内容清空',
+		'审核时间约为1-5天，部分使用邀请码注册的用户可能会享有免审核特权，审核期间您可以完善后续表格，您只有在完成所有表格后才能使用在线校友录功能',
+		'对于您提供的信息，您可在认证结束后自行修改相关隐私设置，我们将尊重您的设置，不会随意透露给第三方或其他用户（默认设置为：同一届同学可见）',
+        '表格除个人介绍部分外所有符号均为半角符号，请在输入相关符号时切换至英文输入法，否则服务器可能将无法识别您输入的内容',
         '所有入学/毕业年份请用4位阿拉伯数字填写，所有班级号请用1位或者2位阿拉伯数字，或者是一个英文字母填写（仅限国际部）',
-        '所有学校名称请使用完整的官方名称，不要使用任何简写、简拼等。非南京市的请注明所在城市。'
+        '所有学校名称请使用完整的官方名称，不要使用任何简写、简拼等。非南京市的请注明所在城市。',
+		'挂靠请按照实际情况填写在南外就读所对应的班级号'
     ];
+
     const STEP1 = [
         '填写此表格前请确认您的用户名及邮箱是否正确',
         '生日请使用yyyy/mm/dd的格式填写，即如果你的生日在2000年1月1日，就请填写2000/01/01，注意符号为半角符号',
@@ -86,10 +92,24 @@ class AlumniController extends Controller
 
     const STEP3 = [
         '请在本页填写您的初中信息',
-        '挂靠请按照实际情况填写对应的班级号',
         '病假／休学等特殊情况导致在校时间超过3年或者存在多个班级号的情况，请在备注中详细注明相关情况（包括两个班级的班级号，发生改动的学期等等）',
         '班级号请填写纯数字1-12，请不要填写英语小班分班号',
     ];
+
+	const STEP4 = [
+		'请在本页填写您的高中信息',
+		'普高请填写6个学期的班级号，一位阿拉伯数字。如果存在不适用的情况（如提前高考或者是提前出国），请在对应班级号处填写0，请不要填写英语小班分班号',
+		'病假／休学等特殊情况导致在校时间超过3年或者存在多个班级号的情况，请在备注中详细注明相关情况（请假开始的学期等等）',
+		'IB/ALEVEL请填写一位阿拉伯数字班级号，中加请填写一个英文大写字母的班级号',
+	];
+
+	const STEP5 = [
+		'请您确认您在前四步填写的信息准确、无误',
+		'如果您的表单存在错误，将在下面的区域内显示，请修正后在提交',
+		'单击下一步，您可以提交您的校友认证，您的信息将由管理员进行审核',
+		'审核期间，您可以继续填写下面的表格，请注意，您只有在完成所有表格后才能使用在线校友录功能'
+	];
+
 
 
     function getCurrentStep(Request $request)
@@ -107,6 +127,12 @@ class AlumniController extends Controller
             case 3:
                 $instructions = self::STEP3;
                 break;
+            case 4:
+                $instructions = self::STEP4;
+                break;
+            case 5:
+                $instructions = self::STEP5;
+                break;
             default:
                 $instructions = [];
                 break;
@@ -119,6 +145,8 @@ class AlumniController extends Controller
         $id = self::getUser(Cookie::get('token'));
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
         if ($user->current_step > 1) {
+            if(!$this->canReturn($id) && $user->current_step = 6)
+                return Response::json(array('code' => '403', 'message' => "您的申请正在处理中，无法返回编辑"));
             DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(["current_step" => (int)$user->current_step - 1]);
             return Response::json(array('code' => '200', 'message' => "已成功返回至上一步"));
         } else {
@@ -162,6 +190,10 @@ class AlumniController extends Controller
         return $id;
     }
 
+    function getInstructions(){
+        return Response::json(array("message"=>self::GENERAL_INSTRUCTION));
+    }
+
     function AuthUpdate(Request $request, $step)
     {
         if (is_numeric($step) == true) {
@@ -192,6 +224,11 @@ class AlumniController extends Controller
                     $message = self::AuthStep4($info);
                     return self::DataCheck($message, $id, $info, self::SENIOR_INFO, 'senior_school');
                     break;
+                case self::CHECK_INFO:
+                    DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => $step + 1, 'submit_time' => date("y-m-d h:i:s")]);
+                    return Response::json(array('code' => '200', 'message' => '提交成功！清单大概管理员审核。'));
+                    break;
+                    //s
             }
         }
     }
@@ -225,8 +262,9 @@ class AlumniController extends Controller
                 if (!is_null($info))
                     $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->senior_school, true);
                 return Response::json($return_array);
-            case self::CHECK_INFO:
-                $this->formStep5Info($return_array['id']);
+            case 5:
+                $return_array['info'] = $this->AuthStep5($return_array['id']);
+                return Response::json($return_array);
             default:
                 break;
         }
@@ -237,14 +275,27 @@ class AlumniController extends Controller
         if (empty($message)) {
             array_push($message, '恭喜您，所有当前的数据均符合要求！');
             if ($insert) {
-                DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => json_encode($content), 'current_step' => $step + 1]);
+                DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => json_encode($content), 'current_step' => $step + 1, 'edit_time' => date("y-m-d h:i:s")]);
             }
-
             return Response::json(array('code' => '200', 'message' => $message));
         } else {
             array_unshift($message, '非常抱歉，您提交的数据在以下部分存在问题：');
             return Response::json(array('code' => '403.1', 'message' => $message));
         }
+    }
+
+    function canReturn($id){
+        $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
+        if($info->status == true)
+            return false;
+        if(!is_null($info->submit_time))
+            if(is_null($info->status_change_time))
+                return false;
+            else
+                if(strtotime($info->status_change_time)<strtotime($info->submmit_time))
+                    return false;
+        return true;
+
     }
 
     function IsEmpty($content)
@@ -599,7 +650,7 @@ abandoned
                     self::StructureCheck($info, 5, $message);
                     break;
                 default:
-                    array_push($message, '高中信息不正确！请重新选择。');
+                    array_push($message, "高中信息不正确！请重新选择。");
                     break;
             }
         }
@@ -607,9 +658,10 @@ abandoned
     }
 
 
-    function formStep5Info($id)
-    {
+    function AuthStep5($id){
         $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
+        $return_array = array();
+        return array("confirm_info"=>"经检验，您的表格不存在机械性问题。请检查您填写的具体内容是否正确。");
 
     }
 
