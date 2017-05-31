@@ -490,14 +490,15 @@ abandoned
         if (@self::EmptyCheck(self::SCHOOL_NO, $info->primary_school_no, "小学", $message)) {
             //两年毕业 ！！！
             switch ($info->primary_school_no) {
+
                 case self::OTHER_PRIMARY:
                     @self::EmptyCheck(self::SCHOOL_NAME, $info->primary_school_name, "小学", $message);
                     self::StructureCheck($info, 2, $message);
                     break;
                 case self::NFLS_PRIMARY_2:
                     @self::EmptyCheck(self::SCHOOL_NAME, $info->primary_school_name, "其他小学", $message);
-                    $passed = @self::EmptyCheck(self::ENTER_YAER, $info->primary_school_enter_year, "小学", $message);
-                    $passed = @self::EmptyCheck(self::GRADUATED_YEAR, $info->primary_school_graduated_year, "小学", $message);
+                    @$passed = @self::EmptyCheck(self::ENTER_YAER, $info->primary_school_enter_year, "小学", $message);
+                    @$passed = @self::EmptyCheck(self::GRADUATED_YEAR, $info->primary_school_graduated_year, "小学", $message);
                     if ($passed) {
                         $info->primary_school_enter_year = (int)($info->primary_school_enter_year);
                         $info->primary_school_graduated_year = (int)($info->primary_school_graduated_year);
@@ -512,7 +513,7 @@ abandoned
                     if ($passed) {
                         $info->primary_school_enter_year = (int)($info->primary_school_enter_year);
                         $info->primary_school_graduated_year = (int)($info->primary_school_graduated_year);
-                        @self::SchoolYearCheck($info->primary_school_enter_year, $info->primary_school_graduated_year, self::SCHOOL_START_YEAR, self::PRIMARY_END_YEAR, 4, $info->remark, "小学", $message);
+                        @self::SchoolYearCheck($info->primary_school_enter_year, $info->primary_school_graduated_year, self::SCHOOL_START_YEAR, self::PRIMARY_END_YEAR, 4, $info->primary_remark, "小学", $message);
                     }
                     self::StructureCheck($info, 5, $message);
                     break;
@@ -543,9 +544,9 @@ abandoned
                     self::StructureCheck($info, 3, $message);
                     break;
                 case self::NFLS_JUNIOR:
-                    $passed = @self::EmptyCheck(self::SCHOOL_START_YEAR, $info->junior_school_enter_year, "初中", $message);
-                    $passed = @self::EmptyCheck(self::SCHOOL_START_YEAR, $info->junior_school_graduated_year, "初中", $message);
-                    $passed = @self::EmptyCheck(self::CLASS_NO, $info->junior_class, "初中", $message);
+                    @$passed = self::EmptyCheck(self::SCHOOL_START_YEAR, $info->junior_school_enter_year, "初中", $message);
+                    @$passed = self::EmptyCheck(self::SCHOOL_START_YEAR, $info->junior_school_graduated_year, "初中", $message);
+                    @$passed = self::EmptyCheck(self::CLASS_NO, $info->junior_class, "初中", $message);
                     if ($passed) {
                         @self::SchoolYearCheck($info->junior_school_enter_year, $info->junior_school_graduated_year, self::SCHOOL_START_YEAR, date('Y') - 6, 3, $info->junior_remark, "初中", $message);
                         @self::ClassNoCheck($info->junior_class, 1, 12, "初中", $message);
@@ -588,14 +589,14 @@ abandoned
                     self::StructureCheck($info, 3, $message);
                     break;
                 case self::NFLS_SENIOR_GENERAL:
-                    $passed = self::EmptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, "高中", $message);
-                    $passed = self::EmptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, "高中", $message);
-                    $passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_11, "高一上", $message);
-                    $passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_12, "高一下", $message);
-                    $passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_21, "高二上", $message);
-                    $passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_22, "高二下", $message);
-                    $passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_31, "高三上", $message);
-                    $passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_32, "高三下", $message);
+                    @$passed = self::EmptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, "高中", $message);
+                    @$passed = self::EmptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, "高中", $message);
+                    @$passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_11, "高一上", $message);
+                    @$passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_12, "高一下", $message);
+                    @$passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_21, "高二上", $message);
+                    @$passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_22, "高二下", $message);
+                    @$passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_31, "高三上", $message);
+                    @$passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_32, "高三下", $message);
                     if ($passed) {
                         @self::SchoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::SCHOOL_START_YEAR, date('Y') - 3, 3, $info->senior_remark, "高中", $message);//
                         //self::
@@ -618,8 +619,8 @@ abandoned
                     break;
                 */
                 case self::NFLS_SENIOR_ALEVEL:
-                    $passed = self::EmptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, "高中", $message);
-                    $passed = self::EmptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, "高中", $message);
+                    @$passed = self::EmptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, "高中", $message);
+                    @$passed = self::EmptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, "高中", $message);
                     if ($passed) {
                         if ($info->senior_school_enter_year > self::ALEVEL_2_START_YEAR) {
                             @self::SchoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::ALEVEL_2_START_YEAR, date('Y') - 3, 3, $info->remark, "高中", $message);
@@ -632,8 +633,8 @@ abandoned
                     self::StructureCheck($info, 5, $message);
                     break;
                 case self::NFLS_SENIOR_IB:
-                    $passed = self::EmptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, "高中", $message);
-                    $passed = self::EmptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, "高中", $message);
+                    @$passed = self::EmptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, "高中", $message);
+                    @$passed = self::EmptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, "高中", $message);
                     if ($passed) {
                         @self::SchoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::IB_START_YEAR, date('Y') - 3, 3, $info->remark, "高中", $message);
                         @self::ClassNoCheck($info->senior_class, 1, 2, "高中", $message);
@@ -641,8 +642,8 @@ abandoned
                     self::StructureCheck($info, 5, $message);
                     break;
                 case self::NFLS_SENIOR_BCA:
-                    $passed = self::EmptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, "高中", $message);
-                    $passed = self::EmptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, "高中", $message);
+                    @$passed = self::EmptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, "高中", $message);
+                    @$passed = self::EmptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, "高中", $message);
                     if ($passed) {
                         @self::SchoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::BCA_START_YEAR, date('Y') - 3, 3, $info->remark, "高中", $message);
                         @self::ClassNoCheck($info->senior_class, 1, 6, "高中", $message);
