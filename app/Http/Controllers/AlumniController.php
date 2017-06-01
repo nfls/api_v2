@@ -40,6 +40,7 @@ class AlumniController extends Controller
     const JUNIOR_INFO = 3;
     const SENIOR_INFO = 4;
     const CHECK_INFO = 5;
+    const COLLEGE_INFO = 6;
 
     const SCHOOL_NO = 1;
     const ENTER_YAER = 2;
@@ -196,6 +197,7 @@ class AlumniController extends Controller
 
     function AuthUpdate(Request $request, $step)
     {
+        //TODO CHECK USER'S CURRENT STEP
         if (is_numeric($step) == true) {
             $id = UserCenterController::GetUserId(Cookie::get('token'));
             if ($id < 0) {
@@ -227,6 +229,10 @@ class AlumniController extends Controller
                 case self::CHECK_INFO:
                     DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => $step + 1, 'submit_time' => date('y-m-d h:i:s')]);
                     return Response::json(array('code' => '200', 'message' => '提交成功！清单大概管理员审核。'));
+                    break;
+                case self::COLLEGE_INFO:
+                    $message = self::authStep6($info);
+                    return $this->dataCheck($message, $id, $info, self::COLLEGE_INFO, 'college');
                     break;
                 //s
             }
@@ -676,7 +682,59 @@ abandoned
     function authStep6($info)
     {
         $message = array();
-        if(@$this->)
+        if(@!$this->isEmpty($info->college) && $info->college == true)
+            $this->collegeInfoCheck("college",$info,$message,"专科");
+        if(@!$this->isEmpty($info->undergraduate) && $info->undergraduate == true)
+            $this->collegeInfoCheck("undergraduate",$info,$message,"本科");
+        if(@!$this->isEmpty($info->master) && $info->master == true)
+            $this->collegeInfoCheck("master",$info,$message,"硕士");
+        if(@!$this->isEmpty($info->doctor) && $info->doctor == true)
+            $this->collegeInfoCheck("doctor",$info,$message,"博士");
+        if(@!$this->isEmpty($info->other) && $info->other == true)
+            $this->collegeInfoCheck("other",$info,$message,"其他");
+        return $message;
+    }
+
+    function collegeInfoCheck($index,$info,&$message,$name){
+        //array_push($message,"1");
+        $start_year = 1900;
+        $end_year = 2100;
+        foreach($info as $key=>$value){
+            switch($key){
+                case $index."_start":
+                    if ($this->isEmpty($value)) {
+                        array_push($message, $name . '入学年份未填写。');
+                    }
+                    else {
+                        $valid = new Between(['min' => $start_year, 'max' => $end_year]);
+                        if (!$valid->isValid($value) || !is_integer($value))
+                            array_push($message, $name . '入学年份不正确。');
+                    }
+                    break;
+                case $index."_end":
+                    if ($this->isEmpty($value)) {
+                        array_push($message, $name . '入学年份未填写。');
+                    }
+                    else {
+                        $valid = new Between(['min' => $start_year, 'max' => $end_year]);
+                        if (!$valid->isValid($value) || !is_integer($value))
+                            array_push($message, $name . '毕业年份不正确。');
+                    }
+                    break;
+                case $index."_major":
+                    if ($this->isEmpty($value))
+                        array_push($message, $name . '专业方向未填写。');
+                    break;
+                case $index."_school":
+                    if ($this->isEmpty($value))
+                        array_push($message, $name . '就读院校未填写。');
+                    break;
+                case $index."_type":
+                    if ($this->isEmpty($value) && $index == "other")
+                        array_push($message, $name . '院校类型未填写。');
+                    break;
+            }
+        }
     }
 
 }
