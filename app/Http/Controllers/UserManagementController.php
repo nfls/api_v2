@@ -17,8 +17,9 @@ class UserManagementController extends Controller
         $return = array();
         $temp = array();
         $info = DB::connection('mysql_alumni')->table('user_auth')->whereNull("status_change_time")->whereNotNull("submit_time")->get();
+        $cut = array("cut"=>"");
         foreach($info as $user){
-            array_push($return,(array("id"=>$user->id) + json_decode($user->auth_info,true) + json_decode($user->primary_school,true) + json_decode($user->junior_school,true) + json_decode($user->senior_school,true)));
+            array_push($return,(array("id"=>$user->id)  + json_decode($user->auth_info,true) + array("cut2"=>"") + json_decode($user->primary_school,true) + array("cut3"=>"") + json_decode($user->junior_school,true) + array("cut4"=>"") + json_decode($user->senior_school,true)));
         }
         return Response::json($return);
     }

@@ -113,7 +113,7 @@ class AlumniController extends Controller
 
     function getCurrentStep(Request $request)
     {
-        $id = self::getUser(Cookie::get('token'));
+        $id = $this->getUser(Cookie::get('token'));
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
 
         switch ($user->current_step) {
@@ -141,7 +141,7 @@ class AlumniController extends Controller
 
     function backStep(Request $request)
     {
-        $id = self::getUser(Cookie::get('token'));
+        $id = $this->getUser(Cookie::get('token'));
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
         if ($user->current_step > 1) {
             if (!$this->canReturn($id) && $user->current_step = 6)
@@ -210,19 +210,19 @@ class AlumniController extends Controller
                 abort('404', 'Check your input!');
             switch ($step) {
                 case self::BASIC_INFO:
-                    $message = self::AuthStep1($info);
-                    return self::DataCheck($message, $id, $info, self::BASIC_INFO, 'auth_info');
+                    $message = self::authStep1($info);
+                    return $this->dataCheck($message, $id, $info, self::BASIC_INFO, 'auth_info');
                 case self::PRIMARY_INFO:
-                    $message = self::AuthStep2($info);
-                    return self::DataCheck($message, $id, $info, self::PRIMARY_INFO, 'primary_school');
+                    $message = self::authStep2($info);
+                    return $this->dataCheck($message, $id, $info, self::PRIMARY_INFO, 'primary_school');
                     break;
                 case self::JUNIOR_INFO:
-                    $message = self::AuthStep3($info);
-                    return self::DataCheck($message, $id, $info, self::JUNIOR_INFO, 'junior_school');
+                    $message = self::authStep3($info);
+                    return $this->dataCheck($message, $id, $info, self::JUNIOR_INFO, 'junior_school');
                     break;
                 case self::SENIOR_INFO:
-                    $message = self::AuthStep4($info);
-                    return self::DataCheck($message, $id, $info, self::SENIOR_INFO, 'senior_school');
+                    $message = self::authStep4($info);
+                    return $this->dataCheck($message, $id, $info, self::SENIOR_INFO, 'senior_school');
                     break;
                 case self::CHECK_INFO:
                     DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => $step + 1, 'submit_time' => date('y-m-d h:i:s')]);
@@ -236,7 +236,7 @@ class AlumniController extends Controller
     function AuthQuery(Request $request, $step)
     {
         $return_array = array();
-        $return_array['id'] = self::getUser(Cookie::get('token'));
+        $return_array['id'] = $this->getUser(Cookie::get('token'));
         $return_array['code'] = 200;
         $return_array['message'] = '一切正常';
         switch ($step) {
@@ -263,14 +263,19 @@ class AlumniController extends Controller
                     $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->senior_school, true);
                 return Response::json($return_array);
             case 5:
-                $return_array['info'] = $this->AuthStep5($return_array['id']);
+                $return_array['info'] = $this->authStep5($return_array['id']);
+                return Response::json($return_array);
+            case 6:
+                $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->college;
+                if (!is_null($info))
+                    $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->college, true);
                 return Response::json($return_array);
             default:
                 break;
         }
     }
 
-    function DataCheck($message, $id, $content, $step, $name, $insert = true)
+    function dataCheck($message, $id, $content, $step, $name, $insert = true)
     {
         if (empty($message)) {
             array_push($message, '恭喜您，所有当前的数据均符合要求！');
@@ -299,57 +304,57 @@ class AlumniController extends Controller
 
     }
 
-    function IsEmpty($content)
+    function isEmpty($content)
     {
         return @(is_null($content) || empty($content));
     }
 
-    function InsertId($id)
+    function insertId($id)
     {
         DB::connection('mysql_alumni')->table('user_auth')->insert(['id' => $id]);
     }
 
 
-    function EmptyCheck($type, $info, $name, &$message, $addMessage = true)
+    function emptyCheck($type, $info, $name, &$message, $addMessage = true)
     {
         switch ($type) {
             case self::SCHOOL_NO:
-                if (self::isEmpty($info)) {
+                if ($this->isEmpty($info)) {
                     if ($addMessage)
                         array_push($message, '请选择您所就读的' . $name . '。');
                     return false;
                 }
                 break;
             case self::ENTER_YAER:
-                if (self::isEmpty($info)) {
+                if ($this->isEmpty($info)) {
                     if ($addMessage)
                         array_push($message, '请填写您' . $name . '的入学年份。');
                     return false;
                 }
                 break;
             case self::GRADUATED_YEAR:
-                if (self::isEmpty($info)) {
+                if ($this->isEmpty($info)) {
                     if ($addMessage)
                         array_push($message, '请填写您' . $name . '的毕业年份。');
                     return false;
                 }
                 break;
             case self::SCHOOL_NAME:
-                if (self::isEmpty($info)) {
+                if ($this->isEmpty($info)) {
                     if ($addMessage)
                         array_push($message, '请填写您所就读的' . $name . '全名。请不要使用任何简写。');
                     return false;
                 }
                 break;
             case self::CLASS_NO:
-                if (self::isEmpty($info)) {
+                if ($this->isEmpty($info)) {
                     if ($addMessage)
                         array_push($message, '请填写您的' . $name . '初中班级号。');
                     return false;
                 }
                 break;
             default:
-                if (self::isEmpty($info)) {
+                if ($this->isEmpty($info)) {
                     if ($addMessage)
                         array_push($message, '请填写您的' . $name . '。');
                     return false;
@@ -358,7 +363,7 @@ class AlumniController extends Controller
         return true;
     }
 
-    function ClassNoCheck(&$info, $min, $max, $name, &$message)
+    function classNoCheck(&$info, $min, $max, $name, &$message)
     {
         $info = (int)($info);
         $valid = new Between(['min' => $min, 'max' => $max]);
@@ -368,7 +373,7 @@ class AlumniController extends Controller
     }
 
 
-    function SchoolYearCheck(&$enter_year, &$graduated_year, $minimum_year, $maximum_year, $interval, $remark, $name, &$message)
+    function schoolYearCheck(&$enter_year, &$graduated_year, $minimum_year, $maximum_year, $interval, $remark, $name, &$message)
     {
         $enter_year = (int)($enter_year);
         $graduated_year = (int)($graduated_year);
@@ -379,11 +384,11 @@ class AlumniController extends Controller
         $valid = new Between(['min' => $minimum_year + $interval, 'max' => $maximum_year + $interval]);
         if (!$valid->isValid($graduated_year) || !is_integer($graduated_year))
             array_push($message, $name . '毕业年份不正确。');
-        if ($enter_year + $interval != $graduated_year && (@self::isEmpty($remark)))
+        if ($enter_year + $interval != $graduated_year && (@$this->isEmpty($remark)))
             array_push($message, $name . '毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。');
     }
 
-    function StructureCheck($info, $count, &$message)
+    function structureCheck($info, $count, &$message)
     {
         if (count((array)$info) != $count)
             array_push($message, '您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。');
@@ -392,7 +397,7 @@ class AlumniController extends Controller
 
     //auth data
 
-    function AuthStep1($info)
+    function authStep1($info)
     {
         /*
             JSON格式：
@@ -415,7 +420,7 @@ abandoned
 
         */
         $message = array();
-        @self::EmptyCheck(self::OTHER, $info->realname, '真实姓名', $message);
+        @$this->emptyCheck(self::OTHER, $info->realname, '真实姓名', $message);
         if (mb_strlen($info->realname) >= 2 || mb_strlen($info->realname) <= 4) {
             $len = mb_strlen($info->realname);
             $width = mb_strwidth($info->realname);
@@ -424,12 +429,12 @@ abandoned
         } else {
             array_push($message, '真实姓名内容不符合要求。请输入2-4个中文字符');
         }
-        if (@self::EmptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message)) {
+        if (@$this->emptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message)) {
             if (!preg_match('/^1[34578]\d{9}$/', (string)($info->phone_domestic))) {
                 array_push($message, '国内手机号码不正确！');
             }
         }
-        if (@self::EmptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message, false)) {
+        if (@$this->emptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message, false)) {
             try {
                 $phone_validate = \libphonenumber\PhoneNumberUtil::getInstance();
                 $phone_number = $phone_validate->parse($info->phone_international, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
@@ -440,13 +445,13 @@ abandoned
                 array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
             }
         }
-        if (@self::EmptyCheck(self::OTHER, $info->nickname, '昵称或英文名', $message)) {
+        if (@$this->emptyCheck(self::OTHER, $info->nickname, '昵称或英文名', $message)) {
             $names = explode(',', $info->nickname);
             if (count($names) <= 0) {
                 array_push($message, '昵称或英文名分割错误，请检查您的输入内容。');
             }
         }
-        if (@self::EmptyCheck(self::OTHER, $info->birthday, '出生日期', $message)) {
+        if (@$this->emptyCheck(self::OTHER, $info->birthday, '出生日期', $message)) {
             $validator = new Date(['format' => 'Y/m/d']);
             if (!$validator->isValid($info->birthday)) {
                 array_push($message, '出生日期格式不符合要求。');
@@ -458,13 +463,13 @@ abandoned
                 array_push($message, '您的年龄不符合最低入学要求。');
             }
         }
-        if (@self::EmptyCheck(self::OTHER, $info->gender, '性别', $message)) {
+        if (@$this->emptyCheck(self::OTHER, $info->gender, '性别', $message)) {
             $info->gender = (int)($info->gender);
             $valid = new Between(['min' => self::GENDER_MALE, 'max' => self::GENDER_OTHER]);
             if (!$valid->isValid($info->gender))
                 array_push($message, '性别不正确。');
         }
-        if (@self::EmptyCheck(self::OTHER, $info->usedname, '曾用名', $message, false)) {
+        if (@$this->emptyCheck(self::OTHER, $info->usedname, '曾用名', $message, false)) {
             if (mb_strlen($info->usedname) >= 2 || mb_strlen($info->usedname) <= 4) {
                 $len = mb_strlen($info->usedname);
                 $width = mb_strwidth($info->usedname);
@@ -477,7 +482,7 @@ abandoned
         return $message;
     }
 
-    function AuthStep2($info)
+    function authStep2($info)
     {
         $message = array();
         /*
@@ -488,35 +493,35 @@ abandoned
                 primary_school_graduated_year：毕业年份
                 remark：备注
         */
-        if (@self::EmptyCheck(self::SCHOOL_NO, $info->primary_school_no, '小学', $message)) {
+        if (@$this->emptyCheck(self::SCHOOL_NO, $info->primary_school_no, '小学', $message)) {
             //两年毕业 ！！！
             switch ($info->primary_school_no) {
 
                 case self::OTHER_PRIMARY:
-                    @self::EmptyCheck(self::SCHOOL_NAME, $info->primary_school_name, '小学', $message);
-                    self::StructureCheck($info, 2, $message);
+                    @$this->emptyCheck(self::SCHOOL_NAME, $info->primary_school_name, '小学', $message);
+                    $this->structureCheck($info, 2, $message);
                     break;
                 case self::NFLS_PRIMARY_2:
-                    @self::EmptyCheck(self::SCHOOL_NAME, $info->primary_school_name, '其他小学', $message);
-                    @$passed = @self::EmptyCheck(self::ENTER_YAER, $info->primary_school_enter_year, '小学', $message);
-                    @$passed = @self::EmptyCheck(self::GRADUATED_YEAR, $info->primary_school_graduated_year, '小学', $message);
+                    @$this->emptyCheck(self::SCHOOL_NAME, $info->primary_school_name, '其他小学', $message);
+                    @$passed = @$this->emptyCheck(self::ENTER_YAER, $info->primary_school_enter_year, '小学', $message);
+                    @$passed = @$this->emptyCheck(self::GRADUATED_YEAR, $info->primary_school_graduated_year, '小学', $message);
                     if ($passed) {
                         $info->primary_school_enter_year = (int)($info->primary_school_enter_year);
                         $info->primary_school_graduated_year = (int)($info->primary_school_graduated_year);
-                        @self::SchoolYearCheck($info->primary_school_enter_year, $info->primary_school_graduated_year, self::SCHOOL_START_YEAR, self::PRIMARY_END_YEAR, 2, $info->primary_remark, '小学', $message);
+                        @$this->schoolYearCheck($info->primary_school_enter_year, $info->primary_school_graduated_year, self::SCHOOL_START_YEAR, self::PRIMARY_END_YEAR, 2, $info->primary_remark, '小学', $message);
                     }
-                    self::StructureCheck($info, 5, $message);
+                    $this->structureCheck($info, 5, $message);
                     break;
                 case self::NFLS_PRIMARY_4:
-                    @self::EmptyCheck(self::SCHOOL_NAME, $info->primary_school_name, '其他小学', $message);
-                    $passed = @self::EmptyCheck(self::ENTER_YAER, $info->primary_school_enter_year, '小学', $message);
-                    $passed = @self::EmptyCheck(self::GRADUATED_YEAR, $info->primary_school_graduated_year, '小学', $message);
+                    @$this->emptyCheck(self::SCHOOL_NAME, $info->primary_school_name, '其他小学', $message);
+                    $passed = @$this->emptyCheck(self::ENTER_YAER, $info->primary_school_enter_year, '小学', $message);
+                    $passed = @$this->emptyCheck(self::GRADUATED_YEAR, $info->primary_school_graduated_year, '小学', $message);
                     if ($passed) {
                         $info->primary_school_enter_year = (int)($info->primary_school_enter_year);
                         $info->primary_school_graduated_year = (int)($info->primary_school_graduated_year);
-                        @self::SchoolYearCheck($info->primary_school_enter_year, $info->primary_school_graduated_year, self::SCHOOL_START_YEAR, self::PRIMARY_END_YEAR, 4, $info->primary_remark, '小学', $message);
+                        @$this->schoolYearCheck($info->primary_school_enter_year, $info->primary_school_graduated_year, self::SCHOOL_START_YEAR, self::PRIMARY_END_YEAR, 4, $info->primary_remark, '小学', $message);
                     }
-                    self::StructureCheck($info, 5, $message);
+                    $this->structureCheck($info, 5, $message);
                     break;
                 default:
                     array_push($message, '小学信息不正确！请重新选择。');
@@ -526,7 +531,7 @@ abandoned
         return $message;
     }
 
-    function AuthStep3($info)
+    function authStep3($info)
     {
         $message = array();
         /*
@@ -538,21 +543,21 @@ abandoned
                 junior_class：班级号
                 remark：备注
         */
-        if (@self::EmptyCheck(self::SCHOOL_NO, $info->junior_school_no, '初中', $message)) {
+        if (@$this->emptyCheck(self::SCHOOL_NO, $info->junior_school_no, '初中', $message)) {
             switch ($info->junior_school_no) {
                 case self::OTHER_JUNIOR:
-                    @self::EmptyCheck(self::SCHOOL_NAME, $info->junior_school_name, '初中', $message);
-                    self::StructureCheck($info, 3, $message);
+                    @$this->emptyCheck(self::SCHOOL_NAME, $info->junior_school_name, '初中', $message);
+                    $this->structureCheck($info, 3, $message);
                     break;
                 case self::NFLS_JUNIOR:
-                    @$passed = self::EmptyCheck(self::SCHOOL_START_YEAR, $info->junior_school_enter_year, '初中', $message);
-                    @$passed = self::EmptyCheck(self::SCHOOL_START_YEAR, $info->junior_school_graduated_year, '初中', $message);
-                    @$passed = self::EmptyCheck(self::CLASS_NO, $info->junior_class, '初中', $message);
+                    @$passed = $this->emptyCheck(self::SCHOOL_START_YEAR, $info->junior_school_enter_year, '初中', $message);
+                    @$passed = $this->emptyCheck(self::SCHOOL_START_YEAR, $info->junior_school_graduated_year, '初中', $message);
+                    @$passed = $this->emptyCheck(self::CLASS_NO, $info->junior_class, '初中', $message);
                     if ($passed) {
-                        @self::SchoolYearCheck($info->junior_school_enter_year, $info->junior_school_graduated_year, self::SCHOOL_START_YEAR, date('Y') - 6, 3, $info->junior_remark, '初中', $message);
-                        @self::ClassNoCheck($info->junior_class, 1, 12, '初中', $message);
+                        @$this->schoolYearCheck($info->junior_school_enter_year, $info->junior_school_graduated_year, self::SCHOOL_START_YEAR, date('Y') - 6, 3, $info->junior_remark, '初中', $message);
+                        @$this->classNoCheck($info->junior_class, 1, 12, '初中', $message);
                     }
-                    self::StructureCheck($info, 5, $message);
+                    $this->structureCheck($info, 5, $message);
                     break;
                 default:
                     array_push($message, '初中信息不正确！请重新选择。');
@@ -562,7 +567,7 @@ abandoned
         return $message;
     }
 
-    function AuthStep4($info)
+    function authStep4($info)
     {
         $message = array();
         /*
@@ -581,75 +586,75 @@ abandoned
                 graduate_info: 1[保送] 2[高考] 3[提前高考] 4[出国] 5[提前出国] 6[其他]
                 remark：备注
         */
-        if (@self::isEmpty($info->senior_school_no))
+        if (@$this->isEmpty($info->senior_school_no))
             array_push($message, '请选择您所就读的高中。');
         else {
             switch ($info->senior_school_no) {
                 case self::OTHER_SENIOR:
-                    @self::EmptyCheck(self::SCHOOL_NAME, $info->senior_school_name, '高中', $message);
-                    self::StructureCheck($info, 3, $message);
+                    @$this->emptyCheck(self::SCHOOL_NAME, $info->senior_school_name, '高中', $message);
+                    $this->structureCheck($info, 3, $message);
                     break;
                 case self::NFLS_SENIOR_GENERAL:
-                    @$passed = self::EmptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, '高中', $message);
-                    @$passed = self::EmptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, '高中', $message);
-                    @$passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_11, '高一上', $message);
-                    @$passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_12, '高一下', $message);
-                    @$passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_21, '高二上', $message);
-                    @$passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_22, '高二下', $message);
-                    @$passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_31, '高三上', $message);
-                    @$passed = self::EmptyCheck(self::CLASS_NO, $info->senior_class_32, '高三下', $message);
+                    @$passed = $this->emptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, '高中', $message);
+                    @$passed = $this->emptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, '高中', $message);
+                    @$passed = $this->emptyCheck(self::CLASS_NO, $info->senior_class_11, '高一上', $message);
+                    @$passed = $this->emptyCheck(self::CLASS_NO, $info->senior_class_12, '高一下', $message);
+                    @$passed = $this->emptyCheck(self::CLASS_NO, $info->senior_class_21, '高二上', $message);
+                    @$passed = $this->emptyCheck(self::CLASS_NO, $info->senior_class_22, '高二下', $message);
+                    @$passed = $this->emptyCheck(self::CLASS_NO, $info->senior_class_31, '高三上', $message);
+                    @$passed = $this->emptyCheck(self::CLASS_NO, $info->senior_class_32, '高三下', $message);
                     if ($passed) {
-                        @self::SchoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::SCHOOL_START_YEAR, date('Y') - 3, 3, $info->senior_remark, '高中', $message);//
+                        @$this->schoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::SCHOOL_START_YEAR, date('Y') - 3, 3, $info->senior_remark, '高中', $message);//
                         //self::
-                        self::ClassNoCheck($info->senior_class_11, 1, 8, '高一上', $message);
-                        self::ClassNoCheck($info->senior_class_12, 0, 8, '高一下', $message);
-                        self::ClassNoCheck($info->senior_class_21, 0, 8, '高二上', $message);
-                        self::ClassNoCheck($info->senior_class_22, 0, 8, '高二下', $message);
-                        self::ClassNoCheck($info->senior_class_31, 0, 8, '高三上', $message);
-                        self::ClassNoCheck($info->senior_class_32, 0, 8, '高三下', $message);
+                        $this->classNoCheck($info->senior_class_11, 1, 8, '高一上', $message);
+                        $this->classNoCheck($info->senior_class_12, 0, 8, '高一下', $message);
+                        $this->classNoCheck($info->senior_class_21, 0, 8, '高二上', $message);
+                        $this->classNoCheck($info->senior_class_22, 0, 8, '高二下', $message);
+                        $this->classNoCheck($info->senior_class_31, 0, 8, '高三上', $message);
+                        $this->classNoCheck($info->senior_class_32, 0, 8, '高三下', $message);
                     }
-                    self::StructureCheck($info, 10, $message);
+                    $this->structureCheck($info, 10, $message);
                     break;
                 /*
                 case NFLS_SENIOR_AUSTRALIA:
-                    $passed = self::EmptyCheck(self::ENTER_YAER,$info->senior_school_enter_year,'高中',$message);
-                    $passed = self::EmptyCheck(self::GRADUATED_YEAR,$info->senior_school_graduated_year,'高中',$message);
+                    $passed = $this->emptyCheck(self::ENTER_YAER,$info->senior_school_enter_year,'高中',$message);
+                    $passed = $this->emptyCheck(self::GRADUATED_YEAR,$info->senior_school_graduated_year,'高中',$message);
                     if($passed)
-                        @self::SchoolYearCheck($info->senior_school_enter_year,$info->senior_school_graduated_year,self::SCHOOL_START_YEAR,date('Y') - 3,3,$info->remark,'高中',$message);
-                    self::StructureCheck($info,4,$message);
+                        @$this->schoolYearCheck($info->senior_school_enter_year,$info->senior_school_graduated_year,self::SCHOOL_START_YEAR,date('Y') - 3,3,$info->remark,'高中',$message);
+                    $this->structureCheck($info,4,$message);
                     break;
                 */
                 case self::NFLS_SENIOR_ALEVEL:
-                    @$passed = self::EmptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, '高中', $message);
-                    @$passed = self::EmptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, '高中', $message);
+                    @$passed = $this->emptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, '高中', $message);
+                    @$passed = $this->emptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, '高中', $message);
                     if ($passed) {
                         if ($info->senior_school_enter_year > self::ALEVEL_2_START_YEAR) {
-                            @self::SchoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::ALEVEL_2_START_YEAR, date('Y') - 3, 3, $info->remark, '高中', $message);
-                            @self::ClassNoCheck($info->senior_class, 1, 2, '高中', $message);
+                            @$this->schoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::ALEVEL_2_START_YEAR, date('Y') - 3, 3, $info->remark, '高中', $message);
+                            @$this->classNoCheck($info->senior_class, 1, 2, '高中', $message);
                         } else {
-                            @self::SchoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::ALEVEL_4_START_YEAR, date('Y') - 3, 3, $info->remark, '高中', $message);
-                            @self::ClassNoCheck($info->senior_class, 1, 4, '高中', $message);
+                            @$this->schoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::ALEVEL_4_START_YEAR, date('Y') - 3, 3, $info->remark, '高中', $message);
+                            @$this->classNoCheck($info->senior_class, 1, 4, '高中', $message);
                         }
                     }
-                    self::StructureCheck($info, 5, $message);
+                    $this->structureCheck($info, 5, $message);
                     break;
                 case self::NFLS_SENIOR_IB:
-                    @$passed = self::EmptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, '高中', $message);
-                    @$passed = self::EmptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, '高中', $message);
+                    @$passed = $this->emptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, '高中', $message);
+                    @$passed = $this->emptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, '高中', $message);
                     if ($passed) {
-                        @self::SchoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::IB_START_YEAR, date('Y') - 3, 3, $info->remark, '高中', $message);
-                        @self::ClassNoCheck($info->senior_class, 1, 2, '高中', $message);
+                        @$this->schoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::IB_START_YEAR, date('Y') - 3, 3, $info->remark, '高中', $message);
+                        @$this->classNoCheck($info->senior_class, 1, 2, '高中', $message);
                     }
-                    self::StructureCheck($info, 5, $message);
+                    $this->structureCheck($info, 5, $message);
                     break;
                 case self::NFLS_SENIOR_BCA:
-                    @$passed = self::EmptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, '高中', $message);
-                    @$passed = self::EmptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, '高中', $message);
+                    @$passed = $this->emptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, '高中', $message);
+                    @$passed = $this->emptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, '高中', $message);
                     if ($passed) {
-                        @self::SchoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::BCA_START_YEAR, date('Y') - 3, 3, $info->remark, '高中', $message);
-                        @self::ClassNoCheck($info->senior_class, 1, 6, '高中', $message);
+                        @$this->schoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::BCA_START_YEAR, date('Y') - 3, 3, $info->remark, '高中', $message);
+                        @$this->classNoCheck($info->senior_class, 1, 6, '高中', $message);
                     }
-                    self::StructureCheck($info, 5, $message);
+                    $this->structureCheck($info, 5, $message);
                     break;
                 default:
                     array_push($message, '高中信息不正确！请重新选择。');
@@ -660,7 +665,7 @@ abandoned
     }
 
 
-    function AuthStep5($id)
+    function authStep5($id)
     {
         $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
         $return_array = array();
@@ -668,6 +673,11 @@ abandoned
 
     }
 
+    function authStep6($info)
+    {
+        $message = array();
+        if(@$this->)
+    }
 
 }
 
