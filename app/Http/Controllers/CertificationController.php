@@ -14,7 +14,7 @@ use Zend\Validator\Between;
 use Zend\Validator\Date;
 use Response;
 
-class AlumniController extends Controller
+class CertificationController extends Controller
 {
     const NOT_START = 0;
     const IN_PROGRESS = 1;
@@ -41,6 +41,8 @@ class AlumniController extends Controller
     const SENIOR_INFO = 4;
     const CHECK_INFO = 5;
     const COLLEGE_INFO = 6;
+    const WORK_INFO = 7;
+    const PERSONAL_INFO = 8;
 
     const SCHOOL_NO = 1;
     const ENTER_YAER = 2;
@@ -66,23 +68,22 @@ class AlumniController extends Controller
 
 
     const GENERAL_INSTRUCTION = [
-        '本认证共八步，前五步将确认您的校友信息，提交并审核通过后无法修改，后三步为后续经历填写，可随时修改',
+        '本认证共八步，前五步将确认您的校友信息，提交并审核通过后无法修改（手机号除外），后三步为后续经历填写，可随时修改',
         '单击上一步可返回，单击下一步将把您填写的信息发送至服务器保存，单击重置可将当前表格恢复至最近一次保存的内容，单击清空可以将表格填写内容清空',
         '审核时间约为1-5天，部分使用邀请码注册的用户可能会享有免审核特权，审核期间您可以完善后续表格，您只有在完成所有表格后才能使用在线校友录功能',
         '对于您提供的信息，您可在认证结束后自行修改相关隐私设置，我们将尊重您的设置，不会随意透露给第三方或其他用户（默认设置为：同一届同学可见）',
-        '表格除个人介绍部分外所有符号均为半角符号，请在输入相关符号时切换至英文输入法，否则服务器可能将无法识别您输入的内容',
-        '所有入学/毕业年份请用4位阿拉伯数字填写，所有班级号请用1位或者2位阿拉伯数字，或者是一个英文字母填写（仅限国际部）',
-        '所有学校名称请使用完整的官方名称，不要使用任何简写、简拼等。非南京市的请注明所在城市。',
+        '表格除个人介绍和工作信息部分外所有符号均为半角符号，请在输入相关符号时切换至英文输入法，否则服务器可能将无法识别您输入的内容',
+        '所有入学/毕业年份不记录具体日月，只记录年份',
+        '所有学校名称请使用完整的官方名称，不要使用任何简写、简拼等。',
         '挂靠请按照实际情况填写在南外就读所对应的班级号'
     ];
 
     const STEP1 = [
         '填写此表格前请确认您的用户名及邮箱是否正确',
-        '生日请使用yyyy/mm/dd的格式填写，即如果你的生日在2000年1月1日，就请填写2000/01/01，注意符号为半角符号',
-        '昵称或英文名请填写在南外期间常用的，如英语课上的英文名，或者是同学之间的昵称，如有多个请用半角逗号', '分割；如果更改过姓名请填写曾用名',
+        '昵称或英文名请填写在南外期间常用的，如英语课上的英文名，或者是同学之间的昵称，如有多个请用半角逗号分割；如果更改过姓名请填写曾用名',
         '手机号请务必填写正确，在未来可能会启用手机号验证系统',
         '出国的同学请填写自己的国外手机号，并请加上正确的国际区号，以便联系',
-        '本页除“曾用名”项外均为必填项目，“手机号码（国外）”仅需要长期不在国内的校友（如读书或工作等）填写'
+        '本页除“曾用名”项外均为必填项目，“手机号码（国外）”仅需要当前不在国内的校友填写'
     ];
 
     const STEP2 = [
@@ -110,13 +111,32 @@ class AlumniController extends Controller
         '单击下一步，您可以提交您的校友认证，您的信息将由管理员进行审核',
         '审核期间，您可以继续填写下面的表格，请注意，您只有在完成所有表格后才能使用在线校友录功能'
     ];
+	
+	const STEP6 = [
+        '请在本页填写您的大学信息',
+        '如果您已经获得或正在获得相关学历，请在对应方框内打钩，并填写相关内容。若还没有毕业可填写预估的毕业年份',
+		'如果您有除了列表内容以外的学历，请在“其他”中填写',
+		'请至少填写一个内容'
+    ];
+	
+	const STEP7 = [
+        '请在本页填写您的工作信息',
+        '本区域可自由发挥，介绍工作的公司，职业类型什么的都可以。文本框会根据内容自动调整大小。',
+		'如果您暂时还在就读大学，可留空。'
+    ];
+	
+	const STEP8 = [
+        '请在本页填写您的个人信息',
+        '本区域可自由发挥，可填写自我介绍等各类关于自己的内容。文本框会根据内容自动调整大小。',
+		'底下的联系方式，可根据自己的情况选填，但至少必须填写一个。'
+    ];
+
 
 
     function getCurrentStep(Request $request)
     {
         $id = $this->getUser(Cookie::get('token'));
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
-
         switch ($user->current_step) {
             case 1:
                 $instructions = self::STEP1;
@@ -132,6 +152,15 @@ class AlumniController extends Controller
                 break;
             case 5:
                 $instructions = self::STEP5;
+                break;
+            case 6:
+                $instructions = self::STEP6;
+                break;
+            case 7:
+                $instructions = self::STEP7;
+                break;
+            case 8:
+                $instructions = self::STEP8;
                 break;
             default:
                 $instructions = [];
@@ -195,7 +224,7 @@ class AlumniController extends Controller
         return Response::json(array('message' => self::GENERAL_INSTRUCTION));
     }
 
-    function AuthUpdate(Request $request, $step)
+    function authUpdate(Request $request, $step)
     {
         //TODO CHECK USER'S CURRENT STEP
         if (is_numeric($step) == true) {
@@ -212,18 +241,18 @@ class AlumniController extends Controller
                 abort('404', 'Check your input!');
             switch ($step) {
                 case self::BASIC_INFO:
-                    $message = self::authStep1($info);
+                    $message = $this->authStep1($info);
                     return $this->dataCheck($message, $id, $info, self::BASIC_INFO, 'auth_info');
                 case self::PRIMARY_INFO:
-                    $message = self::authStep2($info);
+                    $message = $this->authStep2($info);
                     return $this->dataCheck($message, $id, $info, self::PRIMARY_INFO, 'primary_school');
                     break;
                 case self::JUNIOR_INFO:
-                    $message = self::authStep3($info);
+                    $message = $this->authStep3($info);
                     return $this->dataCheck($message, $id, $info, self::JUNIOR_INFO, 'junior_school');
                     break;
                 case self::SENIOR_INFO:
-                    $message = self::authStep4($info);
+                    $message = $this->authStep4($info);
                     return $this->dataCheck($message, $id, $info, self::SENIOR_INFO, 'senior_school');
                     break;
                 case self::CHECK_INFO:
@@ -231,50 +260,67 @@ class AlumniController extends Controller
                     return Response::json(array('code' => '200', 'message' => '提交成功！清单大概管理员审核。'));
                     break;
                 case self::COLLEGE_INFO:
-                    $message = self::authStep6($info);
+                    $message = $this->authStep6($info);
                     return $this->dataCheck($message, $id, $info, self::COLLEGE_INFO, 'college');
                     break;
-                //s
+                case self::WORK_INFO:
+                    $message = $this->authStep7($info);
+                    return $this->dataCheck($message, $id, $info, self::WORK_INFO, 'working_info');
+                    break;
+                case self::PERSONAL_INFO:
+                    $message = $this->authStep8($info);
+                    return $this->dataCheck($message, $id, $info, self::PERSONAL_INFO, 'personal_info');
+                    break;
             }
         }
     }
 
-    function AuthQuery(Request $request, $step)
+    function authQuery(Request $request, $step)
     {
         $return_array = array();
         $return_array['id'] = $this->getUser(Cookie::get('token'));
         $return_array['code'] = 200;
         $return_array['message'] = '一切正常';
         switch ($step) {
-            case 1:
+            case self::BASIC_INFO:
                 $return_array['info']['email'] = UserCenterController::GetUserEmail($return_array['id']);
                 $return_array['info']['username'] = UserCenterController::GetUserNickname($return_array['id']);
                 $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->auth_info;
                 if (!is_null($info))
-                    $return_array['info'] = array_merge(json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->auth_info, true), $return_array['info']);
+                    $return_array['info'] = array_merge(json_decode($info, true), $return_array['info']);
                 return Response::json($return_array);
-            case 2:
+            case self::PRIMARY_INFO:
                 $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->primary_school;
                 if (!is_null($info))
-                    $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->primary_school, true);
+                    $return_array['info'] = json_decode($info, true);
                 return Response::json($return_array);
-            case 3:
+            case self::JUNIOR_INFO:
                 $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->junior_school;
                 if (!is_null($info))
-                    $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->junior_school, true);
+                    $return_array['info'] = json_decode($info, true);
                 return Response::json($return_array);
-            case 4:
+            case self::SENIOR_INFO:
                 $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->senior_school;
                 if (!is_null($info))
-                    $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->senior_school, true);
+                    $return_array['info'] = json_decode($info, true);
                 return Response::json($return_array);
-            case 5:
+            case self::CHECK_INFO:
                 $return_array['info'] = $this->authStep5($return_array['id']);
                 return Response::json($return_array);
-            case 6:
+            case self::COLLEGE_INFO:
                 $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->college;
                 if (!is_null($info))
-                    $return_array['info'] = json_decode(DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->college, true);
+                    $return_array['info'] = json_decode($info, true);
+                return Response::json($return_array);
+            case self::WORK_INFO:
+                $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->working_info;
+                if (!is_null($info))
+                    $return_array['info'] = json_decode($info, true);
+                return Response::json($return_array);
+            case self::PERSONAL_INFO:
+                $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->personal_info;
+                if (!is_null($info))
+                    $return_array['info'] = json_decode($info, true);
                 return Response::json($return_array);
             default:
                 break;
