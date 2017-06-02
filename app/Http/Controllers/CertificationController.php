@@ -234,7 +234,6 @@ class CertificationController extends Controller
 
     function authUpdate(Request $request, $step)
     {
-        //TODO CHECK USER'S CURRENT STEP
         if (is_numeric($step) == true) {
             $id = UserCenterController::GetUserId(Cookie::get('token'));
             if ($id < 0) {
@@ -242,7 +241,7 @@ class CertificationController extends Controller
             }
             $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
             if((int)$user->current_step != $step)
-                return Response::json(array('code' => '403', 'message' => array(['请点击重置或刷新网页再试。'])));
+                return Response::json(array('code' => '403', 'message' => array(['数据不匹配！请点击重置或刷新网页再试。'])));
             if (is_null($user))
                 self::InsertId($id);
             $content = file_get_contents('php://input');
@@ -266,8 +265,15 @@ class CertificationController extends Controller
                     return $this->dataCheck($message, $id, $info, self::SENIOR_INFO, 'senior_school');
                     break;
                 case self::CHECK_INFO:
-                    DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => $step + 1, 'submit_time' => date('y-m-d h:i:s')]);
-                    return Response::json(array('code' => '200', 'message' => array(['提交成功！请等待管理员审核。您可以继续填写本表格，但无法返回修改前面的内容了。'])));
+                    $message = $this->authStep5($id);
+                    if (empty($message)) {
+                        array_push($message, '您提交的数据已保存至数据库，即将进入下一步。');
+                        DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => $step + 1, 'submit_time' => date('y-m-d h:i:s')]);
+                        return Response::json(array('code' => '200', 'message' => $message));
+                    } else {
+                        array_unshift($message, '非常抱歉，您提交的数据在以下部分存在问题：');
+                        return Response::json(array('code' => '403.1', 'message' => $message));
+                    }
                     break;
                 case self::COLLEGE_INFO:
                     $message = $this->authStep6($info);
@@ -316,6 +322,10 @@ class CertificationController extends Controller
                 return Response::json($return_array);
             case self::CHECK_INFO:
                 $return_array['info'] = $this->authStep5($return_array['id']);
+                if(count($return_array['info'])==0)
+                    array_push($return_array['info'],"您的表格无任何机械性错误，请再次检查填写内容是否正确！");
+                else
+                    array_unshift($return_array['info'],"您的表格存在以下错误，请再次检查填写内容是否正确！");
                 return Response::json($return_array);
             case self::COLLEGE_INFO:
                 $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->college;
@@ -732,15 +742,47 @@ abandoned
     {
         $return_array = array();
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
-        $birth_year = mb_substr(json_decode($user->auth_info,true)['birthday'],0,4);
+        $birth_year = (int)mb_substr(json_decode($user->auth_info,true)['birthday'],0,4);
         $primary=json_decode($user->primary_school);
         $junior=json_decode($user->junior_school);
         $senior=json_decode($user->senior_school);
-        if(['junior_school_no']>0){
-
+        $p_graduate = 0;
+        $j_enter = 0;
+        $j_graduate = 0;
+        $s_enter = 0;
+        if($primary->primary_school_no > 0){
+            if(-$birth_year + $primary->primary_school_graduated_year > 15)
+                array_push($return_array,"小学毕业年份与生日差大于15年！");
+            if(-$birth_year + $primary->primary_school_graduated_year < 12)
+                array_push($return_array,"小学毕业年份与生日差小于12年！");
+            $p_graduate = $primary->primary_school_graduated_year;
         }
+        if($junior->junior_school_no > 0){
+            if(-$birth_year + $junior->junior_school_graduated_year > 18)
+                array_push($return_array,"初中毕业年份与生日差大于18年！");
+            if(-$birth_year + $junior->junior_school_graduated_year < 15)
+                array_push($return_array,"初中毕业年份与生日差小于15年！");
+            $j_enter = $junior->junior_school_enter_year;
+            $j_graduate = $junior->junior_school_graduated_year;
+        }
+        if($senior->senior_school_no > 0){
+            if(-$birth_year + $senior->senior_school_graduated_year > 21)
+                array_push($return_array,"高中毕业年份与生日差大于21年！");
+            if(-$birth_year + $senior->senior_school_graduated_year < 18)
+                array_push($return_array,"高中毕业年份与生日差小于18年！");
+            $s_enter = $senior->senior_school_enter_year;
+        }
+        if($p_graduate!=0 && $j_enter!=0 && ($j_enter - $p_graduate > 1))
+            array_push($return_array,"小学毕业与初中入学年份相差超过一年！");
+        if($j_graduate!=0 && $s_enter!=0 && ($s_enter - $j_graduate > 1))
+            array_push($return_array,"初中毕业与高中入学年份相差超过一年！");
+        if($p_graduate!=0 && $j_enter!=0 && ($j_enter < $p_graduate))
+            array_push($return_array,"初中入学年份小于小学毕业年份！");
+        if($j_graduate!=0 && $s_enter!=0 && ($s_enter < $j_graduate))
+            array_push($return_array,"高中入学年份小于初中毕业年份！");
+
         //$user->
-        return array('confirm_info' => array(['经检验，您的表格不存在机械性问题。请检查您填写的具体内容是否正确。']));
+        return $return_array;
 
     }
 
