@@ -164,7 +164,7 @@ class CertificationController extends Controller
                 $instructions = [];
                 break;
         }
-        return Response::json(array('code' => '200', 'instructions' => $instructions, 'step' => $user->current_step));
+        return Response::json(array('code' => '200', 'messgae'=> '一切正常','instructions' => $instructions, 'step' => $user->current_step));
     }
 
     function backStep(Request $request)
@@ -175,7 +175,7 @@ class CertificationController extends Controller
             if (!$this->canReturn($id) && $user->current_step == 6)
                 return Response::json(array('code' => '403', 'message' => '您的申请正在处理中，无法返回编辑'));
             DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => (int)$user->current_step - 1]);
-            return Response::json(array('code' => '200', 'message' => '已成功返回至上一步'));
+            return Response::json(array('code' => '200', 'message' => '您即将返回至上一步'));
         } else {
             return Response::json(array('code' => '403', 'message' => '您已经在第一步，无法再返回了'));
         }
@@ -202,6 +202,16 @@ class CertificationController extends Controller
             array_push($return, '审核员：' . $user->operator);
         return Response::json(array('code' => '200', 'message' => $return));
 
+    }
+
+    function getDuration(Request $request){
+        $id = $this->getUser(Cookie::get('token'));
+        $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
+        $birth_year = mb_substr(json_decode($user->auth_info,true)['birthday'],0,4);
+        $birth_month = mb_substr(json_decode($user->auth_info,true)['birthday'],5,2);
+        $birth_day = mb_substr(json_decode($user->auth_info,true)['birthday'],8,2);
+        $now = date('Y');
+        return Response::json(array("max"=>$now+5,"min_year"=>(int)($birth_year),"min_month"=>(int)($birth_month),"min_day"=>(int)($birth_day)));
     }
 
     function getUser($token)
@@ -231,6 +241,8 @@ class CertificationController extends Controller
                 return Response::json(array('code' => '23333'));
             }
             $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
+            if((int)$user->current_step != $step)
+                return Response::json(array('code' => '403', 'message' => array(['请点击重置或刷新网页再试。'])));
             if (is_null($user))
                 self::InsertId($id);
             $content = file_get_contents('php://input');
@@ -255,7 +267,7 @@ class CertificationController extends Controller
                     break;
                 case self::CHECK_INFO:
                     DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => $step + 1, 'submit_time' => date('y-m-d h:i:s')]);
-                    return Response::json(array('code' => '200', 'message' => '提交成功！清单大概管理员审核。'));
+                    return Response::json(array('code' => '200', 'message' => array(['提交成功！请等待管理员审核。您可以继续填写本表格，但无法返回修改前面的内容了。'])));
                     break;
                 case self::COLLEGE_INFO:
                     $message = $this->authStep6($info);
@@ -321,6 +333,7 @@ class CertificationController extends Controller
                     $return_array['info'] = json_decode($info, true);
                 return Response::json($return_array);
             default:
+                return Response::json($return_array);
                 break;
         }
     }
@@ -328,7 +341,7 @@ class CertificationController extends Controller
     function dataCheck($message, $id, $content, $step, $name, $insert = true)
     {
         if (empty($message)) {
-            array_push($message, '恭喜您，所有当前的数据均符合要求！');
+            array_push($message, '您提交的数据已保存至数据库，即将进入下一步。');
             if ($insert) {
                 DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => json_encode($content), 'current_step' => $step + 1, 'edit_time' => date('y-m-d h:i:s')]);
             }
@@ -718,6 +731,15 @@ abandoned
     function authStep5($id)
     {
         $return_array = array();
+        $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
+        $birth_year = mb_substr(json_decode($user->auth_info,true)['birthday'],0,4);
+        $primary=json_decode($user->primary_school);
+        $junior=json_decode($user->junior_school);
+        $senior=json_decode($user->senior_school);
+        if(['junior_school_no']>0){
+
+        }
+        //$user->
         return array('confirm_info' => array(['经检验，您的表格不存在机械性问题。请检查您填写的具体内容是否正确。']));
 
     }
@@ -726,28 +748,31 @@ abandoned
     {
         $message = array();
         $passed = false;
+        $grid_count = 0;
         if(@!$this->isEmpty($info->college) && $info->college == true)
-            $passed = $this->collegeInfoCheck("college",$info,$message,"专科");
+            $passed = $this->collegeInfoCheck("college",$info,$message,"专科",$grid_count);
         if(@!$this->isEmpty($info->undergraduate) && $info->undergraduate == true)
-            $passed = $this->collegeInfoCheck("undergraduate",$info,$message,"本科");
+            $passed = $this->collegeInfoCheck("undergraduate",$info,$message,"本科",$grid_count);
         if(@!$this->isEmpty($info->master) && $info->master == true)
-            $passed = $this->collegeInfoCheck("master",$info,$message,"硕士");
+            $passed = $this->collegeInfoCheck("master",$info,$message,"硕士",$grid_count);
         if(@!$this->isEmpty($info->doctor) && $info->doctor == true)
-            $passed = $this->collegeInfoCheck("doctor",$info,$message,"博士");
+            $passed = $this->collegeInfoCheck("doctor",$info,$message,"博士",$grid_count);
         if(@!$this->isEmpty($info->other) && $info->other == true)
-            $passed = $this->collegeInfoCheck("other",$info,$message,"其他");
+            $passed = $this->collegeInfoCheck("other",$info,$message,"其他",$grid_count);
         if(!$passed)
             array_push($message,"请至少选择一个进行填写！");
+        $this->structureCheck($info,$grid_count+6,$message);
         return $message;
     }
 
-    function collegeInfoCheck($index,$info,&$message,$name){
+    function collegeInfoCheck($index,$info,&$message,$name,&$count){
         //array_push($message,"1");
         $min_year = 1900;
         $max_year = 2100;
         foreach($info as $key=>$value){
             switch($key){
                 case $index."_start":
+                    $count = $count + 4;
                     if ($this->isEmpty($value)) {
                         array_push($message, $name . '入学年份未填写。');
                     }
@@ -782,8 +807,10 @@ abandoned
                         array_push($message, $name . '就读院校未填写。');
                     break;
                 case $index."_type":
-                    if ($this->isEmpty($value) && $index == "other")
+                    if ($this->isEmpty($value) && $index == "other") {
                         array_push($message, $name . '院校类型未填写。');
+                        $count++;
+                    }
                     break;
             }
         }
@@ -797,12 +824,45 @@ abandoned
     function authStep7($info){
         $message = array();
         $this->structureCheck($info,1,$message);
-        //没啥好检查的，，，
+        if(is_null($info->work_info))
+            array_push($message,"您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。");
         return $message;
     }
 
     function authStep8($info){
         $message = array();
+        $contact_count = 0;
+        $content_count = 0;
+        $this->structureCheck($info,14,$message);
+        if($this->isEmpty($info->personal_info))
+            array_push($message,"请填写自我介绍。");
+        foreach($info as $key=>$value){
+            switch($key){
+                case "wechat":
+                case "qq":
+                case "weibo":
+                case "telegram":
+                case "whatsapp":
+                case "skype":
+                case "viber":
+                case "google_talk":
+                case "youtube":
+                case "twitter":
+                case "facebook":
+                case "vimeo":
+                case "instagram":
+                    $contact_count++;
+                    if(!$this->isEmpty($value))
+                        $content_count++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        if($contact_count != 13)
+            array_push($message,"您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。");
+        if($content_count == 0)
+            array_push($message,"请至少填写一个联系方式。");
         return $message;
     }
 
