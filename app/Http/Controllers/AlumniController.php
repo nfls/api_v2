@@ -145,7 +145,7 @@ class AlumniController extends Controller
         $id = $this->getUser(Cookie::get('token'));
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
         if ($user->current_step > 1) {
-            if (!$this->canReturn($id) && $user->current_step = 6)
+            if (!$this->canReturn($id) && $user->current_step == 6)
                 return Response::json(array('code' => '403', 'message' => '您的申请正在处理中，无法返回编辑'));
             DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => (int)$user->current_step - 1]);
             return Response::json(array('code' => '200', 'message' => '已成功返回至上一步'));
@@ -673,7 +673,6 @@ abandoned
 
     function authStep5($id)
     {
-        $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
         $return_array = array();
         return array('confirm_info' => array(['经检验，您的表格不存在机械性问题。请检查您填写的具体内容是否正确。']));
 
@@ -682,23 +681,26 @@ abandoned
     function authStep6($info)
     {
         $message = array();
+        $passed = false;
         if(@!$this->isEmpty($info->college) && $info->college == true)
-            $this->collegeInfoCheck("college",$info,$message,"专科");
+            $passed = $this->collegeInfoCheck("college",$info,$message,"专科");
         if(@!$this->isEmpty($info->undergraduate) && $info->undergraduate == true)
-            $this->collegeInfoCheck("undergraduate",$info,$message,"本科");
+            $passed = $this->collegeInfoCheck("undergraduate",$info,$message,"本科");
         if(@!$this->isEmpty($info->master) && $info->master == true)
-            $this->collegeInfoCheck("master",$info,$message,"硕士");
+            $passed = $this->collegeInfoCheck("master",$info,$message,"硕士");
         if(@!$this->isEmpty($info->doctor) && $info->doctor == true)
-            $this->collegeInfoCheck("doctor",$info,$message,"博士");
+            $passed = $this->collegeInfoCheck("doctor",$info,$message,"博士");
         if(@!$this->isEmpty($info->other) && $info->other == true)
-            $this->collegeInfoCheck("other",$info,$message,"其他");
+            $passed = $this->collegeInfoCheck("other",$info,$message,"其他");
+        if(!$passed)
+            array_push($message,"请至少选择一个进行填写！");
         return $message;
     }
 
     function collegeInfoCheck($index,$info,&$message,$name){
         //array_push($message,"1");
-        $start_year = 1900;
-        $end_year = 2100;
+        $min_year = 1900;
+        $max_year = 2100;
         foreach($info as $key=>$value){
             switch($key){
                 case $index."_start":
@@ -706,19 +708,25 @@ abandoned
                         array_push($message, $name . '入学年份未填写。');
                     }
                     else {
-                        $valid = new Between(['min' => $start_year, 'max' => $end_year]);
+                        $value = (int)$value;
+                        $valid = new Between(['min' => $min_year, 'max' => $max_year]);
                         if (!$valid->isValid($value) || !is_integer($value))
                             array_push($message, $name . '入学年份不正确。');
+                        else
+                            $start_year = $value;
                     }
                     break;
                 case $index."_end":
                     if ($this->isEmpty($value)) {
-                        array_push($message, $name . '入学年份未填写。');
+                        array_push($message, $name . '毕业年份未填写。');
                     }
                     else {
-                        $valid = new Between(['min' => $start_year, 'max' => $end_year]);
+                        $value = (int)$value;
+                        $valid = new Between(['min' => $min_year, 'max' => $max_year]);
                         if (!$valid->isValid($value) || !is_integer($value))
                             array_push($message, $name . '毕业年份不正确。');
+                        else
+                            $end_year = $value;
                     }
                     break;
                 case $index."_major":
@@ -735,6 +743,11 @@ abandoned
                     break;
             }
         }
+        if(!is_null($start_year) && !is_null($end_year)){
+            if($start_year>$end_year)
+                array_push($message,$name . "入学年份大于毕业年份。");
+        }
+        return true;
     }
 
 }
