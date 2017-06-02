@@ -186,20 +186,29 @@ class CertificationController extends Controller
         $id = $this->getUser(Cookie::get('token'));
         $return = array();
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
-        if ($user->status == false)//未通过
+        if ($user->status == false)
             array_push($return, '状态：未实名认证');
         else
             array_push($return, '状态：已实名认证');
-        if (!is_null($user->edit_time))
-            array_push($return, '最近一次编辑时间：' . $user->edit_time);
-        if (is_null($user->submit_time))
-            array_push($return, '是否提交：未提交');
-        else
-            array_push($return, '是否提交：已提交，提交时间为' . $user->submit_time);
+        if($user->status == false && !$this->isEmpty($user->submit_time) && !$this->isEmpty($user->status_change_time) && strtotime($user->status_change_time) > strtotime($user->submit_time))
+            array_push($return,'审核状态：未通过');
+        else if($user->status == false && !$this->isEmpty($user->submit_time) && $this->isEmpty($user->status_change_time))
+            array_push($return,'审核状态：等待审核');
         if (!is_null($user->status_change_time))
             array_push($return, '审核时间：' . $user->status_change_time);
         if (!is_null($user->operator))
             array_push($return, '审核员：' . $user->operator);
+        if (!is_null($user->edit_time))
+            array_push($return, '最近一次编辑时间：' . $user->edit_time);
+        if (is_null($user->submit_time)){
+            array_push($return, '是否提交：未提交');
+            array_push($return, '编辑权限：1-5步');
+        }
+        else {
+            array_push($return, '是否提交：已提交');
+            array_push($return, '提交时间为：' . $user->submit_time);
+            array_push($return, '编辑权限：6-8步');
+        }
         return Response::json(array('code' => '200', 'message' => $return));
 
     }
