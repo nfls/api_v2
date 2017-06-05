@@ -69,16 +69,15 @@ class CertificationController extends Controller
 
     const GENERAL_INSTRUCTION = [
         '本认证共八步，前五步将确认您的校友信息，提交并审核通过后无法修改（手机号除外），后三步为后续经历填写，可随时修改',
-        '审核时间约为1-5天，部分使用邀请码注册的用户可能会享有免审核特权，审核期间您可以完善后续表格，您只有在完成所有表格后才能使用在线校友录功能',
-        '对于您提供的信息，您可在认证结束后自行修改相关隐私设置，我们将尊重您的设置，不会随意透露给第三方或其他用户（默认设置为：同一届同学可见）',
-        '表格除个人介绍和工作信息部分外所有符号均为半角符号，请在输入相关符号时切换至英文输入法，否则服务器可能将无法识别您输入的内容',
-        '所有入学/毕业年份不记录具体日月，只记录年份',
-        '所有学校名称请使用完整的官方名称，不要使用任何简写、简拼等。',
+        '审核时间约为1-5天，审核期间您可以完善后续表格，您只有在完成所有表格后才能使用在线校友录功能',
+        '对于您提供的信息，您可在认证结束后自行修改相关隐私设置（默认设置为：同一届同学可见）',
+        '所有入学/毕业日期只记录年份',
+        '所有学校名称请使用完整的官方名称，不要使用任何简写、简拼等',
     ];
 
     const STEP1 = [
         '填写此表格前请确认您的用户名及邮箱是否正确',
-        '昵称或英文名请填写在南外期间常用的，如英语课上的英文名，或者是同学之间的昵称，如有多个请用半角逗号分割；如果更改过姓名请填写曾用名',
+        '昵称或英文名请填写在南外期间常用的，如英语课上的英文名，或者是同学之间的昵称，如有多个请用半角逗号分隔；如果更改过姓名请填写曾用名',
         '手机号请务必填写正确，在未来可能会启用手机号验证系统',
         '出国的同学请填写自己的国外手机号，并请加上正确的国际区号，以便联系',
         '本页除“曾用名”项外均为必填项目，“手机号码（国外）”仅需要当前不在国内的校友填写'
@@ -169,16 +168,7 @@ class CertificationController extends Controller
 
     function backStep(Request $request)
     {
-        $id = $this->getUser(Cookie::get('token'));
-        $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
-        if ($user->current_step > 1) {
-            if (!$this->canReturn($id) && $user->current_step == 6)
-                return Response::json(array('code' => '403', 'message' => '您的申请正在处理中，无法返回编辑'));
-            DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => (int)$user->current_step - 1]);
-            return Response::json(array('code' => '200', 'message' => '您即将返回至上一步'));
-        } else {
-            return Response::json(array('code' => '403', 'message' => '您已经在第一步，无法再返回了'));
-        }
+
     }
 
     function getCurrentStatus(Request $request)
@@ -255,46 +245,54 @@ class CertificationController extends Controller
                 self::InsertId($id);
             $content = file_get_contents('php://input');
             $info = json_decode($content);
+            $action = $info->action;
+            unset( $info->action);
             if (!is_object($info))
                 abort('404', 'Check your input!');
             switch ($step) {
                 case self::BASIC_INFO:
                     $message = $this->authStep1($info);
-                    return $this->dataCheck($message, $id, $info, self::BASIC_INFO, 'auth_info');
+                    return $this->dataCheck($message, $id, $info, self::BASIC_INFO, 'auth_info',$action);
                 case self::PRIMARY_INFO:
                     $message = $this->authStep2($info);
-                    return $this->dataCheck($message, $id, $info, self::PRIMARY_INFO, 'primary_school');
+                    return $this->dataCheck($message, $id, $info, self::PRIMARY_INFO, 'primary_school',$action);
                     break;
                 case self::JUNIOR_INFO:
                     $message = $this->authStep3($info);
-                    return $this->dataCheck($message, $id, $info, self::JUNIOR_INFO, 'junior_school');
+                    return $this->dataCheck($message, $id, $info, self::JUNIOR_INFO, 'junior_school',$action);
                     break;
                 case self::SENIOR_INFO:
                     $message = $this->authStep4($info);
-                    return $this->dataCheck($message, $id, $info, self::SENIOR_INFO, 'senior_school');
+                    return $this->dataCheck($message, $id, $info, self::SENIOR_INFO, 'senior_school',$action);
                     break;
                 case self::CHECK_INFO:
                     $message = $this->authStep5($id);
-                    if (empty($message)) {
-                        array_push($message, '您提交的数据已保存至数据库，即将进入下一步。');
-                        DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => $step + 1, 'submit_time' => date('y-m-d h:i:s')]);
-                        return Response::json(array('code' => '200', 'message' => $message));
-                    } else {
-                        array_unshift($message, '非常抱歉，您提交的数据在以下部分存在问题：');
-                        return Response::json(array('code' => '403.1', 'message' => $message));
+                    if((int)$action == 1)
+                    {
+                        if (empty($message)) {
+                            array_push($message, '您提交的数据已保存至数据库，即将进入下一步。');
+                            DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => $step + 1, 'submit_time' => date('y-m-d h:i:s')]);
+                            return Response::json(array('code' => '200', 'message' => $message));
+                        } else {
+                            array_unshift($message, '非常抱歉，您提交的数据在以下部分存在问题：');
+                            return Response::json(array('code' => '403.1', 'message' => $message));
+                        }
+                    } else if ((int)$action == -1){
+                        DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => (int)$user->current_step - 1]);
+                        return Response::json(array('code' => '200', 'message' => '您即将返回至上一步'));
                     }
                     break;
                 case self::COLLEGE_INFO:
                     $message = $this->authStep6($info);
-                    return $this->dataCheck($message, $id, $info, self::COLLEGE_INFO, 'college');
+                    return $this->dataCheck($message, $id, $info, self::COLLEGE_INFO, 'college',$action);
                     break;
                 case self::WORK_INFO:
                     $message = $this->authStep7($info);
-                    return $this->dataCheck($message, $id, $info, self::WORK_INFO, 'working_info');
+                    return $this->dataCheck($message, $id, $info, self::WORK_INFO, 'working_info',$action);
                     break;
                 case self::PERSONAL_INFO:
                     $message = $this->authStep8($info);
-                    return $this->dataCheck($message, $id, $info, self::PERSONAL_INFO, 'personal_info');
+                    return $this->dataCheck($message, $id, $info, self::PERSONAL_INFO, 'personal_info',$action);
                     break;
             }
         }
@@ -332,9 +330,9 @@ class CertificationController extends Controller
             case self::CHECK_INFO:
                 $return_array['info'] = $this->authStep5($return_array['id']);
                 if(count($return_array['info'])==0)
-                    array_push($return_array['info'],"您的表格无任何机械性错误，请再次检查填写内容是否正确！");
+                    array_push($return_array['info'],["如果确认输入无误的话，请点击下一步进行提交。"]);
                 else
-                    array_unshift($return_array['info'],"您的表格存在以下错误，请再次检查填写内容是否正确！");
+                    array_unshift($return_array['info'],["您的表格存在以下错误，请再次检查填写内容是否正确！"]);
                 return Response::json($return_array);
             case self::COLLEGE_INFO:
                 $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->college;
@@ -357,12 +355,34 @@ class CertificationController extends Controller
         }
     }
 
-    function dataCheck($message, $id, $content, $step, $name, $insert = true)
+    function dataCheck($message, $id, $content, $step, $name, $action, $insert = true )
     {
+        $action = (int)$action;
         if (empty($message)) {
-            array_push($message, '您提交的数据已保存至数据库，即将进入下一步。');
+            switch($action){
+                case 1:
+                    array_push($message, '您提交的数据已保存至数据库，即将进入下一步。');
+                    break;
+                case -1:
+                    $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
+                    if ($user->current_step > 1) {
+                        if (!$this->canReturn($id) && $user->current_step == 6)
+                            return Response::json(array('code' => '403', 'message' => ['您的申请正在处理中，无法返回编辑']));
+                        DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => (int)$user->current_step - 1]);
+                        return Response::json(array('code' => '200', 'message' => ['您即将返回至上一步']));
+                    } else {
+                        return Response::json(array('code' => '403', 'message' => ['您已经在第一步，无法再返回了']));
+                    }
+                    break;
+                case 0:
+                    array_push($message, '您提交的数据已保存至数据库！');
+                    break;
+                default:
+                    abort(403);
+                    break;
+            }
             if ($insert) {
-                DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => json_encode($content), 'current_step' => $step + 1, 'edit_time' => date('y-m-d h:i:s')]);
+                DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => json_encode($content), 'current_step' => $step + $action, 'edit_time' => date('y-m-d h:i:s')]);
             }
             return Response::json(array('code' => '200', 'message' => $message));
         } else {
@@ -789,6 +809,9 @@ abandoned
             array_push($return_array,"初中入学年份小于小学毕业年份！");
         if($j_graduate!=0 && $s_enter!=0 && ($s_enter < $j_graduate))
             array_push($return_array,"高中入学年份小于初中毕业年份！");
+        if($j_graduate==0 && $p_graduate==0 && $s_enter==0)
+            array_push($return_array,"本服务仅限在南外校友使用！");
+
 
         //$user->
         return $return_array;

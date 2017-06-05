@@ -14,7 +14,6 @@
 Route::post('alumni/auth/{step}/update',"CertificationController@authUpdate");
 Route::get('alumni/auth/{step}/query',"CertificationController@authQuery");
 Route::get('alumni/auth/step',"CertificationController@getCurrentStep");
-Route::get('alumni/auth/back',"CertificationController@backStep");
 Route::get('alumni/auth/status',"CertificationController@getCurrentStatus");
 Route::get('alumni/auth/instructions',"CertificationController@getInstructions");
 Route::get('alumni/auth/duration',"CertificationController@getDuration");
