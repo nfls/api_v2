@@ -166,10 +166,6 @@ class CertificationController extends Controller
         return Response::json(array('code' => '200', 'messgae'=> '一切正常','instructions' => $instructions, 'step' => $user->current_step));
     }
 
-    function backStep(Request $request)
-    {
-
-    }
 
     function getCurrentStatus(Request $request)
     {
@@ -509,17 +505,10 @@ class CertificationController extends Controller
                 realname：真实姓名
                 phone_domestic：中国手机号
                 phone_international：外国手机号（含区号）［二选一］
-                nickname：英文名或绰号
+                nickname：绰号
+                english_name：英文名
                 birthday：出生日期
                 gender：性别
-abandoned
-                ［选填内容，至少填一个］
-                wechat：微信号
-                qq：QQ号
-                telegram：telegram账户
-                whatsapp：whatsapp账户
-        ...TO-DO：ADD MORE
-
         */
         $message = array();
         @$this->emptyCheck(self::OTHER, $info->realname, '真实姓名', $message);
@@ -547,10 +536,16 @@ abandoned
                 array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
             }
         }
-        if (@$this->emptyCheck(self::OTHER, $info->nickname, '昵称或英文名', $message)) {
-            $names = explode(',', $info->nickname);
-            if (count($names) <= 0) {
-                array_push($message, '昵称或英文名分割错误，请检查您的输入内容。');
+        if (@$this->emptyCheck(self::OTHER, $info->nickname, '昵称', $message, false)) {
+            $names = explode('，', $info->nickname);
+            if (count($names) > 1) {
+                array_push($message, '昵称分隔错误，请检查您的输入内容。');
+            }
+        }
+        if (@$this->emptyCheck(self::OTHER, $info->english_name, '英文名', $message)) {
+            $names = explode('，', $info->english_name);
+            if (count($names) > 1) {
+                array_push($message, '英文名分隔错误，请检查您的输入内容。');
             }
         }
         if (@$this->emptyCheck(self::OTHER, $info->birthday, '出生日期', $message)) {
@@ -581,6 +576,7 @@ abandoned
                 array_push($message, '曾用名内容不符合要求。请输入2-4个中文字符');
             }
         }
+        $this->structureCheck($info,10,$message);
         return $message;
     }
 
