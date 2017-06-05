@@ -7,7 +7,7 @@ use Cookie;
 use Response;
 use Illuminate\Support\Facades\DB;
 
-class UserManagementController extends Controller
+class CertificationManagementController extends Controller
 {
 
     //
