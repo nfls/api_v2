@@ -648,8 +648,8 @@ class CertificationController extends Controller
                     $this->structureCheck($info, 3, $message);
                     break;
                 case self::NFLS_JUNIOR:
-                    @$passed = $this->emptyCheck(self::SCHOOL_START_YEAR, $info->junior_school_enter_year, '初中', $message);
-                    @$passed = $this->emptyCheck(self::SCHOOL_START_YEAR, $info->junior_school_graduated_year, '初中', $message);
+                    @$passed = $this->emptyCheck(self::ENTER_YAER, $info->junior_school_enter_year, '初中', $message);
+                    @$passed = $this->emptyCheck(self::GRADUATED_YEAR, $info->junior_school_graduated_year, '初中', $message);
                     @$passed = $this->emptyCheck(self::CLASS_NO, $info->junior_class, '初中', $message);
                     if ($passed) {
                         @$this->schoolYearCheck($info->junior_school_enter_year, $info->junior_school_graduated_year, self::SCHOOL_START_YEAR, date('Y') - 6, 3, $info->junior_remark, '初中', $message);
