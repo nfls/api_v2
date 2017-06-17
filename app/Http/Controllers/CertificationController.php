@@ -904,7 +904,7 @@ class CertificationController extends Controller
         $contact_count = 0;
         $content_count = 0;
         $this->structureCheck($info,14,$message);
-        if($this->isEmpty($info->personal_info))
+        if(@$this->isEmpty($info->personal_info))
             array_push($message,"请填写自我介绍。");
         foreach($info as $key=>$value){
             switch($key){
@@ -921,6 +921,7 @@ class CertificationController extends Controller
                 case "facebook":
                 case "vimeo":
                 case "instagram":
+                case "snapchat":
                     $contact_count++;
                     if(!$this->isEmpty($value))
                         $content_count++;
@@ -929,7 +930,7 @@ class CertificationController extends Controller
                     break;
             }
         }
-        if($contact_count != 13)
+        if($contact_count != 14)
             array_push($message,"您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。");
         if($content_count == 0)
             array_push($message,"请至少填写一个联系方式。");
