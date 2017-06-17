@@ -843,7 +843,7 @@ class CertificationController extends Controller
             switch($key){
                 case $index."_start":
                     $count = $count + 4;
-                    if ($this->isEmpty($value)) {
+                    if (@$this->isEmpty($value)) {
                         array_push($message, $name . '入学年份未填写。');
                     }
                     else {
@@ -856,7 +856,7 @@ class CertificationController extends Controller
                     }
                     break;
                 case $index."_end":
-                    if ($this->isEmpty($value)) {
+                    if (@$this->isEmpty($value)) {
                         array_push($message, $name . '毕业年份未填写。');
                     }
                     else {
@@ -869,15 +869,15 @@ class CertificationController extends Controller
                     }
                     break;
                 case $index."_major":
-                    if ($this->isEmpty($value))
+                    if (@$this->isEmpty($value))
                         array_push($message, $name . '专业方向未填写。');
                     break;
                 case $index."_school":
-                    if ($this->isEmpty($value))
+                    if (@$this->isEmpty($value))
                         array_push($message, $name . '就读院校未填写。');
                     break;
                 case $index."_type":
-                    if ($this->isEmpty($value) && $index == "other") {
+                    if (@$this->isEmpty($value) && $index == "other") {
                         array_push($message, $name . '院校类型未填写。');
                         $count++;
                     }
