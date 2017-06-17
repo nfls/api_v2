@@ -275,7 +275,7 @@ class CertificationController extends Controller
                         }
                     } else if ((int)$action == -1){
                         DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => (int)$user->current_step - 1]);
-                        return Response::json(array('code' => '200', 'message' => '您即将返回至上一步'));
+                        return Response::json(array('code' => '200', 'message' => array(['您即将返回至上一步'])));
                     }
                     break;
                 case self::COLLEGE_INFO:
@@ -326,9 +326,9 @@ class CertificationController extends Controller
             case self::CHECK_INFO:
                 $return_array['info'] = $this->authStep5($return_array['id']);
                 if(count($return_array['info'])==0)
-                    array_push($return_array['info'],["如果确认输入无误的话，请点击下一步进行提交。"]);
+                    array_push($return_array['info'],"如果确认输入无误的话，请点击下一步进行提交。");
                 else
-                    array_unshift($return_array['info'],["您的表格存在以下错误，请再次检查填写内容是否正确！"]);
+                    array_unshift($return_array['info'],"您的表格存在以下错误，请再次检查填写内容是否正确！");
                 return Response::json($return_array);
             case self::COLLEGE_INFO:
                 $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $return_array['id'])->first()->college;
