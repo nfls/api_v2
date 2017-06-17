@@ -924,7 +924,7 @@ class CertificationController extends Controller
                 case "instagram":
                 case "snapchat":
                     $contact_count++;
-                    if(!$this->isEmpty($value))
+                    if(@!$this->isEmpty($value))
                         $content_count++;
                     break;
                 default:
