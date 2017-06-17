@@ -597,7 +597,7 @@ class CertificationController extends Controller
 
                 case self::OTHER_PRIMARY:
                     @$this->emptyCheck(self::SCHOOL_NAME, $info->primary_school_name, '小学', $message);
-                    $this->structureCheck($info, 2, $message);
+                    $this->structureCheck($info, 3, $message);
                     break;
                 case self::NFLS_PRIMARY_2:
                     @$this->emptyCheck(self::SCHOOL_NAME, $info->primary_school_name, '其他小学', $message);
