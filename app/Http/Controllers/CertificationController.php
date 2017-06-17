@@ -236,7 +236,7 @@ class CertificationController extends Controller
             }
             $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
             if((int)$user->current_step != $step)
-                return Response::json(array('code' => '403', 'message' => array(['数据不匹配！请点击重置或刷新网页再试。'])));
+                return Response::json(array('code' => '403', 'message' => array('数据不匹配！请点击重置或刷新网页再试。')));
             if (is_null($user))
                 self::InsertId($id);
             $content = file_get_contents('php://input');
@@ -413,11 +413,12 @@ class CertificationController extends Controller
     }
 
 
-    function emptyCheck($type, $info, $name, &$message, $addMessage = true)
+    function emptyCheck($type, &$info, $name, &$message, $addMessage = true)
     {
         switch ($type) {
             case self::SCHOOL_NO:
                 if ($this->isEmpty($info)) {
+                    $info = (int)$info;
                     if ($addMessage)
                         array_push($message, '请选择您所就读的' . $name . '。');
                     return false;
