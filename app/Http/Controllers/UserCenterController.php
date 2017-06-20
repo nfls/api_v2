@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Pagination\PaginationServiceProvider;
 use Illuminate\Support\Facades\DB;
 
 class UserCenterController extends Controller
@@ -120,43 +121,27 @@ class UserCenterController extends Controller
 
     function CheckIfUserExists($id) //检查论坛用户是否存在于user表中
     {
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_users");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"SELECT * FROM user_list WHERE id = $id");
-        if(mysqli_num_rows($result)==1)
-            return true;
-        else
+        $user = DB::connection("mysql_user")->table("user_list")->where("id", $id)->first();
+        if(is_null($user))
             return false;
+        return true;
     }
 
     function AddUser($id)//添加论坛用户到user表中
     {
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_users");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"INSERT INTO `user_list` (`id`) VALUES ($id)");
+        DB:conncetion("mysql_user")->table("user_list")->insert(["id"=>$id]);
     }
 
     function CheckIfTokenExists($id)//检查是否存在Token
     {
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_users");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"SELECT * FROM user_list WHERE id = $id");
-        if(mysqli_num_rows($result)==1)
-        {
-            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-            if($row['token']==null)
-                return false;
-            else
-                return $row['token'];
-        }
+        $user = DB::connection("mysql_user")->table("user_list")->where("id", $id)->first();
+        if(@is_null($user->token))
+            return false;
+        return $user->token;
     }
 
     function GenerateToken($id)//生成Token
     {
-        include "conn.php";
         do
         {
             $str1=(string)microtime(true);
@@ -164,126 +149,39 @@ class UserCenterController extends Controller
             $final=$str1."顾平德穿女装".$str2;
             $hash=hash("sha512",$final);
             $token = substr($hash,(strlen($hash)-64));
-            $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_users");
-            mysqli_query($con,"set character set 'utf8'");
-            $result = @mysqli_query($con,'SELECT * FROM user_list WHERE token = "'.$token.'"');
-        }while(@mysqli_num_rows($result)>0);
-        unset($result);
-        $result = mysqli_query($con,'UPDATE `user_list` SET `token`="'.$token.'" WHERE `id`='.$id);
+            $db = DB::connection("mysql_user")->table("user_list")->where("token",$token)->first();
+        }while(@!is_null($db->token));
+        DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["token"=>$token]);
         return $token;
     }
 
-    function GeneratePassword($id)//生成密码
+    function GetAssociatePassword($id)//生成密码
     {
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_users");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"SELECT * FROM user_list WHERE id = $id");
-        if(@mysqli_num_rows($result)==1)
-        {
-
-            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-            if($row['asso_password']!="")
-                return $row['asso_password'];
-            else
-            {
-                $str1=(string)microtime(true);
-                $final=$str1."顾平德穿女装";
-                $hash=hash("sha512",$final);
-                $password = substr($hash,(strlen($hash)-16));
-                unset($result);
-                $result = mysqli_query($con,'UPDATE `user_list` SET `asso_password`="'.$password.'" WHERE `id`='.$id);
-                return $password;
-            }
+        $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
+        if(@is_null($user->asso_password)){
+            $str1=(string)microtime(true);
+            $final=$str1."顾平德穿女装";
+            $hash=hash("sha512",$final);
+            $password = substr($hash,(strlen($hash)-16));
+            DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["asso_password"=>$password]);
+            return $password;
         }
-
-
-
-    }
-
-    function GetUserIdByToken($token)//根据token获取用户id
-    {
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_users");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,'SELECT * FROM user_list WHERE token = "'.$token.'"');
-        if(@mysqli_num_rows($result)==1)
-        {
-            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-            return $row['id'];
-        }
-        else
-        {
-            die(json_encode(array("status"=>"error","message"=>"Invaid Token.")));
-        }
-    }
-
-    function GetShadowsocksStatusById($id)//获取用户ss信息
-    {
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_users");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"SELECT * FROM user_list WHERE id = $id");
-        if(mysqli_num_rows($result)==1)
-        {
-            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-            return $row['ss_account'];
-        }
-        else
-        {
-            return false;
+        else {
+            return $user->asso_password;
         }
     }
 
     function GetShareStatusById($id)//获取用户share信息
     {
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_users");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"SELECT * FROM user_list WHERE id = $id");
-        if(mysqli_num_rows($result)==1)
-        {
-            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-            return $row['share_account'];
-        }
-        else
-        {
-            return false;
-        }
+        $user = DB::connection("mysql_user")->table("user_list")->where("id", $id)->first();
+        return $user->share_account;
     }
 
-    function GetPersonalAuthStatusById($id)//根据id获取用户实名认证信息
-    {
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_users");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"SELECT * FROM user_list WHERE id = $id");
-        if(mysqli_num_rows($result)==1)
-        {
-            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-            return $row['auth_info'];
-        }
-        else
-        {
-            return false;
-        }
-    }
 
     function GetUsernameById($id)//根据id获取用户名
     {
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_forum");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"SELECT * FROM nfls_users WHERE id = $id");
-        if(mysqli_num_rows($result)==1)
-        {
-            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-            return $row['username'];
-        }
-        else
-        {
-            return false;
-        }
+        $user = DB::connection("mysql_user")->table("user_list")->where("id", $id)->first();
+        return $user->username;
     }
 
     function GetAvatarById($id)//根据id获取头像
@@ -291,8 +189,6 @@ class UserCenterController extends Controller
         $headers = array('content-type:application/vnd.api+json',);
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, "https://forum.nfls.io/api/users/$id");
-        //curl_setopt ($ch, CURLOPT_POST, 1);
-        //$post_data = '{"identification":"'.$user.'","password":"'.$pass.'"}';
         curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 120);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -300,143 +196,79 @@ class UserCenterController extends Controller
         $file_contents = curl_exec($ch);
         curl_close($ch);
         $detail=(array)json_decode($file_contents,true);
-        //return $file_contents;
-        //return $file_contents;
         return $detail['data']['attributes']['avatarUrl'];
     }
 
     function GetPersonalGeneralInfoById($id)//根据id获取综合信息
     {
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_forum");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"SELECT * FROM nfls_users WHERE id = $id");
-        if(mysqli_num_rows($result)==1)
-        {
-            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-            $info=array();
-            $info['id']=$row['id'];
-            $info['username']=$row['username'];
-            $info['email']=$row['email'];
-            $info['is_activated']=$row['is_activated'];
-            $info['bio']=$row['bio'];
-            $info['avatar_path']=$row['avatar_path'];
-            $info['join_time']=$row['join_time'];
-            return $info;
-        }
-        else
-        {
-            return false;
-        }
+        $info = DB::connection("mysql_forum")->table("nfls_forum")->where(["id"=>$id])->first();
+        $info=array();
+        $info['id']=$info->id;
+        $info['username']=$info->username;
+        $info['email']=$info->email;
+        $info['is_activated']=$info->is_activated;
+        $info['bio']=$info->bio;
+        $info['avatar_path']=$info->avatar_path;
+        $info['join_time']=$info->join_time;
+        return $info;
     }
 
     function GetPersonalForumInfoById($id)//根据id获取论坛信息
     {
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_forum");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"SELECT * FROM nfls_users WHERE id = $id");
-        if(mysqli_num_rows($result)==1)
-        {
-            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-            $info=array();
-            $info['id']=$row['id'];
-            $info['username']=$row['username'];
-            $info['last_seen_time']=$row['last_seen_time'];
-            $info['notifications_read_time']=$row['notifications_read_time'];
-            $info['discussions_count']=$row['discussions_count'];
-            $info['comments_count']=$row['comments_count'];
-            return $info;
-        }
-        else
-        {
-            return false;
-        }
+        $user = DB::connection("mysql_forum")->table("nfls_users")->where(["id"=>$id])->first();
+        $info=array();
+        $info['id']=$user->id;
+        $info['username']=$user->username;
+        $info['last_seen_time']=$user->last_seen_time;
+        $info['notifications_read_time']=$user->notifications_read_time;
+        $info['discussions_count']=$user->discussions_count;
+        $info['comments_count']=$user->comments_count;
+        return $info;
     }
 
     function GetUserWikiInfoByWikiId($id)//根据wiki_id获取wiki信息
     {
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_wiki");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"SELECT * FROM wiki_user WHERE user_id = $id");
-        if(mysqli_num_rows($result)==1)
-        {
-            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-            $info=array();
-            $info['user_id']=$row['user_id'];
-            $info['user_name']=$row['user_name'];
-            $info['user_real_name']=$row['user_real_name'];
-            $info['user_touched']=$row['user_touched'];
-            $info['user_registration']=$row['user_registration'];
-            $info['user_editcount']=$row['user_editcount'];
-            return $info;
-        }
-        else
-        {
-            return false;
-        }
+        $user = DB::connection("mysql_wiki")->table("wiki_user")->where(["user_id"=>$id])->first();
+        $info=array();
+        $info['user_id']=$user->user_id;
+        $info['user_name']=$user->user_name;
+        $info['user_real_name']=$user->user_real_name;
+        $info['user_touched']=$user->user_touched;
+        $info['user_registration']=$user->user_registration;
+        $info['user_editcount']=$user->user_editcount;
+        return $info;
     }
 
     function GetUserShareInfoByShareId($id)//根据shareid获取share信息
     {
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_share");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"SELECT * FROM users WHERE id = $id");
-        if(mysqli_num_rows($result)==1)
-        {
-            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-            $info=array();
-            $info['user_id']=$row['id'];
-            $info['user_name']=$row['username'];
-            $info['user_touched']=$row['last_login'];
-            $info['user_registration']=$row['added'];
-            $info['user_ip']=$row['ip'];
-            $info['user_uploaded']=$row['uploaded'];
-            $info['user_downloaded']=$row['downloaded'];
-            return $info;
-        }
-        else
-        {
-            return false;
-        }
+        $user = DB::connection("mysql_share")->table("users")->where(["id"=>$id])->first();
+        $info=array();
+        $info['user_id']=$user->id;
+        $info['user_name']=$user->username;
+        $info['user_touched']=$user->last_login;
+        $info['user_registration']=$user->added;
+        $info['user_ip']=$user->ip;
+        $info['user_uploaded']=$user->uploaded;
+        $info['user_downloaded']=$user->downloaded;
+        return $info;
     }
     function GetUserAssiciatedIdById($id,$service)
     {
-        //echo $id;
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_users");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"SELECT * FROM user_list WHERE id = $id");
-        if(mysqli_num_rows($result)==1)
-        {
-            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-            switch($service)
-            {
-                case "shadowsocks":
-                    $id=$row['ss_account'];
-                    break;
-                case "share":
-                    $id=$row['share_account'];
-                    break;
-                case "wiki":
-                    $id=$row['wiki_account'];
-                    break;
-            }
-            return $id;
-        }
-        else
-        {
-            return false;
+        $user = DB::connection("mysql_user")->table("user_list")->where("id", $id)->first();
+        switch($service) {
+            case "share":
+                return $user->share_account;
+            case "wiki":
+                return $user->wiki_accoount;
+            default:
+                abort(403);
         }
     }
 
     function CreateWikiAccountById($id)//注册wiki账户
     {
-        include "conn.php";
         if(GetUserAssiciatedIdById($id,"wiki")!=-1)
-            die(json_encode(array("status"=>"error")));
+            abort(403);
         $cookie = tempnam('./','cookie');
         $cookie2 = tempnam('./','cookie2');
         $headers = array('Content-Type: application/x-www-form-urlencoded','Cache-Control: no-cache','Api-User-Agent: Example/1.0',);
@@ -464,7 +296,7 @@ class UserCenterController extends Controller
         $url=urlencode("https://login.nfls.io");
         curl_setopt($ch,CURLOPT_COOKIEFILE,$cookie);
         curl_setopt($ch,CURLOPT_COOKIEJAR,$cookie2);
-        $post_data = "username=$wiki_bot&password=$bot_pass&logintoken=$wiki_token&format=json&loginreturnurl=$url";
+        $post_data = "username="+env("WIKI_BOT")+"&password="+env("BOT_PASS")+"&logintoken=$wiki_token&format=json&loginreturnurl=$url";
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
         $file_contents = curl_exec($ch);
         curl_close($ch);
@@ -504,17 +336,8 @@ class UserCenterController extends Controller
         $file_contents = curl_exec($ch);
         curl_close($ch);
         $detail=(array)json_decode($file_contents,true);
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_wiki");
-        mysqli_query($con,"set character set 'utf8'");
-        $username = ucfirst($username);
-        $result = mysqli_query($con,"SELECT * FROM wiki_user WHERE user_name = '".$username."'");
-        if(mysqli_num_rows($result)==1)
-        {
-            $row=mysqli_fetch_array($result,MYSQLI_ASSOC);
-            $con1 = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_users");
-            mysqli_query($con1,"set character set 'utf8'");
-            mysqli_query($con1,'UPDATE `user_list` SET `wiki_account`="'.$row['user_id'].'" WHERE `id`='.$id);
-        }
+        $user = DB::connection("mysql_wiki")->table("wiki_user")->where(["user_name"=>$username])->first();
+        DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["wiki_account"=>$user->user_id]);
         return 0;
     }
 
