@@ -44,6 +44,10 @@ class UserCenterController extends Controller
                 if($request->only(['username','password','email']))
                     $info = $this->UserRegister($request->input("email"),$request->input("password"),$request->input("email"));
                 break;
+            case "username":
+                if($request->isMethod("get"))
+                    $info = $this->GetUsernameById(self::GetUserId(Cookie::get('token'));
+                break;
             case "forumLogin":
                 if($request->only(['username','password']))
                     $info = $this->ForumLogin($request->input("username"), $request->input("password"));
