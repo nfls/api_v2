@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\PaginationServiceProvider;
 use Illuminate\Support\Facades\DB;
 use Response;
-
+use Cookie;
 class UserCenterController extends Controller
 {
     public static function GetUserId($token){
