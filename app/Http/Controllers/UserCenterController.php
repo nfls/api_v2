@@ -355,7 +355,7 @@ class UserCenterController extends Controller
             case "share":
                 return $user->share_account;
             case "wiki":
-                return $user->wiki_accoount;
+                return $user->wiki_account;
             default:
                 abort(403);
         }
