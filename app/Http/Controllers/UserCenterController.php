@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\PaginationServiceProvider;
 use Illuminate\Support\Facades\DB;
+use Response;
 
 class UserCenterController extends Controller
 {
@@ -100,11 +101,11 @@ class UserCenterController extends Controller
             $json_mes['status'] = "error";
         }
         else{
-            $json['code'] = 200;
-            $json['status'] = "succeed";
-            $json['info'] = $info;
+            $json_mes['code'] = 200;
+            $json_mes['status'] = "succeed";
+            $json_mes['info'] = $info;
         }
-
+        return Response::json($json_mes);
     }
 
     function UserLogin($username,$password)
