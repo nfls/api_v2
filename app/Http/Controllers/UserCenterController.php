@@ -275,7 +275,7 @@ class UserCenterController extends Controller
 
     function GetUsernameById($id)//根据id获取用户名
     {
-        $user = DB::connection("mysql_user")->table("user_list")->where("id", $id)->first();
+        $user = DB::connection("mysql_forum")->table("nfls_users")->where("id", $id)->first();
         return $user->username;
     }
 
