@@ -125,7 +125,7 @@ class UserCenterController extends Controller
         $detail=(array)json_decode($file_contents,true);
         unset($ch);
         if(isset($detail['token']))
-            return LoginProcess($detail['userId']);
+            return $this->LoginProcess($detail['userId']);
         else
             return false;
     }
@@ -171,7 +171,6 @@ class UserCenterController extends Controller
         curl_setopt($ch, CURLOPT_HEADER, true);
         $file_contents = curl_exec($ch);
         curl_close($ch);
-        $detail=(array)json_decode($file_contents,true);
         //echo $file_contents;
         preg_match_all("/Set\-cookie:([^\r\n]*)/i",$file_contents,$str);
         //echo json_encode($str);
@@ -187,11 +186,11 @@ class UserCenterController extends Controller
 
     function LoginProcess($id)
     {
-        if(!CheckIfUserExists($id))
-            AddUser($id);
-        $token = CheckIfTokenExists($id);
+        if(!$this->CheckIfUserExists($id))
+            $this->AddUser($id);
+        $token = $this->CheckIfTokenExists($id);
         if(!$token)
-            $token = GenerateToken($id);
+            $token = $this->GenerateToken($id);
         return($token);
     }
 
@@ -363,7 +362,7 @@ class UserCenterController extends Controller
 
     function CreateWikiAccountById($id)//注册wiki账户
     {
-        if(GetUserAssociatedIdById($id,"wiki")!=-1)
+        if($this->GetUserAssociatedIdById($id,"wiki")!=-1)
             abort(403);
         $cookie = tempnam('./','cookie');
         $cookie2 = tempnam('./','cookie2');
@@ -414,10 +413,10 @@ class UserCenterController extends Controller
         unset($ch);
 
         $wiki_token=urlencode($detail['query']['tokens']['createaccounttoken']);
-        $info=GetPersonalGeneralInfoById($id);
+        $info=$this->GetPersonalGeneralInfoById($id);
         $email=urlencode($info['email']);
         $username=$info['username'];
-        $password=GeneratePassword($id);
+        $password=$this->GetAssociatePassword($id);
 
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, "https://wiki.nfls.io/api.php?action=createaccount");
@@ -440,7 +439,7 @@ class UserCenterController extends Controller
     function LoginWikiAccountById($id)//登录wiki账户
     {
         $user = DB::connection("mysql_wiki")->table("wiki_user")->where(["user_id"=>$id])->first();
-        $username=urlencode(GetUsernameById($id));
+        $username=urlencode($this->GetUsernameById($id));
         $password = $user->asso_password;
 
         $cookie = tempnam('./','cookie');
@@ -488,7 +487,7 @@ class UserCenterController extends Controller
 
     function LoginShareAccountById($id)//登录Share账户
     {
-        $id=GetUserAssociatedIdById($id,"share");
+        $id=$this->GetUserAssociatedIdById($id,"share");
         $user = DB::connection("mysql_share")->table("users")->where(["id"=>$id])->first();
         $info=array();
         $info['c_secure_uid']=urlencode(base64_encode($user->id));
@@ -501,11 +500,11 @@ class UserCenterController extends Controller
 
     function CreateShareAccountById($id)//注册wiki账户
     {
-        if(GetUserAssociatedIdById($id,"share")!=-1)
+        if($this->GetUserAssociatedIdById($id,"share")!=-1)
             die(json_encode(array("status"=>"error")));
-        $secret=mksecret();
-        $password=GeneratePassword($id);
-        $info=GetPersonalGeneralInfoById($id);
+        $secret=$this->mksecret();
+        $password=$this->GetAssociatePassword($id);
+        $info=$this->GetPersonalGeneralInfoById($id);
         $email=$info['email'];
         $username=$info['username'];
         $wantpasshash = md5($secret . $password . $secret);
