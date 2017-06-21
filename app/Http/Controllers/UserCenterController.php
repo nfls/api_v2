@@ -363,7 +363,7 @@ class UserCenterController extends Controller
     function CreateWikiAccountById($id)//注册wiki账户
     {
         if($this->GetUserAssociatedIdById($id,"wiki")!=-1)
-            abort(403);
+            return null;
         $cookie = tempnam('./','cookie');
         $cookie2 = tempnam('./','cookie2');
         $headers = array('Content-Type: application/x-www-form-urlencoded','Cache-Control: no-cache','Api-User-Agent: Example/1.0',);
@@ -501,7 +501,7 @@ class UserCenterController extends Controller
     function CreateShareAccountById($id)//注册wiki账户
     {
         if($this->GetUserAssociatedIdById($id,"share")!=-1)
-            die(json_encode(array("status"=>"error")));
+            return null;
         $secret=$this->mksecret();
         $password=$this->GetAssociatePassword($id);
         $info=$this->GetPersonalGeneralInfoById($id);
