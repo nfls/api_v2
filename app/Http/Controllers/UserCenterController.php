@@ -297,7 +297,7 @@ class UserCenterController extends Controller
 
     function GetPersonalGeneralInfoById($id)//根据id获取综合信息
     {
-        $info = DB::connection("mysql_forum")->table("nfls_forum")->where(["id"=>$id])->first();
+        $info = DB::connection("mysql_forum")->table("nfls_users")->where(["id"=>$id])->first();
         $info=array();
         $info['id']=$info->id;
         $info['username']=$info->username;
