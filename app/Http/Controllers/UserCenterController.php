@@ -59,13 +59,13 @@ class UserCenterController extends Controller
             case "wikiRegister":
                 if($request->isMethod("get")) {
                     $this->CreateWikiAccountById(self::GetUserId(Cookie::get('token')));
-                    $info['status'] = "success";
+                    $info['status'] = "succeed";
                 }
                 break;
             case "shareRegister":
                 if($request->isMethod("get")) {
                     $this->CreateShareAccountById(self::GetUserId(Cookie::get('token')));
-                    $info['status'] = "success";
+                    $info['status'] = "succeed";
                 }
                 break;
             case "avatar":
@@ -363,7 +363,7 @@ class UserCenterController extends Controller
     function CreateWikiAccountById($id)//注册wiki账户
     {
         if($this->GetUserAssociatedIdById($id,"wiki")!=-1)
-            return null;
+            abort(403);
         $cookie = tempnam('./','cookie');
         $cookie2 = tempnam('./','cookie2');
         $headers = array('Content-Type: application/x-www-form-urlencoded','Cache-Control: no-cache','Api-User-Agent: Example/1.0',);
@@ -501,7 +501,7 @@ class UserCenterController extends Controller
     function CreateShareAccountById($id)//注册wiki账户
     {
         if($this->GetUserAssociatedIdById($id,"share")!=-1)
-            return null;
+            abort(403);
         $secret=$this->mksecret();
         $password=$this->GetAssociatePassword($id);
         $info=$this->GetPersonalGeneralInfoById($id);
