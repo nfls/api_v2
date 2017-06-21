@@ -17,6 +17,9 @@ Route::get('alumni/auth/step',"CertificationController@getCurrentStep");
 Route::get('alumni/auth/status',"CertificationController@getCurrentStatus");
 Route::get('alumni/auth/instructions',"CertificationController@getInstructions");
 Route::get('alumni/auth/duration',"CertificationController@getDuration");
+
+Route::get('center/{type}',"UserCenterController@requestHandler");
+
 Route::get('media/gallery/list/{id}',"AlbumController@getPhotoList");
 Route::get('media/gallery/info/{id}',"AlbumController@getAlbumInfo");
 Route::get('media/gallery/getlist',"AlbumController@getAlbumList");

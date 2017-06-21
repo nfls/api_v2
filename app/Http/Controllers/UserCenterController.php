@@ -11,7 +11,7 @@ class UserCenterController extends Controller
     public static function GetUserId($token){
     	$user = DB::connection("mysql_user")->table("user_list")->where("token", $token)->first();
     	if(is_null($user))
-    		return -1;
+    		abort(403);
     	return $user->id;
     }
 
@@ -29,6 +29,84 @@ class UserCenterController extends Controller
         return true;
     }
 
+    function requestHandler(Request $request, $type){
+        switch($type){
+            case "login":
+                if($request->only(['username','password']))
+                    $info = $this->UserLogin($request->input("username"), $request->input("password"));
+                break;
+            case "recover":
+                if($request->only(['email']))
+                    $info = $this->RecoverPassword($request->input("email"));
+                break;
+            case "register":
+                if($request->only(['username','password','email']))
+                    $info = $this->UserRegister($request->input("email"),$request->input("password"),$request->input("email"));
+                break;
+            case "forumLogin":
+                if($request->only(['username','password']))
+                    $info = $this->ForumLogin($request->input("username"), $request->input("password"));
+                break;
+            case "wikiLogin":
+                if($request->isMethod("get"))
+                    $info = $this->LoginWikiAccountById(self::GetUserId(Cookie::get('token')));
+                break;
+            case "shareLogin":
+                if($request->isMethod("get"))
+                    $info = $this->LoginShareAccountById(self::GetUserId(Cookie::get('token')));
+                break;
+            case "wikiRegister":
+                if($request->isMethod("get")) {
+                    $this->CreateWikiAccountById(self::GetUserId(Cookie::get('token')));
+                    $info['status'] = "success";
+                }
+                break;
+            case "shareRegister":
+                if($request->isMethod("get")) {
+                    $this->CreateShareAccountById(self::GetUserId(Cookie::get('token')));
+                    $info['status'] = "success";
+                }
+                break;
+            case "avatar":
+                if($request->isMethod("get"))
+                    $info['url'] = $this->GetAvatarById($this->GetUserId(Cookie::get('token')));
+                break;
+            case "generalInfo":
+                if($request->isMethod("get"))
+                    $info = $this->GetPersonalGeneralInfoById(self::GetUserId(Cookie::get('token')));
+                break;
+            case "forumInfo":
+                if($request->isMethod("get"))
+                    $info = $this->GetPersonalForumInfoById(self::GetUserId(Cookie::get('token')));
+                break;
+            case "wikiInfo":
+                if($request->isMethod("get"))
+                    $info = $this->GetUserWikiInfoByWikiId($this->GetUserAssociatedIdById(self::GetUserId(Cookie::get('token')),"wiki"));
+                break;
+            case "shareInfo":
+                if($request->isMethod("get"))
+                    $info = $this->GetUserShareInfoByShareId($this->GetUserAssociatedIdById(self::GetUserId(Cookie::get('token')),"share"));
+                break;
+            case "systemMessage":
+                if($request->isMethod("get"))
+                    $info = $this->GetSystemNoticeById(Cookie::get('token'));
+                break;
+            default:
+                break;
+        }
+        $json_mes = array();
+        if(@is_null($info)||empty($info)){
+            $json_mes['code'] = 403;
+            $json_mes['status'] = "error";
+        }
+        else{
+            $json['code'] = 200;
+            $json['status'] = "succeed";
+            $json['info'] = $info;
+        }
+
+    }
+
     function UserLogin($username,$password)
     {
         $headers = array('content-type:application/vnd.api+json',);
@@ -44,18 +122,38 @@ class UserCenterController extends Controller
         $file_contents = curl_exec($ch);
         curl_close($ch);
         $detail=(array)json_decode($file_contents,true);
-        //echo $file_contents;
-        //return $file_contents;
-        //preg_match_all("/Set\-cookie:([^\r\n]*)/i",$file_contents,$str);
-        //$opt_cookie=array();
-        //$opt_cookie[$i]=urldecode(substr($str[1][$i],1));
-        //curl_close($ch);
         unset($ch);
         if(isset($detail['token']))
             return LoginProcess($detail['userId']);
         else
             return false;
+    }
 
+    function UserRegister($email,$password,$username){
+        $headers = array('content-type:application/vnd.api+json');
+        $ch = curl_init();
+        curl_setopt ($ch, CURLOPT_URL, "https://forum.nfls.io/api/users");
+        curl_setopt ($ch, CURLOPT_POST, 1);
+        $post_data = '{"data":{"attributes":{"username":"'.$username.'","email":"'.$email.'", "password":"'.$password.'"}}}';
+        if($post_data != ''){
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+        }
+        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 120);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        $file_contents = curl_exec($ch);
+        curl_close($ch);
+        $detail=(array)json_decode($file_contents,true);
+        if(isset($detail['data']))
+        {
+            return array("status"=>"success");
+        }
+        if(isset($detail['errors']))
+        {
+            //die($file_contents);
+            return array("status"=>"failure","code"=>$detail['errors'][0]['status'],"general"=>$detail['errors'][0]['code'],"message"=>$detail['errors'][0]['detail']);
+        }
     }
 
     function ForumLogin($username,$password)
@@ -90,7 +188,6 @@ class UserCenterController extends Controller
     {
         if(!CheckIfUserExists($id))
             AddUser($id);
-        //GenerateToken($id);
         $token = CheckIfTokenExists($id);
         if(!$token)
             $token = GenerateToken($id);
@@ -111,12 +208,10 @@ class UserCenterController extends Controller
         curl_setopt($ch, CURLOPT_HEADER, false);
         $file_contents = curl_exec($ch);
         curl_close($ch);
-        $detail=(array)json_decode($file_contents,true);
         if($file_contents==null)
             return array("status"=>"success");
         else
             return array("status"=>"error");
-        unset($ch);
     }
 
     function CheckIfUserExists($id) //检查论坛用户是否存在于user表中
@@ -252,7 +347,7 @@ class UserCenterController extends Controller
         $info['user_downloaded']=$user->downloaded;
         return $info;
     }
-    function GetUserAssiciatedIdById($id,$service)
+    function GetUserAssociatedIdById($id,$service)
     {
         $user = DB::connection("mysql_user")->table("user_list")->where("id", $id)->first();
         switch($service) {
@@ -267,7 +362,7 @@ class UserCenterController extends Controller
 
     function CreateWikiAccountById($id)//注册wiki账户
     {
-        if(GetUserAssiciatedIdById($id,"wiki")!=-1)
+        if(GetUserAssociatedIdById($id,"wiki")!=-1)
             abort(403);
         $cookie = tempnam('./','cookie');
         $cookie2 = tempnam('./','cookie2');
@@ -296,7 +391,7 @@ class UserCenterController extends Controller
         $url=urlencode("https://login.nfls.io");
         curl_setopt($ch,CURLOPT_COOKIEFILE,$cookie);
         curl_setopt($ch,CURLOPT_COOKIEJAR,$cookie2);
-        $post_data = "username="+env("WIKI_BOT")+"&password="+env("BOT_PASS")+"&logintoken=$wiki_token&format=json&loginreturnurl=$url";
+        $post_data = "username=".env("WIKI_BOT")."&password=".env("BOT_PASS")."&logintoken=$wiki_token&format=json&loginreturnurl=$url";
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
         $file_contents = curl_exec($ch);
         curl_close($ch);
@@ -343,13 +438,9 @@ class UserCenterController extends Controller
 
     function LoginWikiAccountById($id)//登录wiki账户
     {
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_users");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"SELECT * FROM user_list WHERE id=$id");
-        $row=mysqli_fetch_array($result,MYSQLI_ASSOC);
+        $user = DB::connection("mysql_wiki")->table("wiki_user")->where(["user_id"=>$id])->first();
         $username=urlencode(GetUsernameById($id));
-        $password=$row['asso_password'];
+        $password = $user->asso_password;
 
         $cookie = tempnam('./','cookie');
         $cookie2 = tempnam('./','cookie2');
@@ -396,31 +487,20 @@ class UserCenterController extends Controller
 
     function LoginShareAccountById($id)//登录Share账户
     {
-        include "conn.php";
-        $id=GetUserAssiciatedIdById($id,"share");
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_share");
-        mysqli_query($con,"set character set 'utf8'");
-        $result = mysqli_query($con,"SELECT * FROM users WHERE id = $id");
-        if(mysqli_num_rows($result)==1)
-        {
-            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-            $info=array();
-            $info['c_secure_uid']=urlencode(base64_encode($row['id']));
-            $info['c_secure_pass']=urlencode(md5($row["passhash"]));
-            $info['c_secure_ssl']=urlencode(base64_encode("yeah"));
-            $info['c_secure_tracker_ssl']=urlencode(base64_encode("yeah"));
-            $info['c_secure_login']=urlencode(base64_encode("nope"));
-            return $info;
-        }
-        else
-        {
-            return false;
-        }
+        $id=GetUserAssociatedIdById($id,"share");
+        $user = DB::connection("mysql_share")->table("users")->where(["id"=>$id])->first();
+        $info=array();
+        $info['c_secure_uid']=urlencode(base64_encode($user->id));
+        $info['c_secure_pass']=urlencode(md5($user->passhash));
+        $info['c_secure_ssl']=urlencode(base64_encode("yeah"));
+        $info['c_secure_tracker_ssl']=urlencode(base64_encode("yeah"));
+        $info['c_secure_login']=urlencode(base64_encode("nope"));
+        return $info;
     }
 
     function CreateShareAccountById($id)//注册wiki账户
     {
-        if(GetUserAssiciatedIdById($id,"share")!=-1)
+        if(GetUserAssociatedIdById($id,"share")!=-1)
             die(json_encode(array("status"=>"error")));
         $secret=mksecret();
         $password=GeneratePassword($id);
@@ -429,22 +509,111 @@ class UserCenterController extends Controller
         $username=$info['username'];
         $wantpasshash = md5($secret . $password . $secret);
         $time=date('Y-m-d h:i:s',time());
-        include "conn.php";
-        $con = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_share");
-        mysqli_query($con,"set character set 'utf8'");
-        mysqli_query($con,"SET sql_mode = 'ALLOW_INVALID_DATES'");
-        mysqli_query($con,"INSERT INTO users (username, passhash, secret, email, added, last_login, status) values('$username','$wantpasshash','$secret','$email','$time','$time', 'confirmed')");
-        $result = mysqli_query($con,"SELECT * FROM users WHERE username = '".$username."'");
+        DB::connection("mysql_share")->select("SET sql_mode = 'ALLOW_INVALID_DATES'");
+        DB::connection("mysql_share")->table("users")->insert(["username"=>$username,"passhash"=>$wantpasshash,"secret"=>$secret,"email"=>$email,"added"=>$time,"last_login"=>$time,"status"=>"confirmed"]);
+        $user = DB::connection("mysql_share")->table("users")->where(["username"=>$username])->first();
+        DB::connection("mysql_user")->where(["id"=>$id])->update(["wiki_account"=>$user->id]);
+    }
+
+    function GetNoticeType($type)//获取通知类型
+    {
+        switch($type)
+        {
+            case "1":
+                return "测试";
+                break;
+            case "2":
+                return "通知";
+                break;
+            case "3":
+                return "公告";
+                break;
+            case "4":
+                return "预告";
+                break;
+            default:
+                return "";
+                break;
+        }
+    }
+
+    function GetSystemNoticeById($id)//获取主站通知或推送，并根据Token记录已读信息
+    {
+        DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
+        $messages = DB::connection("mysql_user")->table("system_message")->get();
+        $count = 0;
+        foreach($messages as $message){
+            $info[$count]['time'] = $message -> time;
+            $info[$count]['title'] = $message -> title;
+            $info[$count]['type'] = $this->GetNoticeType($message -> type);
+            $info[$count]['detail'] = $message -> detail;
+            $count++;
+        }
+        return $info;
+        /*
         if(mysqli_num_rows($result)==1)
         {
-            $row=mysqli_fetch_array($result,MYSQLI_ASSOC);
-            $con1 = mysqli_connect($sql_add,$sql_user,$sql_pass,"nfls_users");
-            mysqli_query($con1,"set character set 'utf8'");
-            mysqli_query($con1,'UPDATE `user_list` SET `share_account`="'.$row['id'].'" WHERE `id`='.$id);
-        }
-        return 0;
 
+            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+            if($is_push)//测试中，请勿投入使用
+            {
+                $push_text=array();
+                $last_id = $row['last_sysmessage_pushed'];
+                $message = mysqli_query($con,"SELECT * FROM system_message WHERE id > $last_id");
+                if(mysqli_num_rows($result)<1)
+                {
+                    return 1;
+                }
+                while($row = mysqli_fetch_array($result,MYSQLI_ASSOC))
+                {
+                    if($row['push_text']!="")
+                        array_push($push_text,$row['push_text']);
+                }
+                return $push_text;
+            }
+            else
+            {
+                $count=1;
+                $mes_text=array();
+                $last_id = $row['last_sysmessage_read'];
+                $message = mysqli_query($con,"SELECT * FROM system_message order by id desc limit 10");
+                if(mysqli_num_rows($result)<1)
+                {
+                    return 1;
+                }
+                while($row = mysqli_fetch_array($message,MYSQLI_ASSOC))
+                {
+
+                    if($only_not_read)
+                    {
+                        if($row['id']>=$last_id)
+                        {
+                            $mes_text[$count]['time']=$row['time'];
+                            $mes_text[$count]['title']=$row['title'];
+                            $mes_text[$count]['type']=GetNoticeType($row['type']);
+                            $mes_text[$count]['detail']=$row['detail'];
+                        }
+                    }
+                    else
+                    {
+                        $mes_text[$count]['time']=$row['time'];
+                        $mes_text[$count]['title']=$row['title'];
+                        $mes_text[$count]['type']=GetNoticeType($row['type']);
+                        $mes_text[$count]['detail']=$row['detail'];
+                    }
+                    $count++;
+                }
+                return $mes_text;
+            }
+        }
+        else
+        {
+            return false;
+        }
+        */
     }
+
+
     function mksecret($len = 20) {//share secret制作
         $ret = "";
         for ($i = 0; $i < $len; $i++)
