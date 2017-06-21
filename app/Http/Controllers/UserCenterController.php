@@ -33,23 +33,23 @@ class UserCenterController extends Controller
     function requestHandler(Request $request, $type){
         switch($type){
             case "login":
-                if($request->only(['username','password']))
+                if($request->only(['username','password'] && $request->isMethod("post")))
                     $info = $this->UserLogin($request->input("username"), $request->input("password"));
                 break;
             case "recover":
-                if($request->only(['email']))
+                if($request->only(['email']) && $request->isMethod("post"))
                     $info = $this->RecoverPassword($request->input("email"));
                 break;
             case "register":
-                if($request->only(['username','password','email']))
+                if($request->only(['username','password','email']) && $request->isMethod("post"))
                     $info = $this->UserRegister($request->input("email"),$request->input("password"),$request->input("email"));
                 break;
             case "username":
                 if($request->isMethod("get"))
-                    $info = $this->GetUsernameById(self::GetUserId(Cookie::get('token'));
+                    $info = $this->GetUsernameById(self::GetUserId(Cookie::get('token')));
                 break;
             case "forumLogin":
-                if($request->only(['username','password']))
+                if($request->only(['username','password']) && $request->isMethod("post"))
                     $info = $this->ForumLogin($request->input("username"), $request->input("password"));
                 break;
             case "wikiLogin":
