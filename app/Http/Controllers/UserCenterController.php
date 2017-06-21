@@ -438,7 +438,7 @@ class UserCenterController extends Controller
 
     function LoginWikiAccountById($id)//登录wiki账户
     {
-        $user = DB::connection("mysql_wiki")->table("wiki_user")->where(["user_id"=>$id])->first();
+        $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
         $username=urlencode($this->GetUsernameById($id));
         $password = $user->asso_password;
 
