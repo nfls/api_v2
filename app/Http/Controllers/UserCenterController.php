@@ -42,7 +42,7 @@ class UserCenterController extends Controller
                 break;
             case "register":
                 if($request->only(['username','password','email']) && $request->isMethod("post"))
-                    $info = $this->UserRegister($request->input("email"),$request->input("password"),$request->input("email"));
+                    $info = $this->UserRegister($request->input("email"),$request->input("password"),$request->input("username"));
                 break;
             case "username":
                 if($request->isMethod("get"))
