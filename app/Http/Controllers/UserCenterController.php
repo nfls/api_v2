@@ -228,7 +228,7 @@ class UserCenterController extends Controller
 
     function AddUser($id)//添加论坛用户到user表中
     {
-        DB:conncetion("mysql_user")->table("user_list")->insert(["id"=>$id]);
+        DB::conncetion("mysql_user")->table("user_list")->insert(["id"=>$id]);
     }
 
     function CheckIfTokenExists($id)//检查是否存在Token
