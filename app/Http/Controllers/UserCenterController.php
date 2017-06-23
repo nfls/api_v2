@@ -327,6 +327,9 @@ class UserCenterController extends Controller
 
     function GetUserWikiInfoByWikiId($id)//根据wiki_id获取wiki信息
     {
+        $id = $this->GetUserAssociatedIdById($id,"wiki");
+        if($id==-1)
+            return [];
         $user = DB::connection("mysql_wiki")->table("wiki_user")->where(["user_id"=>$id])->first();
         $info=array();
         $info['user_id']=$user->user_id;
@@ -340,6 +343,9 @@ class UserCenterController extends Controller
 
     function GetUserShareInfoByShareId($id)//根据shareid获取share信息
     {
+        $id = $this->GetUserAssociatedIdById($id,"share");
+        if($id==-1)
+            return [];
         $user = DB::connection("mysql_share")->table("users")->where(["id"=>$id])->first();
         $info=array();
         $info['user_id']=$user->id;
