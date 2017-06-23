@@ -442,6 +442,10 @@ class UserCenterController extends Controller
 
     function LoginWikiAccountById($id)//登录wiki账户
     {
+        $id=$this->GetUserAssociatedIdById($id,"wiki");
+        if($id===false){
+            return [];
+        }
         $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
         $username=urlencode($this->GetUsernameById($id));
         $password = $user->asso_password;
@@ -492,6 +496,9 @@ class UserCenterController extends Controller
     function LoginShareAccountById($id)//登录Share账户
     {
         $id=$this->GetUserAssociatedIdById($id,"share");
+        if($id===false){
+            return [];
+        }
         $user = DB::connection("mysql_share")->table("users")->where(["id"=>$id])->first();
         $info=array();
         $info['c_secure_uid']=urlencode(base64_encode($user->id));
