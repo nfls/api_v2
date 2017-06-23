@@ -446,13 +446,12 @@ class UserCenterController extends Controller
 
     function LoginWikiAccountById($id)//登录wiki账户
     {
-        $id=$this->GetUserAssociatedIdById($id,"wiki");
-        if($id==-1){
+        $wiki_id=$this->GetUserAssociatedIdById($id,"wiki");
+        if($wiki_id==-1){
             return [];
         }
-        $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
-        $username=urlencode($this->GetUsernameById($id));
-        $password = $user->asso_password;
+        $username=urlencode(self::GetUsernameById($id));
+        $password = $this->GetAssociatePassword($id);
 
         $cookie = tempnam('./','cookie');
         $cookie2 = tempnam('./','cookie2');
