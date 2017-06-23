@@ -446,6 +446,7 @@ class UserCenterController extends Controller
 
     function LoginWikiAccountById($id)//登录wiki账户
     {
+        $id=$this->GetUserAssociatedIdById($id,"wiki");
         if($id==-1){
             return [];
         }
@@ -498,6 +499,7 @@ class UserCenterController extends Controller
 
     function LoginShareAccountById($id)//登录Share账户
     {
+        $id=$this->GetUserAssociatedIdById($id,"share");
         if($id==-1){
             return [];
         }
