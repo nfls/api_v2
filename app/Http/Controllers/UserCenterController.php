@@ -446,8 +446,7 @@ class UserCenterController extends Controller
 
     function LoginWikiAccountById($id)//登录wiki账户
     {
-        $id=$this->GetUserAssociatedIdById($id,"wiki");
-        if($id===false){
+        if($id==-1){
             return [];
         }
         $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
@@ -499,8 +498,7 @@ class UserCenterController extends Controller
 
     function LoginShareAccountById($id)//登录Share账户
     {
-        $id=$this->GetUserAssociatedIdById($id,"share");
-        if($id===false){
+        if($id==-1){
             return [];
         }
         $user = DB::connection("mysql_share")->table("users")->where(["id"=>$id])->first();
