@@ -441,7 +441,7 @@ class UserCenterController extends Controller
         $detail=(array)json_decode($file_contents,true);
         $user = DB::connection("mysql_wiki")->table("wiki_user")->where(["user_name"=>$username])->first();
         DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["wiki_account"=>$user->user_id]);
-        return 0;
+        return array("status"=>"success");
     }
 
     function LoginWikiAccountById($id)//登录wiki账户
@@ -527,6 +527,7 @@ class UserCenterController extends Controller
         DB::connection("mysql_share")->table("users")->insert(["username"=>$username,"passhash"=>$wantpasshash,"secret"=>$secret,"email"=>$email,"added"=>$time,"last_login"=>$time,"status"=>"confirmed"]);
         $user = DB::connection("mysql_share")->table("users")->where(["username"=>$username])->first();
         DB::connection("mysql_user")->where(["id"=>$id])->update(["wiki_account"=>$user->id]);
+        return array("status"=>"success");
     }
 
     function GetNoticeType($type)//获取通知类型
