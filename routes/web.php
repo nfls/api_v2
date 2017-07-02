@@ -25,3 +25,5 @@ Route::get('media/gallery/info/{id}',"AlbumController@getAlbumInfo");
 Route::get('media/gallery/getlist',"AlbumController@getAlbumList");
 Route::any('media/gallery/update',"AlbumController@updateAnAlbum");
 Route::get("admin/auth/list","CertificationManagementController@getSubmittedUserList");
+
+Route:post('device/register',"IOSDeviceController@registerDevice");
