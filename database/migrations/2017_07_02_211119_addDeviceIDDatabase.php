@@ -16,7 +16,7 @@ class AddDeviceIDDatabase extends Migration
         Schema::connection('mysql_user')->create('user_device', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->unique();
             $table->string("device_id");
-            $table->string("devicd_model");
+            $table->string("device_model");
             $table->mediumInteger("user_id");
             $table->index('id');
         });
