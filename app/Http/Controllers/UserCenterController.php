@@ -135,6 +135,10 @@ class UserCenterController extends Controller
     }
 
     function UserRegister($email,$password,$username){
+        /*
+        if(preg_match("[A-Za-z0-9_]+",$username)!=$username)
+            return [""]
+        */
         $headers = array('content-type:application/vnd.api+json');
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, "https://forum.nfls.io/api/users");
