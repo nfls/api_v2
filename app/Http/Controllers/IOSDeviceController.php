@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Cookie;
 use Response;
-use Databse;
+use Illuminate\Support\Facades\DB;
+
 class IOSDeviceController extends Controller
 {
     function registerDevice(Request $request){
