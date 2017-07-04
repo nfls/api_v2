@@ -8,6 +8,7 @@
         "php": ">=5.6.4",
         "barryvdh/laravel-cors": "^0.9.2",
         "giggsey/libphonenumber-for-php": "^8.4",
+        "gregwar/captcha": "^1.1",
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
         "qiniu/php-sdk": "^7.1",

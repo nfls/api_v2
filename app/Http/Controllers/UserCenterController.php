@@ -7,6 +7,8 @@ use Illuminate\Pagination\PaginationServiceProvider;
 use Illuminate\Support\Facades\DB;
 use Response;
 use Cookie;
+use Gregwar\Captcha\CaptchaBuilder;
+
 class UserCenterController extends Controller
 {
     public static function GetUserId($token){
@@ -96,6 +98,9 @@ class UserCenterController extends Controller
                 if($request->isMethod("get"))
                     $info = $this->GetSystemNoticeById(Cookie::get('token'));
                 break;
+            case "captcha":
+                if($request->isMethod("get"))
+                    $info = $this->CreateCaptcha("0.0.0.0");
             default:
                 break;
         }
@@ -112,6 +117,13 @@ class UserCenterController extends Controller
         return Response::json($json_mes);
     }
 
+    function CreateCaptcha($ip){
+        $builder = new CaptchaBuilder;
+        $builder->build();
+        header('Content-type: image/jpeg');
+        $builder->output();
+        die();
+    }
     function UserLogin($username,$password)
     {
         $headers = array('content-type:application/vnd.api+json',);
