@@ -388,8 +388,8 @@ class UserCenterController extends Controller
     {
         if($this->GetUserAssociatedIdById($id,"wiki")!=-1)
             abort(403);
-        $cookie = tempnam('./','cookie');
-        $cookie2 = tempnam('./','cookie2');
+        $cookie = tempnam('/tmp/','cookie');
+        $cookie2 = tempnam('/tmp/','cookie2');
         $headers = array('Content-Type: application/x-www-form-urlencoded','Cache-Control: no-cache','Api-User-Agent: Example/1.0',);
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, "https://wiki.nfls.io/api.php?action=query&type=login&meta=tokens&format=json");
