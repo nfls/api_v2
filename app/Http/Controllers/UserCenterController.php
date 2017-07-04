@@ -36,8 +36,8 @@ class UserCenterController extends Controller
     function requestHandler(Request $request, $type){
         switch($type){
             case "login":
-                if($request->only(['username','password'] && $request->isMethod("post")))
-                    $info = $this->UserLogin($request->input("username"), $request->input("password"));
+                if($request->only(['username','password','session','captcha'] && $request->isMethod("post")))
+                    $info = $this->UserLogin($request->input("username"), $request->input("password"),$request->input("session"),$request->input("captcha"));
                 break;
             case "recover":
                 if($request->only(['email']) && $request->isMethod("post"))
@@ -99,9 +99,14 @@ class UserCenterController extends Controller
                 if($request->isMethod("get"))
                     $info = $this->GetSystemNoticeById(Cookie::get('token'));
                 break;
-            case "captcha":
+            case "registerCaptcha":
                 if($request->isMethod("get"))
-                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR']);
+                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'],"register");
+                break;
+            case "loginCaptcha":
+                if($request->isMethod("get"))
+                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'],"login");
+                break;
             default:
                 break;
         }
@@ -118,7 +123,7 @@ class UserCenterController extends Controller
         return Response::json($json_mes);
     }
 
-    function CreateCaptcha($ip,$operation = "register"){
+    function CreateCaptcha($ip,$operation){
         DB::connection("mysql_user")->table("user_session")->where("valid_before","<",date('Y-m-d h:i:s'))->delete();
         $phraseBuilder = new PhraseBuilder(10);
         $builder = new CaptchaBuilder(null, $phraseBuilder);
@@ -143,8 +148,14 @@ class UserCenterController extends Controller
         return $str;
     }
 
-    function UserLogin($username,$password,$session = "",$captcha = "")
+    function UserLogin($username,$password,$session,$captcha)
     {
+        $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "login", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
+        if(@is_null($valid->id)){
+            return array("status"=>"failure","message"=>"验证码无效或不正确");
+        } else {
+            DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "login", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
+        }
         $headers = array('content-type:application/vnd.api+json',);
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, "https://forum.nfls.io/api/token");
@@ -160,9 +171,9 @@ class UserCenterController extends Controller
         $detail=(array)json_decode($file_contents,true);
         unset($ch);
         if(isset($detail['token']))
-            return $this->LoginProcess($detail['userId']);
+            return array("status"=>"success","token"=>$this->LoginProcess($detail['userId']));
         else
-            return false;
+            return array("status"=>"failure","message"=>"用户名或密码不正确");
     }
 
     function UserRegister($email,$password,$username,$session,$captcha){
