@@ -128,7 +128,7 @@ class UserCenterController extends Controller
         $time = date('Y-m-d h:i:s', strtotime('+10 minutes'));
         $session = $this->random_str(16);
         DB::connection("mysql_user")->table("user_session")->insert(["phrase"=>$phrase,"ip"=>$ip,"valid_before"=>$time,"session"=>$session,"operation"=>$operation]);
-        $image = "data:image/jpeg;base64," + base64_encode($builder->get($quality = 100));
+        $image = 'data:image/jpeg;base64,' . base64_encode($builder->get($quality = 100));
         return array("captcha"=>$image,"session"=>$session);
 
     }
