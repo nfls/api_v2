@@ -121,7 +121,7 @@ class UserCenterController extends Controller
     function CreateCaptcha($ip){
         $phraseBuilder = new PhraseBuilder(10);
         $builder = new CaptchaBuilder(null, $phraseBuilder);
-        $builder->buildAgainstOCR($width = 300, $height = 200, $font = null);
+        $builder->buildAgainstOCR($width = 300, $height = 100, $font = null);
         header('Content-type: image/jpeg');
         $phrase = $builder->getPhrase();
         $time = date('Y-m-d h:i:s', strtotime('+5 minutes'));
