@@ -118,17 +118,30 @@ class UserCenterController extends Controller
         return Response::json($json_mes);
     }
 
-    function CreateCaptcha($ip){
+    function CreateCaptcha($ip,$operation = "register"){
         $phraseBuilder = new PhraseBuilder(10);
         $builder = new CaptchaBuilder(null, $phraseBuilder);
         $builder->buildAgainstOCR($width = 300, $height = 100, $font = null);
         header('Content-type: image/jpeg');
         $phrase = $builder->getPhrase();
-        $time = date('Y-m-d h:i:s', strtotime('+5 minutes'));
-        DB::connection("mysql_user")->table("user_session")->insert(["phrase"=>$phrase,"ip"=>$ip,"valid_before"=>$time]);
-        $builder->output();
-        die();
+        $time = date('Y-m-d h:i:s', strtotime('+10 minutes'));
+        $session = $this->random_str(16);
+        DB::connection("mysql_user")->table("user_session")->insert(["phrase"=>$phrase,"ip"=>$ip,"valid_before"=>$time,"session"=>$session,"operation"=>$operation]);
+        $image = base64_encode($builder->output());
+        return array("captcha"=>$image,"session"=>$session);
+
     }
+
+    function random_str($length, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    {
+        $str = '';
+        $max = mb_strlen($keyspace, '8bit') - 1;
+        for ($i = 0; $i < $length; ++$i) {
+            $str .= $keyspace[random_int(0, $max)];
+        }
+        return $str;
+    }
+
     function UserLogin($username,$password)
     {
         $headers = array('content-type:application/vnd.api+json',);
