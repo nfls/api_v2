@@ -171,7 +171,7 @@ class UserCenterController extends Controller
             return [""]
         */
         $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "register", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
-        if(is_null($valid->id)){
+        if(@is_null($valid->id)){
             return array("status"=>"failure","message"=>"验证码无效或不正确");
         } else {
             DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "register", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
