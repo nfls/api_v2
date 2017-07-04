@@ -44,8 +44,8 @@ class UserCenterController extends Controller
                     $info = $this->RecoverPassword($request->input("email"));
                 break;
             case "register":
-                if($request->only(['username','password','email']) && $request->isMethod("post"))
-                    $info = $this->UserRegister($request->input("email"),$request->input("password"),$request->input("username"));
+                if($request->only(['username','password','email',"session","captcha"]) && $request->isMethod("post"))
+                    $info = $this->UserRegister($request->input("email"),$request->input("password"),$request->input("username"),$request->input("session"),$request->input("captcha"));
                 break;
             case "username":
                 if($request->isMethod("get"))
@@ -143,7 +143,7 @@ class UserCenterController extends Controller
         return $str;
     }
 
-    function UserLogin($username,$password)
+    function UserLogin($username,$password,$session = "",$captcha = "")
     {
         $headers = array('content-type:application/vnd.api+json',);
         $ch = curl_init();
@@ -165,11 +165,17 @@ class UserCenterController extends Controller
             return false;
     }
 
-    function UserRegister($email,$password,$username){
+    function UserRegister($email,$password,$username,$session,$captcha){
         /*
         if(preg_match("[A-Za-z0-9_]+",$username)!=$username)
             return [""]
         */
+        $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "register", "captcha" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
+        if(is_null($valid->id)){
+            return array("status"=>"failure","message"=>"验证码无效或不正确");
+        } else {
+            DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "register", "captcha" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
+        }
         $headers = array('content-type:application/vnd.api+json');
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, "https://forum.nfls.io/api/users");
