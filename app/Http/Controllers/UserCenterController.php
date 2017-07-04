@@ -40,8 +40,8 @@ class UserCenterController extends Controller
                     $info = $this->UserLogin($request->input("username"), $request->input("password"),$request->input("session"),$request->input("captcha"));
                 break;
             case "recover":
-                if($request->only(['email']) && $request->isMethod("post"))
-                    $info = $this->RecoverPassword($request->input("email"));
+                if($request->only(['email','session','captcha']) && $request->isMethod("post"))
+                    $info = $this->RecoverPassword($request->input("email"),$request->input("session"),$request->input("captcha"));
                 break;
             case "register":
                 if($request->only(['username','password','email',"session","captcha"]) && $request->isMethod("post"))
@@ -52,8 +52,8 @@ class UserCenterController extends Controller
                     $info = $this->GetUsernameById(self::GetUserId(Cookie::get('token')));
                 break;
             case "forumLogin":
-                if($request->only(['username','password']) && $request->isMethod("post"))
-                    $info = $this->ForumLogin($request->input("username"), $request->input("password"));
+                if($request->only(['username','password','token']) && $request->isMethod("post"))
+                    $info = $this->ForumLogin($request->input("username"), $request->input("password"), $request->input("token"));
                 break;
             case "wikiLogin":
                 if($request->isMethod("get"))
@@ -107,6 +107,10 @@ class UserCenterController extends Controller
                 if($request->isMethod("get"))
                     $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'],"login");
                 break;
+            case "recoverCaptcha":
+                if($request->isMethod("get"))
+                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'],"recover");
+                break;
             default:
                 break;
         }
@@ -152,6 +156,7 @@ class UserCenterController extends Controller
     {
         $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "login", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
         if(@is_null($valid->id)){
+            DB::connection("mysql_user")->table("user_session")->where(["session" => $session])->delete();
             return array("status"=>"failure","message"=>"验证码无效或不正确");
         } else {
             DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "login", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
@@ -183,6 +188,7 @@ class UserCenterController extends Controller
         */
         $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "register", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
         if(@is_null($valid->id)){
+            DB::connection("mysql_user")->table("user_session")->where(["session" => $session])->delete();
             return array("status"=>"failure","message"=>"验证码无效或不正确");
         } else {
             DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "register", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
@@ -213,8 +219,9 @@ class UserCenterController extends Controller
         }
     }
 
-    function ForumLogin($username,$password)
+    function ForumLogin($username,$password,$token)
     {
+        self::GetUserId($token);
         $headers = array('content-type:application/vnd.api+json',);
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, "https://forum.nfls.io/login");
@@ -250,8 +257,15 @@ class UserCenterController extends Controller
         return($token);
     }
 
-    function RecoverPassword($email)
+    function RecoverPassword($email,$session,$captcha)
     {
+        $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "recover", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
+        if(@is_null($valid->id)){
+            DB::connection("mysql_user")->table("user_session")->where(["session" => $session])->delete();
+            return array("status"=>"failure","message"=>"验证码无效或不正确");
+        } else {
+            DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "recover", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
+        }
         $headers = array('content-type:application/vnd.api+json',);
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, "https://forum.nfls.io/api/forgot");
@@ -267,7 +281,7 @@ class UserCenterController extends Controller
         if($file_contents==null)
             return array("status"=>"success");
         else
-            return array("status"=>"error");
+            return array("status"=>"failure","message"=>"未找到您的邮箱");
     }
 
     function CheckIfUserExists($id) //检查论坛用户是否存在于user表中
