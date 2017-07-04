@@ -170,11 +170,11 @@ class UserCenterController extends Controller
         if(preg_match("[A-Za-z0-9_]+",$username)!=$username)
             return [""]
         */
-        $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "register", "captcha" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
+        $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "register", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
         if(is_null($valid->id)){
             return array("status"=>"failure","message"=>"验证码无效或不正确");
         } else {
-            DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "register", "captcha" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
+            DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "register", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
         }
         $headers = array('content-type:application/vnd.api+json');
         $ch = curl_init();
