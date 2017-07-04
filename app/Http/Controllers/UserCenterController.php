@@ -125,7 +125,7 @@ class UserCenterController extends Controller
         header('Content-type: image/jpeg');
         $phrase = $builder->getPhrase();
         $time = date('Y-m-d h:i:s', strtotime('+5 minutes'));
-        DB::connection("mysql_user")->table("nfls_session")->insert(["phrase"=>$phrase,"ip"=>$ip,"valid_before"=>$time]);
+        DB::connection("mysql_user")->table("user_session")->insert(["phrase"=>$phrase,"ip"=>$ip,"valid_before"=>$time]);
         $builder->output();
         die();
     }
