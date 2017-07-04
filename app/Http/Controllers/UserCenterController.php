@@ -119,6 +119,7 @@ class UserCenterController extends Controller
     }
 
     function CreateCaptcha($ip,$operation = "register"){
+        DB::connection("mysql_user")->table("user_session")->where("valid_before","<",date('Y-m-d h:i:s'))->delete();
         $phraseBuilder = new PhraseBuilder(10);
         $builder = new CaptchaBuilder(null, $phraseBuilder);
         $builder->buildAgainstOCR($width = 300, $height = 100, $font = null);
@@ -127,7 +128,7 @@ class UserCenterController extends Controller
         $time = date('Y-m-d h:i:s', strtotime('+10 minutes'));
         $session = $this->random_str(16);
         DB::connection("mysql_user")->table("user_session")->insert(["phrase"=>$phrase,"ip"=>$ip,"valid_before"=>$time,"session"=>$session,"operation"=>$operation]);
-        $image = base64_encode($builder->output());
+        $image = base64_encode($builder->get($quality = 100));
         return array("captcha"=>$image,"session"=>$session);
 
     }
