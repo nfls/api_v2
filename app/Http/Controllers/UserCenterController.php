@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Response;
 use Cookie;
 use Gregwar\Captcha\CaptchaBuilder;
+use Gregwar\Captcha\PhraseBuilder;
 
 class UserCenterController extends Controller
 {
@@ -100,7 +101,7 @@ class UserCenterController extends Controller
                 break;
             case "captcha":
                 if($request->isMethod("get"))
-                    $info = $this->CreateCaptcha("0.0.0.0");
+                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR']);
             default:
                 break;
         }
@@ -118,9 +119,13 @@ class UserCenterController extends Controller
     }
 
     function CreateCaptcha($ip){
-        $builder = new CaptchaBuilder;
-        $builder->build();
+        $phraseBuilder = new PhraseBuilder(10);
+        $builder = new CaptchaBuilder(null, $phraseBuilder);
+        $builder->buildAgainstOCR($width = 300, $height = 200, $font = null);
         header('Content-type: image/jpeg');
+        $phrase = $builder->getPhrase();
+        $time = date('Y-m-d h:i:s', strtotime('+5 minutes'));
+        DB::connection("mysql_user")->table("nfls_session")->insert(["phrase"=>$phrase,"ip"=>$ip,"valid_before"=>$time]);
         $builder->output();
         die();
     }
