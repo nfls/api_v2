@@ -579,7 +579,7 @@ class UserCenterController extends Controller
         return $info;
     }
 
-    function CreateShareAccountById($id)//注册wiki账户
+    function CreateShareAccountById($id)//注册share账户
     {
         if($this->GetUserAssociatedIdById($id,"share")!=-1)
             abort(403);
@@ -593,7 +593,7 @@ class UserCenterController extends Controller
         DB::connection("mysql_share")->select("SET sql_mode = 'ALLOW_INVALID_DATES'");
         DB::connection("mysql_share")->table("users")->insert(["username"=>$username,"passhash"=>$wantpasshash,"secret"=>$secret,"email"=>$email,"added"=>$time,"last_login"=>$time,"status"=>"confirmed"]);
         $user = DB::connection("mysql_share")->table("users")->where(["username"=>$username])->first();
-        DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["wiki_account"=>$user->id]);
+        DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["share_account"=>$user->id]);
         return array("status"=>"success");
     }
 
