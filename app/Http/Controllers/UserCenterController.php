@@ -505,6 +505,7 @@ class UserCenterController extends Controller
         $file_contents = curl_exec($ch);
         curl_close($ch);
         $detail=(array)json_decode($file_contents,true);
+        $username = str_replace("_", " ", $username);
         $user = DB::connection("mysql_wiki")->table("wiki_user")->where(["user_name"=>$username])->first();
         DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["wiki_account"=>$user->user_id]);
         return array("status"=>"success");
