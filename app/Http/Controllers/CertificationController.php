@@ -897,7 +897,7 @@ class CertificationController extends Controller
                     break;
             }
         }
-        if(!is_null($start_year) && !is_null($end_year)){
+        if(@!is_null($start_year) && !is_null($end_year)){
             if($start_year>$end_year)
                 array_push($message,$name . "入学年份大于毕业年份。");
         }
