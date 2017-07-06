@@ -80,7 +80,9 @@ class CertificationController extends Controller
         '昵称或英文名请填写在南外期间常用的，如英语课上的英文名，或者是同学之间的昵称，如有多个请用半角逗号分隔；如果更改过姓名请填写曾用名',
         '手机号请务必填写正确，在未来可能会启用手机号验证系统',
         '出国的同学请填写自己的国外手机号，并请加上正确的国际区号，以便联系',
-        '本页除“曾用名”项外均为必填项目，“手机号码（国外）”仅需要当前不在国内的校友填写'
+        '本页除“曾用名”项外均为必填项目，“手机号码（国外）”仅需要当前不在国内的校友填写',
+        '本表格在校学生仅限国际部高一及以上，普高高二及以上的同学填写。',
+        '普高高二在读请在高三相关的班级号上填入与高二相同的班级号，如有发生变更，可后期申诉修改。'
     ];
 
     const STEP2 = [
@@ -128,6 +130,10 @@ class CertificationController extends Controller
 		'底下的联系方式，可根据自己的情况选填，但至少必须填写一个。'
     ];
 
+	const STEP9 = [
+	    '您已完成所有内容。待审核通过后，您即可使用在线校友录功能。您也可以返回编辑。前四步已经提交，除审核被退回外不可编辑。'
+    ];
+
 
 
     function getCurrentStep(Request $request)
@@ -159,6 +165,8 @@ class CertificationController extends Controller
             case 8:
                 $instructions = self::STEP8;
                 break;
+            case 9:
+                $instructions = self::STEP9;
             default:
                 $instructions = [];
                 break;
@@ -290,6 +298,9 @@ class CertificationController extends Controller
                     $message = $this->authStep8($info);
                     return $this->dataCheck($message, $id, $info, self::PERSONAL_INFO, 'personal_info',$action);
                     break;
+                case 9:
+                    DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => (int)$user->current_step - 1]);
+                    return Response::json(array('code' => '200', 'message' => array(['您即将返回至上一步'])));
             }
         }
     }
@@ -554,8 +565,8 @@ class CertificationController extends Controller
             if (!$validator->isValid($info->birthday)) {
                 array_push($message, '出生日期格式不符合要求。');
             }
-            if (date('Y', strtotime($info->birthday)) + 18 > date('Y')) {
-                array_push($message, '请在高中毕业后填写此表格。');
+            if (date('Y', strtotime($info->birthday)) + 15 > date('Y')) {
+                array_push($message, '请在高一后填写此表格。');
             }
             if (date('Y', strtotime($info->birthday)) + 18 < 1963) {
                 array_push($message, '您的年龄不符合最低入学要求。');
@@ -904,7 +915,7 @@ class CertificationController extends Controller
         $message = array();
         $contact_count = 0;
         $content_count = 0;
-        $this->structureCheck($info,15,$message);
+        $this->structureCheck($info,16,$message);
         if(@$this->isEmpty($info->personal_info))
             array_push($message,"请填写自我介绍。");
         foreach($info as $key=>$value){
