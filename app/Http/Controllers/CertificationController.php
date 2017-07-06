@@ -284,7 +284,7 @@ class CertificationController extends Controller
                         }
                     } else if ((int)$action == -1){
                         DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => (int)$user->current_step - 1]);
-                        return Response::json(array('code' => '200', 'message' => array(['您即将返回至上一步'])));
+                        return Response::json(array('code' => '200', 'message' => array('您即将返回至上一步')));
                     }
                     break;
                 case self::COLLEGE_INFO:
@@ -301,7 +301,7 @@ class CertificationController extends Controller
                     break;
                 case 9:
                     DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => (int)$user->current_step - 1]);
-                    return Response::json(array('code' => '200', 'message' => array(['您即将返回至上一步'])));
+                    return Response::json(array('code' => '200', 'message' => array('您即将返回至上一步')));
             }
         }
     }
