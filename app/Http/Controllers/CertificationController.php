@@ -167,6 +167,7 @@ class CertificationController extends Controller
                 break;
             case 9:
                 $instructions = self::STEP9;
+                break;
             default:
                 $instructions = [];
                 break;
