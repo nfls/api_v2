@@ -23,7 +23,44 @@ class IOSDeviceController extends Controller
 
     function iapPurchase(Request $request){
         $receipt = $request->input("receipt");
-        DB::connection("mysql_user")->table("user_purchase")->insert(["receipt"=>$receipt]);
+        $headers = array('content-type:application/vnd.api+json',);
+        $ch = curl_init();
+        curl_setopt ($ch, CURLOPT_URL, "https://sandbox.itunes.apple.com/verifyReceipt");
+        curl_setopt ($ch, CURLOPT_POST, 1);
+        $post_data = '{"receipt-data":"'.receipt.'""}';
+        if($post_data != ''){curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);}
+        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 120);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        $file_contents = curl_exec($ch);
+        curl_close($ch);
+        $sandbox=(array)json_decode($file_contents,true);
+        unset($ch);
+        if($sandbox["status"] != 0) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "https://sandbox.itunes.apple.com/verifyReceipt");
+            curl_setopt($ch, CURLOPT_POST, 1);
+            $post_data = '{"receipt-data":"' . receipt . '""}';
+            if ($post_data != '') {
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+            }
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 120);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_HEADER, false);
+            $file_contents = curl_exec($ch);
+            curl_close($ch);
+            $production = (array)json_decode($file_contents, true);
+            if ($production["status"] != 0) {
+                return Response::json(array("code"=>403, "status"=>"failed"));
+            } else {
+                DB::connection("mysql_user")->table("user_purchase")->insert(["receipt"=>$receipt,"authorize_data"=>$file_contents,"environment"=>"production","price"=>30]);
+            }
+        } else {
+            DB::connection("mysql_user")->table("user_purchase")->insert(["receipt"=>$receipt,"authorize_data"=>$file_contents,"environment"=>"sandbox","price"=>30]);
+        }
+
         return Response::json(array("code"=>200, "status"=>"succeed"));
     }
 }

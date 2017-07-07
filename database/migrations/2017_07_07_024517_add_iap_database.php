@@ -15,7 +15,10 @@ class AddIapDatabase extends Migration
     {
         Schema::connection('mysql_user')->create('user_purchase', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->unique();
-            $table->string("receipt");
+            $table->mediumText("receipt");
+            $table->json("authorize_data");
+            $table->text("environment");
+            $table->integer("price");
             $table->integer("user_id")->default(-1);
             $table->index('id');
         });
