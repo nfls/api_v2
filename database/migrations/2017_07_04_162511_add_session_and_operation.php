@@ -27,7 +27,7 @@ class AddSessionAndOperation extends Migration
      */
     public function down()
     {
-        Schema::connection('mysql_alumni')->table('user_auth', function (Blueprint $table) {
+        Schema::connection('mysql_alumni')->table('user_session', function (Blueprint $table) {
             $table->dropColumn("session");
             $table->dropColumn("operation");
         });
