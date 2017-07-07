@@ -25,7 +25,7 @@ class IOSDeviceController extends Controller
         $receipt = $request->input("receipt");
         $headers = array('content-type:application/vnd.api+json',);
         $ch = curl_init();
-        curl_setopt ($ch, CURLOPT_URL, "https://sandbox.itunes.apple.com/verifyReceipt");
+        curl_setopt ($ch, CURLOPT_URL, "https://buy.itunes.apple.com/verifyReceipt");
         curl_setopt ($ch, CURLOPT_POST, 1);
         $post_data = '{"receipt-data":"'.$receipt.'""}';
         if($post_data != ''){curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);}
@@ -55,10 +55,10 @@ class IOSDeviceController extends Controller
             if ($production["status"] != 0) {
                 return Response::json(array("code"=>403, "status"=>"failed"));
             } else {
-                DB::connection("mysql_user")->table("user_purchase")->insert(["receipt"=>$receipt,"authorize_data"=>$file_contents,"environment"=>"production","price"=>30]);
+                DB::connection("mysql_user")->table("user_purchase")->insert(["receipt"=>$receipt,"authorize_data"=>$file_contents,"environment"=>"sandbox","price"=>30]);
             }
         } else {
-            DB::connection("mysql_user")->table("user_purchase")->insert(["receipt"=>$receipt,"authorize_data"=>$file_contents,"environment"=>"sandbox","price"=>30]);
+            DB::connection("mysql_user")->table("user_purchase")->insert(["receipt"=>$receipt,"authorize_data"=>$file_contents,"environment"=>"production","price"=>30]);
         }
 
         return Response::json(array("code"=>200, "status"=>"succeed"));
