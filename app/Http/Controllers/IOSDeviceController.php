@@ -35,9 +35,9 @@ class IOSDeviceController extends Controller
         curl_setopt($ch, CURLOPT_HEADER, false);
         $file_contents = curl_exec($ch);
         curl_close($ch);
-        $sandbox=(array)json_decode($file_contents,true);
+        $production=(array)json_decode($file_contents,true);
         unset($ch);
-        if($sandbox["status"] != 0) {
+        if($production["status"] != 0) {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, "https://sandbox.itunes.apple.com/verifyReceipt");
             curl_setopt($ch, CURLOPT_POST, 1);
@@ -51,9 +51,9 @@ class IOSDeviceController extends Controller
             curl_setopt($ch, CURLOPT_HEADER, false);
             $file_contents = curl_exec($ch);
             curl_close($ch);
-            $production = (array)json_decode($file_contents, true);
-            if ($production["status"] != 0) {
-                return Response::json(array("code"=>403, "status"=>"failed"));
+            $sandbox = (array)json_decode($file_contents, true);
+            if ($sandbox["status"] != 0) {
+                return Response::json(array("code"=>403, "status"=>"failed", "sandbox" => $sandbox["status"], "prodcution" => $production["status"]));
             } else {
                 DB::connection("mysql_user")->table("user_purchase")->insert(["receipt"=>$receipt,"authorize_data"=>$file_contents,"environment"=>"sandbox","price"=>30]);
             }
