@@ -20,4 +20,9 @@ class IOSDeviceController extends Controller
         }
         return Response::json(array("code"=>200, "status"=>"succeed"));
     }
+
+    function iapPurchase(Request $request){
+        $receipt = base64_decode($request->input("receipt"));
+        DB::connection("mysql_user")->table("user_purchase")->insert(["receipt"=>$receipt]);
+    }
 }
