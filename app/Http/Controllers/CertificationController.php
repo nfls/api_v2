@@ -172,7 +172,7 @@ class CertificationController extends Controller
                 $instructions = [];
                 break;
         }
-        return Response::json(array('code' => '200', 'messgae'=> '一切正常','instructions' => $instructions, 'step' => $user->current_step));
+        return Response::json(array('code' => 200, 'messgae'=> '一切正常','instructions' => $instructions, 'step' => $user->current_step));
     }
 
 
@@ -204,7 +204,7 @@ class CertificationController extends Controller
             array_push($return, '提交时间为：' . $user->submit_time);
             array_push($return, '编辑权限：6-8步');
         }
-        return Response::json(array('code' => '200', 'message' => $return));
+        return Response::json(array('code' => 200, 'message' => $return));
 
     }
 
@@ -245,7 +245,7 @@ class CertificationController extends Controller
             }
             $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
             if((int)$user->current_step != $step)
-                return Response::json(array('code' => '403', 'message' => array('数据不匹配！请点击重置或刷新网页再试。')));
+                return Response::json(array('code' => 403, 'message' => array('数据不匹配！请点击重置或刷新网页再试。')));
             if (is_null($user))
                 self::InsertId($id);
             $content = file_get_contents('php://input');
@@ -277,14 +277,14 @@ class CertificationController extends Controller
                         if (empty($message)) {
                             array_push($message, '您提交的数据已保存至数据库，即将进入下一步。');
                             DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => $step + 1, 'submit_time' => date('y-m-d h:i:s')]);
-                            return Response::json(array('code' => '200', 'message' => $message));
+                            return Response::json(array('code' => 200, 'message' => $message));
                         } else {
                             array_unshift($message, '非常抱歉，您提交的数据在以下部分存在问题：');
                             return Response::json(array('code' => '403.1', 'message' => $message));
                         }
                     } else if ((int)$action == -1){
                         DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => (int)$user->current_step - 1]);
-                        return Response::json(array('code' => '200', 'message' => array('您即将返回至上一步')));
+                        return Response::json(array('code' => 200, 'message' => array('您即将返回至上一步')));
                     }
                     break;
                 case self::COLLEGE_INFO:
@@ -301,7 +301,7 @@ class CertificationController extends Controller
                     break;
                 case 9:
                     DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => (int)$user->current_step - 1]);
-                    return Response::json(array('code' => '200', 'message' => array('您即将返回至上一步')));
+                    return Response::json(array('code' => 200, 'message' => array('您即将返回至上一步')));
             }
         }
     }
@@ -375,11 +375,11 @@ class CertificationController extends Controller
                     $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
                     if ($user->current_step > 1) {
                         if (!$this->canReturn($id) && $user->current_step == 6)
-                            return Response::json(array('code' => '403', 'message' => ['您的申请正在处理中，无法返回编辑']));
+                            return Response::json(array('code' => 403, 'message' => ['您的申请正在处理中，无法返回编辑']));
                         DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => (int)$user->current_step - 1]);
-                        return Response::json(array('code' => '200', 'message' => ['您即将返回至上一步']));
+                        return Response::json(array('code' => 200, 'message' => ['您即将返回至上一步']));
                     } else {
-                        return Response::json(array('code' => '403', 'message' => ['您已经在第一步，无法再返回了']));
+                        return Response::json(array('code' => 403, 'message' => ['您已经在第一步，无法再返回了']));
                     }
                     break;
                 case 0:
@@ -392,7 +392,7 @@ class CertificationController extends Controller
             if ($insert) {
                 DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => json_encode($content), 'current_step' => $step + $action, 'edit_time' => date('y-m-d h:i:s')]);
             }
-            return Response::json(array('code' => '200', 'message' => $message));
+            return Response::json(array('code' => 200, 'message' => $message));
         } else {
             array_unshift($message, '非常抱歉，您提交的数据在以下部分存在问题：');
             return Response::json(array('code' => '403.1', 'message' => $message));
