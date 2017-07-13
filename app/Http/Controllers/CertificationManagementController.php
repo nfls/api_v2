@@ -38,15 +38,15 @@ class CertificationManagementController extends Controller
         $user = DB::connection('mysql_alumni')->table('user_auth')->where(["id"=>$id])->first();
         $primary = array();
         if(json_decode($user->primary_school)->primary_school_no != -1){
-            $primary = json_decode($user->primary_school)->primary_school_enter_year;
+            array_push($primary,json_decode($user->primary_school)->primary_school_enter_year);
         }
         $junior = array();
         if(json_decode($user->junior_school)->junior_school_no != -1){
-            $junior = json_decode($user->junior_school)->junior_school_enter_year*100 + json_decode($user->junior_school)->junior_class;
+            array_push($junior,json_decode($user->junior_school)->junior_school_enter_year*100 + json_decode($user->junior_school)->junior_class);
         }
         $senior_inter = array();
         if(json_decode($user->senior_school)->senior_school_no > 1){
-            $senior_inter = json_decode($user->senior_school)->senior_school_enter_year*100 + json_decode($user->senior_school)->senior_class;
+            array_push($senior_inter, json_decode($user->senior_school)->senior_school_enter_year*100 + json_decode($user->senior_school)->senior_class);
         }
         $senior_general = array();
         if(json_decode($user->senior_school)->senior_school_no == 1){
