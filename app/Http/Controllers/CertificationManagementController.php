@@ -42,7 +42,7 @@ class CertificationManagementController extends Controller
         if(json_decode($user->junior_school)->junior_school_no != -1){
             $junior = json_decode($user->junior_school)->junior_enter_year*100 + json_decode($user->junior_school)->junior_class;
         }
-        return Response::json(array("primary"=>$primary,"junior"=>junior));
+        return Response::json(array("primary"=>$primary,"junior"=>$junior));
     }
     //function
 }
