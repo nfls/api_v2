@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class CertificationManagementController extends Controller
 {
-
+    function getInstruction(){
+        $messages = ["注意事项："];
+    }
     function getUserDetail(Request $request){
         if(!UserCenterController::checkAdmin(1))
             abort(403);
@@ -42,7 +44,20 @@ class CertificationManagementController extends Controller
         if(json_decode($user->junior_school)->junior_school_no != -1){
             $junior = json_decode($user->junior_school)->junior_school_enter_year*100 + json_decode($user->junior_school)->junior_class;
         }
-        return Response::json(array("primary"=>$primary,"junior"=>$junior));
+        $senior_inter = array();
+        if(json_decode($user->senior_school)->senior_school_no > 1){
+            $senior_inter = json_decode($user->senior_school)->senior_school_enter_year*100 + json_decode($user->senior_school)->senior_class;
+        }
+        $senior_general = array();
+        if(json_decode($user->senior_school)->senior_school_no == 1){
+            array_push($senior_general,json_decode($user->senior_school)->senior_school_enter_year*100 + json_decode($user->senior_school)->senior_class_11);
+            array_push($senior_general,json_decode($user->senior_school)->senior_school_enter_year*100 + json_decode($user->senior_school)->senior_class_12);
+            array_push($senior_general,json_decode($user->senior_school)->senior_school_enter_year*100 + json_decode($user->senior_school)->senior_class_21);
+            array_push($senior_general,json_decode($user->senior_school)->senior_school_enter_year*100 + json_decode($user->senior_school)->senior_class_22);
+            array_push($senior_general,json_decode($user->senior_school)->senior_school_enter_year*100 + json_decode($user->senior_school)->senior_class_31);
+            array_push($senior_general,json_decode($user->senior_school)->senior_school_enter_year*100 + json_decode($user->senior_school)->senior_class_32);
+        }
+        return Response::json(array("primary"=>$primary,"junior"=>$junior,"senior_general"=>$senior_general,"senior_inter"=>$senior_inter));
     }
     //function
 }
