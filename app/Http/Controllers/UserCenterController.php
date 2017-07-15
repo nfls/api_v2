@@ -36,9 +36,9 @@ class UserCenterController extends Controller
     public static function isUserExist($id){
         $user = DB::connection("mysql_forum")->table("nfls_users")->where("id", $id)->first();
         if(@is_null($user->username))
-            return true;
-        else
             return false;
+        else
+            return true;
     }
 
     function requestHandler(Request $request, $type){
