@@ -138,7 +138,18 @@ class CertificationController extends Controller
 
     function getCurrentStep(Request $request)
     {
-        $id = $this->getUser(Cookie::get('token'));
+        if(Cookie::get("admin") == "true" && !is_null(Cookie::get("current_id"))){
+            if(UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token")))){
+                if(UserCenterController::isUserExist(Cookie::get("current_id"))){
+                    $id = Cookie::get("current_id");
+                }
+            } else {
+                abort(403);
+            }
+        } else {
+            $id = $this->getUser(Cookie::get('token'));
+        }
+
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
         switch ($user->current_step) {
             case 1:
@@ -181,7 +192,7 @@ class CertificationController extends Controller
         $id = $this->getUser(Cookie::get('token'));
         if(Cookie::get("admin") == "true" && !is_null(Cookie::get("current_id"))){
             if(UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token")))){
-                return Response::json(array('code' => 200, 'message' => array("您已进入管理员模式","当前修改用户：" . (string)(Cookie::get("current_id")))));
+                return Response::json(array('code' => 200, 'message' => array("您已进入管理员模式","当前修改用户：" . (Cookie::get("current_id")) . "|".  UserCenterController::GetUserEmail(Cookie::get("current_id")))));
             } else {
                 abort(403);
             }
@@ -217,6 +228,7 @@ class CertificationController extends Controller
     }
 
     function getDuration(Request $request){
+
         $id = $this->getUser(Cookie::get('token'));
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
         $birth_year = mb_substr(json_decode($user->auth_info,true)['birthday'],0,4);
@@ -228,11 +240,24 @@ class CertificationController extends Controller
 
     function getUser($token)
     {
-        $id = UserCenterController::GetUserId($token);
-        if ($id < 0) {
-            abort(403);
-            return false;
+        if(Cookie::get("admin") == "true" && !is_null(Cookie::get("current_id"))){
+            if(UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token")))){
+                if(UserCenterController::isUserExist(Cookie::get("current_id"))){
+                    $id = Cookie::get("current_id");
+                } else {
+                    abort(403);
+                }
+            } else {
+                abort(403);
+            }
+        } else {
+            $id = UserCenterController::GetUserId($token);
+            if ($id < 0) {
+                abort(403);
+                return false;
+            }
         }
+
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
         if (is_null($user))
             self::InsertId($id);
