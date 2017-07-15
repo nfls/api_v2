@@ -179,9 +179,9 @@ class CertificationController extends Controller
     function getCurrentStatus(Request $request)
     {
         $id = $this->getUser(Cookie::get('token'));
-        if($request->has(["admin","id"])){
+        if($request->has(["admin","current_id"])){
             if(UserCenterController::checkAdmin(UserCenterController::GetUserId($request->input("token")))){
-                return Response::json(array('code' => 200, 'message' => array("您已进入管理员模式","当前修改用户：" + (string)$request->input("id"))));
+                return Response::json(array('code' => 200, 'message' => array("您已进入管理员模式","当前修改用户：" + (string)$request->input("current_id"))));
             }
         }
         $return = array();
