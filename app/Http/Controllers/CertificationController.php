@@ -261,7 +261,7 @@ class CertificationController extends Controller
     function authUpdate(Request $request, $step)
     {
         if (is_numeric($step) == true) {
-            $id = UserCenterController::GetUserId(Cookie::get('token'));
+            $id = $this->getUser(Cookie::get('token'));
             if ($id < 0) {
                 return Response::json(array('code' => '23333'));
             }
