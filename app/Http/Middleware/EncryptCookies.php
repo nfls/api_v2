@@ -13,5 +13,7 @@ class EncryptCookies extends BaseEncrypter
      */
     protected $except = [
         'token',
+        'current_id',
+        'admin'
     ];
 }
