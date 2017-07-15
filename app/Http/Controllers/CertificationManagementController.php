@@ -59,5 +59,9 @@ class CertificationManagementController extends Controller
         }
         return Response::json(array("primary"=>$primary,"junior"=>$junior,"senior_general"=>$senior_general,"senior_inter"=>$senior_inter));
     }
+
+    function acceptIdentity(Request $request){
+
+    }
     //function
 }
