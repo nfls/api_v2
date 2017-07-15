@@ -138,18 +138,7 @@ class CertificationController extends Controller
 
     function getCurrentStep(Request $request)
     {
-        if(Cookie::get("admin") == "true" && !is_null(Cookie::get("current_id"))){
-            if(UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token")))){
-                if(UserCenterController::isUserExist(Cookie::get("current_id"))){
-                    $id = Cookie::get("current_id");
-                }
-            } else {
-                abort(403);
-            }
-        } else {
-            $id = $this->getUser(Cookie::get('token'));
-        }
-
+        $id = $this->getUser(Cookie::get('token'));
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
         switch ($user->current_step) {
             case 1:
