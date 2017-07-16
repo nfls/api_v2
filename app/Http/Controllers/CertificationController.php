@@ -120,18 +120,19 @@ class CertificationController extends Controller
 	
 	const STEP7 = [
         '请在本页填写您的工作信息',
-        '本区域可自由发挥，介绍工作的公司，职业类型什么的都可以。文本框会根据内容自动调整大小。',
+        '本区域可自由发挥，介绍工作的公司，职业类型什么的都可以。文本框会根据内容自动调整大小',
 		'如果您暂时还在就读大学，可留空。'
     ];
 	
 	const STEP8 = [
         '请在本页填写您的个人信息',
-        '本区域可自由发挥，可填写自我介绍等各类关于自己的内容。文本框会根据内容自动调整大小。',
-		'底下的联系方式，可根据自己的情况选填，但至少必须填写一个。'
+        '本区域可自由发挥，可填写自我介绍等各类关于自己的内容。文本框会根据内容自动调整大小',
+		'底下的联系方式，可根据自己的情况选填，但至少必须填写一个',
+        '建议填写各社交软件的用户名等等，如果跟手机号相同，可填写"同手机号"防止隐私泄露'
     ];
 
 	const STEP9 = [
-	    '您已完成所有内容。待审核通过后，您即可使用在线校友录功能。您也可以返回编辑。前四步已经提交，除审核被退回外不可编辑。'
+	    '您已完成所有内容。待审核通过后，您即可使用在线校友录功能。您也可以返回编辑。前四步已经提交，除审核被退回外不可编辑'
     ];
 
 
@@ -181,7 +182,7 @@ class CertificationController extends Controller
         $id = $this->getUser(Cookie::get('token'));
         if(Cookie::get("admin") == "true" && !is_null(Cookie::get("current_id"))){
             if(UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token")))){
-                return Response::json(array('code' => 200, 'message' => array("您已进入管理员模式","当前修改用户：" . (Cookie::get("current_id")) . "|".  UserCenterController::GetUserEmail(Cookie::get("current_id")))));
+                return Response::json(array('code' => 200, 'message' => array("您已进入管理员模式","当前修改用户ID：" . (Cookie::get("current_id")) . "（".  UserCenterController::GetUserEmail(Cookie::get("current_id")) . "）")));
             } else {
                 abort(403);
             }
@@ -929,8 +930,6 @@ class CertificationController extends Controller
     function authStep7($info){
         $message = array();
         $this->structureCheck($info,1,$message);
-        if(is_null($info->work_info))
-            array_push($message,"您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。");
         return $message;
     }
 
