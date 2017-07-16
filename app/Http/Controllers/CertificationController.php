@@ -182,7 +182,7 @@ class CertificationController extends Controller
         $id = $this->getUser(Cookie::get('token'));
         if(Cookie::get("admin") == "true" && !is_null(Cookie::get("current_id"))){
             if(UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token")))){
-                return Response::json(array('code' => 200, 'message' => array("您已进入管理员模式","当前修改用户ID：" . (Cookie::get("current_id")) . "（".  UserCenterController::GetUserEmail(Cookie::get("current_id")) . "）")));
+                return Response::json(array('code' => 200, 'message' => array("您已进入管理员模式","当前修改用户ID：" . (Cookie::get("current_id")) . "（".  UserCenterController::GetUserEmail(Cookie::get("current_id")) . "）" , "单击保存以返回")));
             } else {
                 abort(403);
             }
