@@ -78,6 +78,7 @@ class CertificationManagementController extends Controller
                         if($this->isInteger($senior_inter,$array))
                             array_push($return,"检查通过！");
         }
+        return Response::json($return);
     }
 
     function isInteger($data,&$array,$num = -1){
