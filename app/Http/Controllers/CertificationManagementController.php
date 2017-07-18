@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Cookie;
+use Illuminate\Pagination\Paginator;
 use Response;
 use Illuminate\Support\Facades\DB;
 
@@ -61,19 +62,38 @@ class CertificationManagementController extends Controller
     }
 
     function acceptIdentity(Request $request){
+        $return = array();
         if(!UserCenterController::checkAdmin(Cookie::get("token")))
             abort(403);
-        $primary_index = json_decode("[".$request->input("primary")."]",true);
-        var_dump($primary_index);
-        var_dump(json_decode("[".$request->input("primary")."=]",true));
-        foreach($primary_index as $index){
-
+        $primary = json_decode("[".$request->input("primary")."]",true);
+        $junior = json_decode("[".$request->input("junior")."]",true);
+        $senior_general = json_decode("[".$request->input("senior_general")."]",true);
+        $senior_inter = json_decode("[".$request->input("senior_inter")."]",true);
+        if(is_null($primary) ||is_null($junior) ||is_null($senior_general) ||is_null($senior_inter))
+            array_push($return, "数据结构问题，请检查索引中是否包含了除半角逗号和数字以外的其他符号。");
+        else{
+            if($this->isInteger($primary,$array))
+                if($this->isInteger($junior,$array))
+                    if($this->isInteger($senior_general,$array,6))
+                        if($this->isInteger($senior_inter,$array))
+                            array_push($return,"检查通过！");
         }
-        json_decode("[".$request->input("junior")."]",true);
+    }
 
-        json_decode("[".$request->input("senior_general")."]",true);
-        json_decode("[".$request->input("senior_inter")."]",true);
-        //$request->input
+    function isInteger($data,&$array,$num = -1){
+        $count = 0;
+        foreach($data as $index){
+            if((int)$index != $index){
+                array_push($array, "请检查索引是否为纯数字！");
+                return false;
+            }
+            $count ++;
+        }
+        if($num != -1 && $num != $count && $count != 0){
+            array_push($array, "请检查索引是否完整！");
+            return false;
+        }
+        return true;
     }
     //function
 }
