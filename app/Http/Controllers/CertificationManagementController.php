@@ -13,7 +13,7 @@ class CertificationManagementController extends Controller
         $messages = ["注意事项："];
     }
     function getUserDetail(Request $request){
-        if(!UserCenterController::checkAdmin(1))
+        if(!UserCenterController::checkAdmin(Cookie::get("token")))
             abort(403);
         $id = $request->input("id");
         $user = DB::connection('mysql_alumni')->table('user_auth')->where(["id"=>$id])->first();
@@ -22,7 +22,7 @@ class CertificationManagementController extends Controller
 
     }
     function getSubmittedUserList(Request $request){
-        if(!UserCenterController::checkAdmin(1))
+        if(!UserCenterController::checkAdmin(Cookie::get("token")))
             abort(403);
         $return = array();
         $info = DB::connection('mysql_alumni')->table('user_auth')->whereNull("status_change_time")->whereNotNull("submit_time")->get();
@@ -61,7 +61,10 @@ class CertificationManagementController extends Controller
     }
 
     function acceptIdentity(Request $request){
-
+        if(!UserCenterController::checkAdmin(Cookie::get("token")))
+            abort(403);
+        var_dump("{".json_decode($request->input("senior_general")."}",true));
+        //$request->input
     }
     //function
 }

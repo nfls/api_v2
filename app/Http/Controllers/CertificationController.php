@@ -415,7 +415,7 @@ class CertificationController extends Controller
             if ($insert) {
                 DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => json_encode($content), 'current_step' => $step + $action, 'edit_time' => date('y-m-d h:i:s')]);
             }
-            return Response::json(array('code' => 200, 'message' => $message));
+             return Response::json(array('code' => 200, 'message' => $message));
         } else {
             array_unshift($message, '非常抱歉，您提交的数据在以下部分存在问题：');
             return Response::json(array('code' => '403.1', 'message' => $message));
@@ -424,6 +424,17 @@ class CertificationController extends Controller
 
     function canReturn($id)
     {
+        if(Cookie::get("admin") == "true" && !is_null(Cookie::get("current_id"))){
+            if(UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token")))){
+                if(UserCenterController::isUserExist(Cookie::get("current_id"))){
+                    return true;
+                } else {
+                    abort(403);
+                }
+            } else {
+                abort(403);
+            }
+        }
         $info = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
         if ($info->status == true)
             return false;
