@@ -63,7 +63,16 @@ class CertificationManagementController extends Controller
     function acceptIdentity(Request $request){
         if(!UserCenterController::checkAdmin(Cookie::get("token")))
             abort(403);
-        var_dump(json_decode("[".$request->input("senior_general")."]",true));
+        $primary_index = json_decode("[".$request->input("primary")."]",true);
+        var_dump($primary_index);
+        var_dump(json_decode("[".$request->input("primary")."=]",true));
+        foreach($primary_index as $index){
+
+        }
+        json_decode("[".$request->input("junior")."]",true);
+
+        json_decode("[".$request->input("senior_general")."]",true);
+        json_decode("[".$request->input("senior_inter")."]",true);
         //$request->input
     }
     //function
