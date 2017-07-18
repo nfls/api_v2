@@ -27,7 +27,11 @@ Route::any('media/gallery/update',"AlbumController@updateAnAlbum");
 
 Route::get("admin/auth/list","CertificationManagementController@getSubmittedUserList");
 Route::post("admin/auth/detail","CertificationManagementController@getUserDetail");
-ROute::post("admin/auth/index","CertificationManagementController@generateIndex");
+Route::post("admin/auth/index","CertificationManagementController@generateIndex");
+Route::post("admin/auth/accept","CertificationManagementController@acceptIdentity");
+Route::post("admin/auth/deny","CertificationManagementController@denyIdentity");
+Route::post("admin/auth/ignore","CertificationManagementController@ignoreIdentity");
+
 
 Route::post('device/register',"IOSDeviceController@registerDevice");
 Route::post('device/purchase',"IOSDeviceController@iapPurchase");
