@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use Illuminate\Http\Request;
 use Cookie;
 use Illuminate\Pagination\Paginator;
@@ -106,5 +107,8 @@ class CertificationManagementController extends Controller
         }
         return true;
     }
-    //function
+
+    function sendIdentityMessage($content,$id){
+        DB::connection("mysql_user")->table("system_message")->insert(["type"=>2,"receiver"=>$id,"title"=>"市民认证动态","detail"=>"测试","push_text"=>null]);
+    }
 }
