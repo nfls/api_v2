@@ -86,8 +86,11 @@ class CertificationManagementController extends Controller
             if($this->isInteger($primary,$return))
                 if($this->isInteger($junior,$return))
                     if($this->isInteger($senior_general,$return,6))
-                        if($this->isInteger($senior_inter,$return))
+                        if($this->isInteger($senior_inter,$return)){
+                            this->$this->sendIdentityMessage("通过",$.cookie("current_id"));
                             return Response::json(array("code"=>"200"));
+                        }
+
         }
         return Response::json(array("code"=>"403","info"=>$return));
     }
@@ -109,6 +112,6 @@ class CertificationManagementController extends Controller
     }
 
     function sendIdentityMessage($content,$id){
-        DB::connection("mysql_user")->table("system_message")->insert(["type"=>2,"receiver"=>$id,"title"=>"市民认证动态","detail"=>"测试","push_text"=>null]);
+        DB::connection("mysql_user")->table("system_message")->insert(["type"=>2,"receiver"=>$id,"title"=>"市民认证动态","detail"=>$content,"push_text"=>null]);
     }
 }
