@@ -72,10 +72,10 @@ class CertificationManagementController extends Controller
         if(is_null($primary) ||is_null($junior) ||is_null($senior_general) ||is_null($senior_inter))
             array_push($return, "数据结构问题，请检查索引中是否包含了除半角逗号和数字以外的其他符号。");
         else{
-            if($this->isInteger($primary,$array))
-                if($this->isInteger($junior,$array))
-                    if($this->isInteger($senior_general,$array,6))
-                        if($this->isInteger($senior_inter,$array))
+            if($this->isInteger($primary,$return))
+                if($this->isInteger($junior,$return))
+                    if($this->isInteger($senior_general,$return,6))
+                        if($this->isInteger($senior_inter,$return))
                             array_push($return,"检查通过！");
         }
         return Response::json($return);
