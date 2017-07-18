@@ -112,6 +112,6 @@ class CertificationManagementController extends Controller
     }
 
     function sendIdentityMessage($content,$id){
-        DB::connection("mysql_user")->table("system_message")->insert(["type"=>2,"receiver"=>$id,"title"=>"市民认证动态","detail"=>$content,"push_text"=>null]);
+        DB::connection("mysql_user")->table("system_message")->insert(["type"=>2,"receiver"=>$id,"title"=>"市民认证动态","detail"=>$content,"push_text"=>""]);
     }
 }
