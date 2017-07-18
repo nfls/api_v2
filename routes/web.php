@@ -11,6 +11,7 @@
 |
 */
 //header("Access-Control-Allow-Origin: http://localhost:63343");
+date_default_timezone_set ( "Asia/Shanghai" );
 Route::post('alumni/auth/{step}/update',"CertificationController@authUpdate");
 Route::get('alumni/auth/{step}/query',"CertificationController@authQuery");
 Route::get('alumni/auth/step',"CertificationController@getCurrentStep");
