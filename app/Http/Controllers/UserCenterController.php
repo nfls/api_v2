@@ -105,7 +105,7 @@ class UserCenterController extends Controller
                 break;
             case "systemMessage":
                 if($request->isMethod("get"))
-                    $info = $this->GetSystemNoticeById(Cookie::get('token'));
+                    $info = $this->GetSystemNoticeById(self::GetUserId(Cookie::get('token')));
                 break;
             case "registerCaptcha":
                 if($request->isMethod("get"))
