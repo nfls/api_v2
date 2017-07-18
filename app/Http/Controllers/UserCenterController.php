@@ -630,7 +630,7 @@ class UserCenterController extends Controller
     function GetSystemNoticeById($id)//获取主站通知或推送，并根据Token记录已读信息
     {
         DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
-        $messages = DB::connection("mysql_user")->table("system_message")->where(["receiver" => $id])->orWhere(["reveiver" => -1])->get();
+        $messages = DB::connection("mysql_user")->table("system_message")->where(["receiver" => $id])->orWhere(["receiver" => -1])->get();
         $count = 0;
         foreach($messages as $message){
             $info[$count]['time'] = $message -> time;
