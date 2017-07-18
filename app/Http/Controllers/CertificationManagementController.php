@@ -87,7 +87,7 @@ class CertificationManagementController extends Controller
                 if($this->isInteger($junior,$return))
                     if($this->isInteger($senior_general,$return,6))
                         if($this->isInteger($senior_inter,$return)){
-                            $this->sendIdentityMessage("通过",$.cookie("current_id"));
+                            $this->sendIdentityMessage("通过",Cookie::get("current_id"));
                             return Response::json(array("code"=>"200"));
                         }
 
