@@ -76,6 +76,8 @@ class CertificationManagementController extends Controller
         $return = array();
         if(!UserCenterController::checkAdmin(Cookie::get("token")))
             abort(403);
+        if(!UserCenterController::isUserExist($request->input("id")))
+            abort(403);
         $primary = json_decode("[".$request->input("primary")."]",true);
         $junior = json_decode("[".$request->input("junior")."]",true);
         $senior_general = json_decode("[".$request->input("senior_general")."]",true);
@@ -87,7 +89,21 @@ class CertificationManagementController extends Controller
                 if($this->isInteger($junior,$return))
                     if($this->isInteger($senior_general,$return,6))
                         if($this->isInteger($senior_inter,$return)){
-                            $this->sendIdentityMessage("通过",$request->input("id"));
+                            $directory_info = array();
+                            $directory_info['primary'] = $primary;
+                            $directory_info['junior'] = $junior;
+                            $directory_info['senior_general'] = $senior_general;
+                            $directory_info['senior_inter'] = $senior_inter;
+                            DB::connection(mysql_alumni)->table("user_auth")->where(["id"=>$request->input("id")])->update([
+                                "status"=>true,
+                                "operator"=>UserCenterController::GetUserId(Cookie::get("token")),
+                                "status_change_time"=>date('Y-m-d h:i:s'),
+                                "directory_info"=>json_encode($directory_info),
+                                "current_step"=>9]);
+                            if(is_null($request->input("message")))
+                                $this->sendIdentityMessage("恭喜您，您的实名认证请求已通过！",$request->input("id"));
+                            else
+                                $this->sendIdentityMessage("恭喜您，您的实名认证请求已通过！管理员留言：" + $request->input("message"),$request->input("id"));
                             return Response::json(array("code"=>"200"));
                         }
 
@@ -112,6 +128,6 @@ class CertificationManagementController extends Controller
     }
 
     function sendIdentityMessage($content,$id){
-        DB::connection("mysql_user")->table("system_message")->insert(["type"=>2,"receiver"=>$id,"title"=>"市民认证动态","detail"=>$content,"push_text"=>""]);
+        DB::connection("mysql_user")->table("system_message")->insert(["type"=>2,"receiver"=>$id,"title"=>"您的实名认证状态已更新","detail"=>$content,"push_text"=>""]);
     }
 }
