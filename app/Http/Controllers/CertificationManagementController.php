@@ -94,7 +94,7 @@ class CertificationManagementController extends Controller
                             $directory_info['junior'] = $junior;
                             $directory_info['senior_general'] = $senior_general;
                             $directory_info['senior_inter'] = $senior_inter;
-                            DB::connection(mysql_alumni)->table("user_auth")->where(["id"=>$request->input("id")])->update([
+                            DB::connection("mysql_alumni")->table("user_auth")->where(["id"=>$request->input("id")])->update([
                                 "status"=>true,
                                 "operator"=>UserCenterController::GetUserId(Cookie::get("token")),
                                 "status_change_time"=>date('Y-m-d h:i:s'),
