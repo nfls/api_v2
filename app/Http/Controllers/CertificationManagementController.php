@@ -37,7 +37,7 @@ class CertificationManagementController extends Controller
         if(!UserCenterController::checkAdmin(Cookie::get("token")))
             abort(403);
         $return = array();
-        $info = DB::connection('mysql_alumni')->table('user_auth')->whereNull("status_change_time")->whereNotNull("submit_time")->get();
+        $info = DB::connection('mysql_alumni')->table('user_auth')->whereNull("status_change_time")->whereNotNull("submit_time")->where("submit_time","<>","9999-12-31 23:59:59")->get();
         foreach($info as $user){
             array_push($return, array("submit_time"=>$user->submit_time,"id"=>$user->id,"email"=>json_decode($user->auth_info)->email,"realname"=>json_decode($user->auth_info)->realname));
             //array_push($return,(array("id"=>$user->id)  + json_decode($user->auth_info,true) + array("cut2"=>"") + json_decode($user->primary_school,true) + array("cut3"=>"") + json_decode($user->junior_school,true) + array("cut4"=>"") + json_decode($user->senior_school,true)));
@@ -112,7 +112,6 @@ class CertificationManagementController extends Controller
     }
 
     function denyIdentity(Request $request){
-        $return = array();
         if(!UserCenterController::checkAdmin(Cookie::get("token")))
             abort(403);
         if(!UserCenterController::isUserExist($request->input("id")))
@@ -127,10 +126,19 @@ class CertificationManagementController extends Controller
             $this->sendIdentityMessage("很抱歉，您的实名认证请求已被拒绝！",$request->input("id"));
         else
             $this->sendIdentityMessage("很抱歉，您的实名认证请求已被拒绝！管理员留言：" . $request->input("message"),$request->input("id"));
+        return Response::json(array("code"=>"200"));
     }
 
     function ignoreIdentity(Request $request){
-
+        if(!UserCenterController::checkAdmin(Cookie::get("token")))
+            abort(403);
+        if(!UserCenterController::isUserExist($request->input("id")))
+            abort(403);
+        DB::connection("mysql_alumni")->table("user_auth")->where(["id"=>$request->input("id")])->update([
+            "status"=>false,
+            "operator"=>UserCenterController::GetUserId(Cookie::get("token")),
+            "status_change_time"=>date('9999-12-31 23:59:59')]);
+        return Response::json(array("code"=>"200"));
     }
 
     function isInteger($data,&$array,$num = -1){
