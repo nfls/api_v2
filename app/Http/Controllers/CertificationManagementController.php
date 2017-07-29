@@ -37,7 +37,7 @@ class CertificationManagementController extends Controller
         if(!UserCenterController::checkAdmin(Cookie::get("token")))
             abort(403);
         $return = array();
-        $info = DB::connection('mysql_alumni')->table('user_auth')->where(["status"=>false])->whereNotNull("submit_time")->where("submit_time","<>","9999-12-31 23:59:59")->get();
+        $info = DB::connection('mysql_alumni')->table('user_auth')->where(["status"=>false])->whereNotNull("submit_time")->where("status_changed_time","<>","9999-12-31 23:59:59")->get();
         foreach($info as $user){
             array_push($return, array("submit_time"=>$user->submit_time,"id"=>$user->id,"email"=>json_decode($user->auth_info)->email,"realname"=>json_decode($user->auth_info)->realname));
             //array_push($return,(array("id"=>$user->id)  + json_decode($user->auth_info,true) + array("cut2"=>"") + json_decode($user->primary_school,true) + array("cut3"=>"") + json_decode($user->junior_school,true) + array("cut4"=>"") + json_decode($user->senior_school,true)));
