@@ -120,12 +120,17 @@ class CertificationManagementController extends Controller
         DB::connection("mysql_alumni")->table("user_auth")->where(["id"=>$request->input("id")])->update([
             "status"=>false,
             "operator"=>UserCenterController::GetUserId(Cookie::get("token")),
+            "submit_time"=>NULL,
             "status_change_time"=>date('Y-m-d h:i:s'),
             "current_step"=>1]);
         if(is_null($request->input("message")))
             $this->sendIdentityMessage("很抱歉，您的实名认证请求已被拒绝！",$request->input("id"));
         else
-            $this->sendIdentityMessage("恭喜您，您的实名认证请求已被拒绝！管理员留言：" . $request->input("message"),$request->input("id"));
+            $this->sendIdentityMessage("很抱歉，您的实名认证请求已被拒绝！管理员留言：" . $request->input("message"),$request->input("id"));
+    }
+
+    function ignoreIdentity(Request $request){
+
     }
 
     function isInteger($data,&$array,$num = -1){
