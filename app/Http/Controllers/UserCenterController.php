@@ -129,6 +129,7 @@ class UserCenterController extends Controller
             case "notice":
                 if($request->isMethod("get"))
                     $info = $this->getNotice();
+                break;
             default:
                 break;
         }
@@ -175,7 +176,7 @@ class UserCenterController extends Controller
             $device = $dd->getDevice();
             $brand = $dd->getBrandName();
             $model = $dd->getModel();
-            if($osInfo->name == "iOS"){
+            if($osInfo['name'] == "iOS"){
                 $allow = false;
                 $message = "由于iOS的WebKit与本站存在兼容性问题，导致无法正常登陆，请使用我们的客户端进行访问。";
             } else {
