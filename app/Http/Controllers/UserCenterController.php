@@ -144,6 +144,8 @@ class UserCenterController extends Controller
     function getDevice(){
         echo $_SERVER['HTTP_USER_AGENT'];
         $dd = new DeviceDetector($_SERVER['HTTP_USER_AGENT']);
+        $dd->parse();
+
         if ($dd->isBot()) {
             // handle bots,spiders,crawlers,...
             $botInfo = $dd->getBot();
