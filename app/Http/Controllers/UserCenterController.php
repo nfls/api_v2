@@ -122,6 +122,9 @@ class UserCenterController extends Controller
                 if($request->isMethod("get"))
                     $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'],"recover");
                 break;
+            case "device":
+                $info = $this->getDevice();
+                break;
             default:
                 break;
         }
@@ -138,7 +141,7 @@ class UserCenterController extends Controller
         return Response::json($json_mes);
     }
 
-    function getDevice(Request $request){
+    function getDevice(){
         $dd = new DeviceDetector($_SERVER['HTTP_USER_AGENT']);
         if ($dd->isBot()) {
             // handle bots,spiders,crawlers,...
@@ -149,7 +152,7 @@ class UserCenterController extends Controller
             $device = $dd->getDevice();
             $brand = $dd->getBrandName();
             $model = $dd->getModel();
-            return Response::json(array("info"=>$clientInfo,"os"=>$osInfo,"device"=>$device,"brand"=>$brand,"model"=>$model));
+            return array("info"=>$clientInfo,"os"=>$osInfo,"device"=>$device,"brand"=>$brand,"model"=>$model);
         }
     }
     function CreateCaptcha($ip,$operation){
