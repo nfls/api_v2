@@ -9,6 +9,9 @@ use Response;
 use Cookie;
 use Gregwar\Captcha\CaptchaBuilder;
 use Gregwar\Captcha\PhraseBuilder;
+use DeviceDetector\DeviceDetector;
+use DeviceDetector\Parser\Device\DeviceParserAbstract;
+
 
 class UserCenterController extends Controller
 {
@@ -135,6 +138,20 @@ class UserCenterController extends Controller
         return Response::json($json_mes);
     }
 
+    function getDevice(Request $request){
+        $dd = new DeviceDetector($_SERVER['HTTP_USER_AGENT']);
+        if ($dd->isBot()) {
+            // handle bots,spiders,crawlers,...
+            $botInfo = $dd->getBot();
+        } else {
+            $clientInfo = $dd->getClient(); // holds information about browser, feed reader, media player, ...
+            $osInfo = $dd->getOs();
+            $device = $dd->getDevice();
+            $brand = $dd->getBrandName();
+            $model = $dd->getModel();
+            return Response::json(array("info"=>$clientInfo,"os"=>$osInfo,"device"=>$device,"brand"=>$brand,"model"=>$model));
+        }
+    }
     function CreateCaptcha($ip,$operation){
         DB::connection("mysql_user")->table("user_session")->where("valid_before","<",date('Y-m-d h:i:s'))->delete();
         $phraseBuilder = new PhraseBuilder(10);
