@@ -173,7 +173,7 @@ class UserCenterController extends Controller
             //$message = "禁止非浏览器访问！";
         } else {
             $clientInfo = $dd->getClient(); // holds information about browser, feed reader, media player, ...
-            if($clientInfo["type"]!="Browser"){
+            if($clientInfo["type"]!="browser"){
                 $allow = false;
                 $message = "禁止非浏览器访问！";
             } else {
