@@ -185,7 +185,7 @@ class UserCenterController extends Controller
                     $allow = false;
                     $message = "由于iOS的WebKit与本站存在兼容性问题，导致无法正常登陆，请使用我们的客户端进行访问。";
                 } else {
-                    if($clientInfo['name']!="Chrome" || $clientInfo['name']!="Chrome Mobile"){
+                    if($clientInfo['name']!="Chrome" && $clientInfo['name']!="Chrome Mobile"){
                         $message = "本站建议使用Chrome进行访问，不保证对于其他浏览器完全兼容。";
                     }
                 }
