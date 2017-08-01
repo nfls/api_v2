@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 class CertificationManagementController extends Controller
 {
     function getInstruction(){
-        if(!UserCenterController::checkAdmin(Cookie::get("token")))
+        if(!UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token"))))
             abort(403);
         $messages = "注意事项<br/>".
         "1. 索引编号小学格式为四位数入学年份，初高中各式位四位数入学年份+两位数班级号（类似于答题卡学号，但无个人学号），中加班级号A-F转换为对应的1-6。<br/>".
@@ -25,7 +25,7 @@ class CertificationManagementController extends Controller
         return Response::json($messages);
     }
     function getUserDetail(Request $request){
-        if(!UserCenterController::checkAdmin(Cookie::get("token")))
+        if(!UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token"))))
             abort(403);
         $id = $request->input("id");
         $user = DB::connection('mysql_alumni')->table('user_auth')->where(["id"=>$id])->first();
@@ -34,7 +34,7 @@ class CertificationManagementController extends Controller
 
     }
     function getSubmittedUserList(Request $request){
-        if(!UserCenterController::checkAdmin(Cookie::get("token")))
+        if(!UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token"))))
             abort(403);
         $return = array();
         $info = DB::connection('mysql_alumni')->table('user_auth')->where(["status"=>false])->whereNotNull("submit_time")->where(function ($query) {
@@ -76,7 +76,7 @@ class CertificationManagementController extends Controller
 
     function acceptIdentity(Request $request){
         $return = array();
-        if(!UserCenterController::checkAdmin(Cookie::get("token")))
+        if(!UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token"))))
             abort(403);
         if(!UserCenterController::isUserExist($request->input("id")))
             abort(403);
@@ -114,7 +114,7 @@ class CertificationManagementController extends Controller
     }
 
     function denyIdentity(Request $request){
-        if(!UserCenterController::checkAdmin(Cookie::get("token")))
+        if(!UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token"))))
             abort(403);
         if(!UserCenterController::isUserExist($request->input("id")))
             abort(403);
@@ -132,7 +132,7 @@ class CertificationManagementController extends Controller
     }
 
     function ignoreIdentity(Request $request){
-        if(!UserCenterController::checkAdmin(Cookie::get("token")))
+        if(!UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token"))))
             abort(403);
         if(!UserCenterController::isUserExist($request->input("id")))
             abort(403);
