@@ -34,6 +34,5 @@ Route::post("admin/auth/deny","CertificationManagementController@denyIdentity");
 Route::post("admin/auth/ignore","CertificationManagementController@ignoreIdentity");
 Route::get("admin/auth/instructions","CertificationManagementController@getInstruction");
 
-
 Route::post('device/register',"IOSDeviceController@registerDevice");
 Route::post('device/purchase',"IOSDeviceController@iapPurchase");
