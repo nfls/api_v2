@@ -33,7 +33,8 @@ class UserCenterController extends Controller
     }
 
     public static function checkAdmin($id){
-        return true;
+        $user = DB::connection("mysql_forum")->table("nfls_users")->where("id", $id)->first();
+        return $user->isAdmin;
     }
 
     public static function isUserExist($id){
