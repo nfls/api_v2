@@ -189,6 +189,7 @@ class UserCenterController extends Controller
                         $message = "本站建议使用Chrome进行访问，不保证对于其他浏览器完全兼容。";
                     }
                 }
+                
             }
 
         }
