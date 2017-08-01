@@ -183,13 +183,13 @@ class UserCenterController extends Controller
                 $model = $dd->getModel();
                 if($osInfo['name'] == "iOS"){
                     $allow = false;
-                    $message = "由于iOS的WebKit与本站存在兼容性问题，导致无法正常登陆，请使用我们的<a href='https://api.nfls.io'>客户端</a>进行访问。";
+                    $message = "由于iOS的WebKit与本站存在兼容性问题，导致无法正常登陆，请使用我们的<a href='https://app.nfls.io'>客户端</a>进行访问。";
                 } else {
                     if($clientInfo['name']!="Chrome" && $clientInfo['name']!="Chrome Mobile"){
                         $message = "本站建议使用Chrome进行访问，不保证对于其他浏览器完全兼容。";
                     }
                 }
-                
+
             }
 
         }
