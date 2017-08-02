@@ -22,6 +22,7 @@ class CreateWeatherDatabase extends Migration
             $table->text("update_key")->comment("更新密钥");
             $table->json("data_structure")->nullable()->comment("传感器及数据结构");
             $table->dateTime("lastupdate")->nullable()->comment("最近一次更新");
+            $table->text("lastupdate_ip")->nullable()->comment("最近一次更新IP");
             $table->json("data")->nullable()->comment("最新数据");
             $table->index('id');
         });
