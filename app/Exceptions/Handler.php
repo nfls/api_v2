@@ -46,7 +46,7 @@ class Handler extends ExceptionHandler
     {
         $error = $this->convertExceptionToResponse($exception);
         $response = [];
-        if($error->getStatusCode() == 500) {
+        //if($error->getStatusCode() == 500) {
             $response['error'] = $exception->getMessage();
             $response['trace'] = $exception->getTraceAsString();
             $response['code'] = $exception->getCode();
@@ -56,7 +56,7 @@ class Handler extends ExceptionHandler
                 $response['code'] = $e->getCode();
             }
             */
-        }
+        //}
         return response()->json($response, $error->getStatusCode());
         //return parent::render($request, $exception);
     }
