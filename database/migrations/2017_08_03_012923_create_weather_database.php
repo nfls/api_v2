@@ -15,6 +15,7 @@ class CreateWeatherDatabase extends Migration
     {
         Schema::connection('mysql_user')->create('weather_station', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->unique();
+            $table->text("name")->comment("名称");
             $table->double("latitude")->comment("纬度");
             $table->double("longitude")->comment("经度");
             $table->double("altitude")->comment("海拔高度");

@@ -36,3 +36,12 @@ Route::get("admin/auth/instructions","CertificationManagementController@getInstr
 
 Route::post('device/register',"IOSDeviceController@registerDevice");
 Route::post('device/purchase',"IOSDeviceController@iapPurchase");
+
+Route::get('weather/ping',"WeatherController@ping");
+Route::post('weather/test',"WeatherController@testKey");
+Route::post('weather/station',"WeatherController@updateStation");
+Route::post('weather/update',"WeatherController@updateData");
+Route::get('weather/list',"WeatherController@getStationList");
+Route::get('weather/info',"WeatherController@getStationInfo");
+Route::get('weather/realtime',"WeatherController@getRealtimeData");
+Route::post('weather/history',"WeatherController@getHistoryData");
