@@ -1,0 +1,39 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateWeatherDatabase extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::connection('mysql_user')->create('weather_station', function (Blueprint $table) {
+            $table->unsignedBigInteger('id')->unique();
+            $table->double("latitude")->comment("纬度");
+            $table->double("longitude")->comment("经度");
+            $table->double("altitude")->comment("海拔高度");
+            $table->mediumInteger("added_by")->comment("添加用户");
+            $table->text("update_key")->comment("更新密钥");
+            $table->json("data_structure")->nullable()->comment("传感器及数据结构");
+            $table->dateTime("lastupdate")->nullable()->comment("最近一次更新");
+            $table->json("data")->nullable()->comment("最新数据");
+            $table->index('id');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::connection('mysql_user')->dropIfExists('weather_station');
+    }
+}
