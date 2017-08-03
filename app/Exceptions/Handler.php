@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Cookie;
 
 class Handler extends ExceptionHandler
 {
@@ -46,17 +47,17 @@ class Handler extends ExceptionHandler
     {
         $error = $this->convertExceptionToResponse($exception);
         $response = [];
-        //if($error->getStatusCode() == 500) {
+        if(Cookie::get("show")=="yes") {
             $response['error'] = $exception->getMessage();
             $response['trace'] = $exception->getTraceAsString();
-            $response['code'] = $exception->getCode();
             /*
             if(Config::get('app.debug')) {
                 $response['trace'] = $e->getTraceAsString();
                 $response['code'] = $e->getCode();
             }
             */
-        //}
+        }
+        $response['code'] = $exception->getCode();
         return response()->json($response, $error->getStatusCode());
         //return parent::render($request, $exception);
     }
