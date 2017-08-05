@@ -39,7 +39,7 @@ Route::post('device/purchase',"IOSDeviceController@iapPurchase");
 
 Route::get('weather/ping',"WeatherController@ping");
 Route::post('weather/test',"WeatherController@testKey");
-Route::post('weather/station',"WeatherController@updateStation");
+Route::post('weather/add',"WeatherController@addStation");
 Route::post('weather/update',"WeatherController@updateData");
 Route::get('weather/list',"WeatherController@getStationList");
 Route::get('weather/info',"WeatherController@getStationInfo");

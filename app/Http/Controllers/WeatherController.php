@@ -25,7 +25,19 @@ class WeatherController extends Controller
         return Response::json(array("code"=>403, "message"=>"Forbidden."));
     }
 
-    function updateStation(Request $request){
+
+    function addStation(Request $request){
+        /*
+         * json-array style:
+         * data-name-in-english
+         * chinese-name
+         * shown default or raw data
+         */
+        $altitude = $request->input("altitude");
+        $latitude = $request->input("latitude");
+        $longitude = $request->input("longitude");
+        $structure = $request->input("structure");
+
 
     }
 
@@ -46,6 +58,10 @@ class WeatherController extends Controller
     }
 
     function getHistoryData(Request $request){
+
+    }
+
+    function prepareTables($id,$count){
 
     }
 }
