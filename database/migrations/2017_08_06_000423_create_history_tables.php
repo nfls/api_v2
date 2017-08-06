@@ -26,7 +26,7 @@ class CreateHistoryTables extends Migration
         Schema::connection('mysql_user')->create('weather_configuration', function (Blueprint $table) {
             $table->increments("id")->comment("配置ID")->unique();
             $table->unsignedBigInteger("operator")->comment("操作员");
-            $table->json("configuration")->comment("配置JSON");
+            $table->json("configuration")->comment("配置JSON，需包含中文显示名，传感器名，数字/模拟");
         });
     }
 
