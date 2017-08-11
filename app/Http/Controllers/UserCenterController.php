@@ -176,7 +176,7 @@ class UserCenterController extends Controller
             $clientInfo = $dd->getClient(); // holds information about browser, feed reader, media player, ...
             if($clientInfo["type"]!="browser"){
                 $allow = false;
-                $message = "禁止非浏览器访问！";
+                $message = "由于iOS的WebKit与本站存在兼容性问题，导致无法正常登陆，请使用我们的<a href='https://app.nfls.io'>客户端</a>进行访问。";
             } else {
                 $osInfo = $dd->getOs();
                 $device = $dd->getDevice();
