@@ -57,7 +57,7 @@ class WeatherController extends Controller
         if($request->only(["data","key"]) && $request->has(["data","key"]) && $request->isMethod("POST")){
             $data_asoc = $request->input("data");
             $id = $this->getStation($request->input("key"));
-            $configurations = $this->$this->getConfiguration($id);
+            $configurations = $this->getConfiguration($id);
             if(count($data_asoc) != count($configurations))
                 abort(1001);
             $final_data = array();
