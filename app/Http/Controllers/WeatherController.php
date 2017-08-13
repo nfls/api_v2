@@ -60,9 +60,31 @@ class WeatherController extends Controller
             $configurations = $this->$this->getConfiguration($id);
             if(count($data_asoc) != count($configurations))
                 abort(1001);
+            $final_data = array();
             foreach ($configurations as $index => $configuration){
-
+                if($configuration["isEnabled"] == true){
+                    $flag = false;
+                    foreach ($data_asoc as $ins){
+                        if($ins["dataname"] = $ins["dataname"]){
+                            array_push($final_data,$ins["data"]);
+                            $flag = true;
+                        }
+                    }
+                    if(!$flag){
+                        abort(404.1);
+                    }
+                }
+                $conf_id = DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->first();
+                DB::connection("mysql_user")->table("weather_history")->insert(["update_time"=>date(),
+                    "update_ip"=>$_SERVER['REMOTE_ADDR'],
+                    "configuration_id"=>$conf_id,
+                    "data"=>json_encode($final_data)]);
+                DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->update(["lastupdate"=>time(),
+                    "lastupdate_ip"=>$_SERVER['REMOTE_ADDR'],
+                    "data"=>json_encode($final_data)]);
             }
+        } else {
+            return(403);
         }
     }
 
