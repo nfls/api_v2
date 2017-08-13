@@ -13,6 +13,20 @@ class WeatherController extends Controller
         return Response::json(array("code"=>200, "message"=>"pong"));
     }
 
+    function getStation($key){
+        $station = DB::connection("mysql_user")->table("weather_station")->where(["update_key"=>$key])->first();
+        if(is_null($station->id))
+            abort(404);
+        else
+            return $station->id;
+    }
+
+    function getConfiguration($id){
+        $conf_id = DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->first();
+        $conf = DB::connection("mysql_user")->table("weather_configuration")->where(["id"=>$conf_id])->first()->configuration;
+        return json_decode($conf,true);
+    }
+
     function testKey(Request $request){
         if($request->only("key") && $request->has("key") && $request->isMethod("POST")){
             $station = DB::connection("mysql_user")->table("weather_station")->where(["update_key"=>$request->input("key")])->first();
@@ -37,12 +51,19 @@ class WeatherController extends Controller
         $latitude = $request->input("latitude");
         $longitude = $request->input("longitude");
         $structure = $request->input("structure");
-
-
     }
 
     function updateData(Request $request){
+        if($request->only(["data","key"]) && $request->has(["data","key"]) && $request->isMethod("POST")){
+            $data_asoc = json_decode($request->input("data"),true);
+            $id = $this->$this->getStation($request->input("key"));
+            $configurations = $this->$this->getConfiguration($id);
+            if(count($data_asoc) != count($configurations))
+                abort(1001);
+            foreach ($configurations as $index => $configuration){
 
+            }
+        }
     }
 
     function getStationList(Request $request){
