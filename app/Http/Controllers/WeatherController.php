@@ -56,7 +56,7 @@ class WeatherController extends Controller
     function updateData(Request $request){
         if($request->only(["data","key"]) && $request->has(["data","key"]) && $request->isMethod("POST")){
             $data_asoc = $request->input("data");
-            $id = $this->$this->getStation($request->input("key"));
+            $id = $this->getStation($request->input("key"));
             $configurations = $this->$this->getConfiguration($id);
             if(count($data_asoc) != count($configurations))
                 abort(1001);
