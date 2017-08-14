@@ -22,7 +22,7 @@ class WeatherController extends Controller
     }
 
     function getConfiguration($id){
-        $conf_id = DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->first();
+        $conf_id = DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->first()->current_configuration;
         $conf = DB::connection("mysql_user")->table("weather_configuration")->where(["id"=>$conf_id])->first()->configuration;
         return json_decode($conf,true);
     }
