@@ -91,14 +91,59 @@ class WeatherController extends Controller
     }
 
     function getStationList(Request $request){
-
+        $stations = DB::connection("mysql_user")->table("weather_station")->get();
+        $return_array = array();
+        foreach($stations as $station){
+            $info["id"] = $station->id;
+            $info["name"] = $station->name;
+            $info["isEnabled"] = $station->isEnabled;
+            array_push($return_array,$info);
+        }
+        return Response::json(array("code"=>200,"info"=>$return_array));
     }
 
     function getStationInfo(Request $request){
+        if($request->only(["id"]) && $request->has(["id"]) && $request->isMethod("POST")) {
+            $station = DB::connection("mysql_user")->table("weather_station")->where(["id"=>$request->input(["id"])])->first();
+            if(is_null($station)){
+                abort(404.1);
+            } else {
+                $confs = $this->getConfiguration($request->input("id"));
+                $return_array = array();
+                foreach($confs as $conf){
+                    if($conf["isVisible"]){
+                        $info['name'] = $conf["visualName"];
+                        $info['id'] = $conf["identification"];
+                        $info['sensor_name'] = $conf["visualSensorName"];
+                        $info['isDigital'] = $conf["idDigital"];
+                        array_push($return_array,$info);
+                    }
+                }
+                return Response::json(array("code"=>200,"info"=>$return_array));
+            }
+        }
 
     }
 
     function getRealtimeData(Request $request){
+        if($request->only(["id"]) && $request->has(["id"]) && $request->isMethod("POST")) {
+            $station = DB::connection("mysql_user")->table("weather_station")->where(["id"=>$request->input(["id"])])->first();
+            if(is_null($station)){
+                abort(404.1);
+            } else {
+                $data = json_decode($station->data,true);
+                $confs = $this->getConfiguration($request->input("id"));
+                $return_array = array();
+                $i = 0;ßßß
+                foreach($confs as $conf){
+                    $i++;
+                    if($conf["isVisible"]){
+                        array_push($return_array,$data[$i]);
+                    }
+                }
+                return Response::json(array("code"=>200,"info"=>$return_array));
+            }
+        }
 
     }
 
@@ -107,6 +152,6 @@ class WeatherController extends Controller
     }
 
     function prepareTables($id,$count){
-
+        $i=9;
     }
 }
