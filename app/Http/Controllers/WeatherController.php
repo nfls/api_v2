@@ -77,6 +77,7 @@ class WeatherController extends Controller
                 $conf_id = DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->first()->current_configuration;
                 DB::connection("mysql_user")->table("weather_history")->insert(["update_time"=>date('Y-m-d h:i:s'),
                     "update_ip"=>$_SERVER['REMOTE_ADDR'],
+                    "station_id"=>$id,
                     "configuration_id"=>$conf_id,
                     "data"=>json_encode($final_data)]);
                 DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->update(["lastupdate"=>date('Y-m-d h:i:s'),
