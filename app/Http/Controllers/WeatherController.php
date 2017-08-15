@@ -97,6 +97,11 @@ class WeatherController extends Controller
             $info["id"] = $station->id;
             $info["name"] = $station->name;
             $info["isEnabled"] = $station->isEnabled;
+            if(strtotime(date('Y-m-d h:i:s', strtotime('-10 minutes'))) < strtotime($info['lastupdate'])){
+                $info["isOnline"] = true;
+            } else {
+                $info["isOnline"] = false;
+            }
             array_push($return_array,$info);
         }
         return Response::json(array("code"=>200,"info"=>$return_array));
@@ -116,6 +121,7 @@ class WeatherController extends Controller
                         $info['id'] = $conf["identification"];
                         $info['sensor_name'] = $conf["visualSensorName"];
                         $info['isDigital'] = $conf["isDigital"];
+
                         array_push($return_array,$info);
                     }
                 }
