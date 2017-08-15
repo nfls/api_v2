@@ -97,7 +97,7 @@ class WeatherController extends Controller
             $info["id"] = $station->id;
             $info["name"] = $station->name;
             $info["isEnabled"] = $station->isEnabled;
-            if(strtotime(date('Y-m-d h:i:s', strtotime('-10 minutes'))) < strtotime($info['lastupdate'])){
+            if(strtotime(date('Y-m-d h:i:s', strtotime('-10 minutes'))) < strtotime($station->lastupdate)){
                 $info["isOnline"] = true;
             } else {
                 $info["isOnline"] = false;
