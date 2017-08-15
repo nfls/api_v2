@@ -42,6 +42,6 @@ Route::post('weather/test',"WeatherController@testKey");
 Route::post('weather/add',"WeatherController@addStation");
 Route::post('weather/update',"WeatherController@updateData");
 Route::get('weather/list',"WeatherController@getStationList");
-Route::get('weather/info',"WeatherController@getStationInfo");
-Route::get('weather/realtime',"WeatherController@getRealtimeData");
+Route::post('weather/info',"WeatherController@getStationInfo");
+Route::post('weather/realtime',"WeatherController@getRealtimeData");
 Route::post('weather/history',"WeatherController@getHistoryData");
