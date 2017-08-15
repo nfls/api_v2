@@ -134,7 +134,7 @@ class WeatherController extends Controller
                 $data = json_decode($station->data,true);
                 $confs = $this->getConfiguration($request->input("id"));
                 $return_array = array();
-                $i = 0;ßßß
+                $i = 0;
                 foreach($confs as $conf){
                     $i++;
                     if($conf["isVisible"]){
