@@ -97,6 +97,7 @@ class WeatherController extends Controller
             if($station->isEnabled) {
                 $info["id"] = $station->id;
                 $info["name"] = $station->name;
+                $info["lastupdate"] = $station->lastupdate;
                 if (strtotime(date('Y-m-d h:i:s', strtotime('-10 minutes'))) < strtotime($station->lastupdate)) {
                     $info["isOnline"] = true;
                 } else {
@@ -108,20 +109,24 @@ class WeatherController extends Controller
         return Response::json(array("code"=>200,"info"=>$return_array));
     }
 
-    function getStationInfo(Request $request){
+    function getStationData(Request $request){
         if($request->only(["id"]) && $request->has(["id"]) && $request->isMethod("POST")) {
             $station = DB::connection("mysql_user")->table("weather_station")->where(["id"=>$request->input(["id"])])->first();
             if(is_null($station)){
                 abort(404.1);
             } else {
                 $confs = $this->getConfiguration($request->input("id"));
+                $data = json_decode($station->data,true);
                 $return_array = array();
+                $i=0;
                 foreach($confs as $conf){
                     if($conf["isVisible"]){
                         $info['name'] = $conf["visualName"];
                         $info['id'] = $conf["identification"];
                         $info['sensor_name'] = $conf["visualSensorName"];
                         $info['isDigital'] = $conf["isDigital"];
+                        $info['value'] = $data[i];
+                        $i++;
                         array_push($return_array,$info);
                     }
                 }
@@ -157,7 +162,4 @@ class WeatherController extends Controller
 
     }
 
-    function prepareTables($id,$count){
-        $i=9;
-    }
 }
