@@ -8,6 +8,6 @@ use Response;
 class LiveListController extends Controller
 {
     function getLiveList(){
-        return Respones::json(DB::connection("mysql_live")->table("activity")->get());
+        return Response::json(DB::connection("mysql_live")->table("activity")->get());
     }
 }
