@@ -159,6 +159,9 @@ class WeatherController extends Controller
     }
 
     function getHistoryData(Request $request){
+        if($request->only(["id","data_index","range"]) && $request->has(["id","data_index"])){
+            $station = DB::connection("mysql_user")->table("weather_station")->where(["id"=>$request->input(["id"])])->first();
+        }
 
     }
 

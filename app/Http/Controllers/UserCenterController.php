@@ -147,6 +147,10 @@ class UserCenterController extends Controller
         return Response::json($json_mes);
     }
 
+    function renameAccount(){
+
+    }
+
     function getDevice(){
         //echo $_SERVER['HTTP_USER_AGENT'];
         $dd = new DeviceDetector($_SERVER['HTTP_USER_AGENT']);
