@@ -18,6 +18,8 @@ Route::get('alumni/auth/step',"CertificationController@getCurrentStep");
 Route::get('alumni/auth/status',"CertificationController@getCurrentStatus");
 Route::get('alumni/auth/instructions',"CertificationController@getInstructions");
 Route::get('alumni/auth/duration',"CertificationController@getDuration");
+Route::get('alumni/post/list',"AlumniWebsiteController@getPostList");
+Route::post('alumni/post/detail',"AlumniWebsiteController@getDetailPost");
 
 Route::any('center/{type}',"UserCenterController@requestHandler");
 
