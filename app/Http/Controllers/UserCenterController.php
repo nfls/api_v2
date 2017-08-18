@@ -198,7 +198,7 @@ class UserCenterController extends Controller
             }
 
         }
-        return array("allow"=>$allow,"message"=>$message);
+        return array("allow"=>$allow,"message"=>$message."本站正在进行服务器升级，预计于2017年8月31日前，论坛、百科等关联登录可能无法正常工作，尽请谅解。");
     }
     function CreateCaptcha($ip,$operation){
         DB::connection("mysql_user")->table("user_session")->where("valid_before","<",date('Y-m-d h:i:s'))->delete();

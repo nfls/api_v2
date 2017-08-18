@@ -86,4 +86,16 @@ class IOSDeviceController extends Controller
         $message = DB::connection("mysql_user")->table("app_startup_notice")->select("id","title","text")->orderBy("id","desc")->first();
         return Response::json(array("code"=>200,"info"=>$message));
     }
+
+    function compareAuthDatabase(Request $request){
+        if($request->only("version") && $request->has("version")){
+            $require_version = "1.0.2";
+            if(version_compare($request->get("version"),$require_version,">")){
+                return Response::json(array("code"=>200));
+            } else {
+                return Response::json(array("code"=>304));
+            }
+        }
+
+    }
 }
