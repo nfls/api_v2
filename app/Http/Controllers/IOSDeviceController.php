@@ -81,4 +81,9 @@ class IOSDeviceController extends Controller
         $id = UserCenterController::GetUserId(Cookie::get("token"));
         return Response::json(array("code"=>200,"id"=>$id));
     }
+
+    function getNotice(){
+        $message = DB::connection("mysql_user")->table("app_startup_notice")->select("id","title","text")->orderBy("id","desc")->first();
+        return Response::json(array("code"=>200,"info"=>$message));
+    }
 }

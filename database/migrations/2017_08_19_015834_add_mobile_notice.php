@@ -16,6 +16,7 @@ class AddMobileNotice extends Migration
         //
         Schema::connection('mysql_user')->create('app_startup_notice', function (Blueprint $table) {
             $table->increments("id")->comment("数据ID")->unique();
+            $table->text("title")->nullable()->comment("标题");
             $table->text("text")->nullable()->comment("文本");
         });
     }
