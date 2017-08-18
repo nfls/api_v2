@@ -90,7 +90,7 @@ class IOSDeviceController extends Controller
     function compareAuthDatabase(Request $request){
         if($request->only("version") && $request->has("version")){
             $require_version = "1.0.2";
-            if(version_compare($request->get("version"),$require_version,">")){
+            if(version_compare($request->get("version"),$require_version,">=")){
                 return Response::json(array("code"=>200));
             } else {
                 return Response::json(array("code"=>304));
