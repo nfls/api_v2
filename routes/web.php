@@ -41,6 +41,7 @@ Route::get("admin/auth/instructions","CertificationManagementController@getInstr
 Route::post('device/register',"IOSDeviceController@registerDevice");
 Route::post('device/purchase',"IOSDeviceController@iapPurchase");
 Route::get('device/status',"IOSDeviceController@confirmLoggedIn");
+Route::get('device/notice',"IOSDeviceController@getNotice");
 
 Route::get('weather/ping',"WeatherController@ping");
 Route::post('weather/test',"WeatherController@testKey");
