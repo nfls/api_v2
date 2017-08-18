@@ -76,4 +76,9 @@ class IOSDeviceController extends Controller
         }
 
     }
+
+    function confirmLoggedIn(){
+        $id = UserCenterController::GetUserId(Cookie::get("token"));
+        return Response::json(array("code"=>200,"id"=>$id));
+    }
 }

@@ -18,7 +18,7 @@ class UserCenterController extends Controller
     public static function GetUserId($token){
     	$user = DB::connection("mysql_user")->table("user_list")->where("token", $token)->first();
     	if(is_null($user))
-    		abort(403);
+    		abort(404.2);
     	return $user->id;
     }
 
