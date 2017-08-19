@@ -418,7 +418,7 @@ class CertificationController extends Controller
              return Response::json(array('code' => 200, 'message' => $message));
         } else {
             array_unshift($message, '非常抱歉，您提交的数据在以下部分存在问题：');
-            return Response::json(array('code' => '403.1', 'message' => $message));
+            return Response::json(array('code' => '403', 'message' => $message));
         }
     }
 
@@ -442,7 +442,7 @@ class CertificationController extends Controller
             if (is_null($info->status_change_time))
                 return false;
             else
-                if (strtotime($info->status_change_time) < strtotime($info->submmit_time))
+                if (strtotime($info->status_change_time) < strtotime($info->submit_time))
                     return false;
         return true;
 
