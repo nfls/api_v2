@@ -21,14 +21,14 @@ class StudentsListController extends Controller
         $cn_arr = array("〇","一","二","三","四","五","六","七","八","九");
         $str = "";
         while ($num>10){
-            $str = $str . $cn_arr[$num % 10];
+            $str = $cn_arr[$num % 10] . $str;
             $num = $num / 10;
         }
-        return $str.$cn_arr[$num];
+        return $cn_arr[$num] . $str;
     }
     function getReadableClass($array){
         $str = $this->decodeClassType($array["type"]).$this->numToChn($array["year"])."届".$this->numToChn($array["class"])."班";
-        if(@!is_null($array["comment"]) || $array["comment"] != ""){
+        if(@!is_null($array["comment"]) && $array["comment"] != ""){
             $str = $str . "（" . $array["comment"] . "）";
         }
         return $str;
