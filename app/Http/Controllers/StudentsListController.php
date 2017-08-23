@@ -20,6 +20,7 @@ class StudentsListController extends Controller
             }
             return Response::json($names);
         } else {
+            echo 1;
             echo $request->input("name");
             echo $request->input("session");
             echo $request->input("captcha");
