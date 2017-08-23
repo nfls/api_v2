@@ -19,6 +19,8 @@ class StudentsListController extends Controller
             foreach($names as $name){
             }
             return Response::json($names);
+        } else {
+            abort(404);
         }
     }
 }
