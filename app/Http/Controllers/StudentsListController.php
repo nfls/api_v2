@@ -27,7 +27,7 @@ class StudentsListController extends Controller
         return $cn_arr[$num] . $str;
     }
     function getReadableClass($array){
-        $str = $this->decodeClassType($array["type"]).$this->numToChn($array["year"])."届".$this->numToChn($array["class"])."班";
+        $str = $this->decodeClassType($array["type"]).$this->numToChn($array["year"])."届".$array["class"]."班";
         if(@!is_null($array["comment"]) && $array["comment"] != ""){
             $str = $str . "（备注：" . $array["comment"] . "）";
         }
