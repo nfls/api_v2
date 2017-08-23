@@ -11,12 +11,56 @@ use Illuminate\Support\Facades\DB;
 
 class StudentsListController extends Controller
 {
+    function getClassDetail($id){
+        $class = DB::connection("mysql_alumni")->table("classes")->where(["id"=>$id])->first();
+        return array("year"=>$class->year,"class"=>$class->class,"type"=>$this->decodeClassType($class->type));
+    }
+    function numToChn($num){
+        $cn_arr = array("〇","一","二","三","四","五","六","七","八","九");
+        $str = "";
+        while ($num>10){
+            $str = $str . $cn_arr[$num % 10];
+            $num = $num / 10;
+        }
+        return $str.$cn_arr[$num];
+    }
+    function getReadableClass($array){
+        return $array->type.$this->numToChn($array->year)."届".$this->numToChn($array->class)."班";
+    }
+    function decodeClassType($str){
+        switch($str){
+            case "GeneralJunior":
+                return "普通初中课程";
+            case "GeneralSenior":
+                return "普通高中课程";
+            case "ALevelSenior":
+                return "A-Level国际课程";
+            case "IBSenior":
+                return "IB国际课程";
+            case "UNSW":
+                return "新南威尔士大学预科课程";
+            case "TeacherSenior":
+                return "中师课程";
+            case "Japanese":
+                return "日语代培课程";
+            case "StandardEducationSenior":
+                return "基础教育高中课程";
+            case "StandardEducationJunior":
+                return "基础教育初中课程";
+            case "StandardEducationPrimary":
+                return "基础教育小学课程";
+            default:
+                return "未知，请联系管理员";
+        }
+    }
     function getNameList(Request $request){
         if($request->has(["name","session","captcha"])){
             //if(!UserCenterController::ConfirmCaptcha($request->input("session"), $request->input("captcha"), "nameQuery"))
             //    return array("status"=>"failure","message"=>"验证码无效或不正确");
-            $names = DB::connection("mysql_alumni")->table("students")->where(["name"=>$request->input("name")])->get();
+            $array = array();
+            $names = DB::connection("mysql_alumni")->table("students")->where(["name"=>$request->input("name"),"used"=>false])->get();
             foreach($names as $name){
+                array_push($array,array("name"=>$name->name,"class"=>$this->getReadableClass($this->getClassDetail($name->class_id))));
             }
             return Response::json($names);
         } else {
