@@ -123,6 +123,10 @@ class UserCenterController extends Controller
                 if($request->isMethod("get"))
                     $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'],"recover");
                 break;
+            case "nameQueryCaptcha":
+                if($request->isMethod("get"))
+                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'],"nameQuery");
+                break;
             case "device":
                 if($request->isMethod("get"))
                     $info = $this->getDevice();
@@ -200,7 +204,9 @@ class UserCenterController extends Controller
         }
         return array("allow"=>$allow,"message"=>$message."本站正在进行服务器升级，预计于2017年8月31日前，论坛、百科等关联登录可能无法正常工作，尽请谅解。");
     }
-    function CreateCaptcha($ip,$operation){
+
+
+    static function CreateCaptcha($ip,$operation){
         DB::connection("mysql_user")->table("user_session")->where("valid_before","<",date('Y-m-d h:i:s'))->delete();
         $phraseBuilder = new PhraseBuilder(10);
         $builder = new CaptchaBuilder(null, $phraseBuilder);
@@ -208,14 +214,24 @@ class UserCenterController extends Controller
         //header('Content-type: image/jpeg');
         $phrase = $builder->getPhrase();
         $time = date('Y-m-d h:i:s', strtotime('+10 minutes'));
-        $session = $this->random_str(16);
+        $session = self::random_str(16);
         DB::connection("mysql_user")->table("user_session")->insert(["phrase"=>$phrase,"ip"=>$ip,"valid_before"=>$time,"session"=>$session,"operation"=>$operation]);
         $image = 'data:image/jpeg;base64,' . base64_encode($builder->get($quality = 100));
         return array("captcha"=>$image,"session"=>$session);
-
     }
 
-    function random_str($length, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    static function ConfirmCaptcha($session,$captcha,$operation){
+        $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => $operation, "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
+        if(@is_null($valid->id)){
+            DB::connection("mysql_user")->table("user_session")->where(["session" => $session])->delete();
+            return false;
+        } else {
+            DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => $operation, "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
+            return true;
+        }
+    }
+
+    static function random_str($length, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
     {
         $str = '';
         $max = mb_strlen($keyspace, '8bit') - 1;
@@ -227,13 +243,8 @@ class UserCenterController extends Controller
 
     function UserLogin($username,$password,$session,$captcha)
     {
-        $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "login", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
-        if(@is_null($valid->id)){
-            DB::connection("mysql_user")->table("user_session")->where(["session" => $session])->delete();
+        if(!$this->ConfirmCaptcha($session,$captcha,"login"))
             return array("status"=>"failure","message"=>"验证码无效或不正确");
-        } else {
-            DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "login", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
-        }
         $headers = array('content-type:application/vnd.api+json',);
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, "https://forum.nfls.io/api/token");
@@ -259,13 +270,8 @@ class UserCenterController extends Controller
         if(preg_match("[A-Za-z0-9_]+",$username)!=$username)
             return [""]
         */
-        $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "register", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
-        if(@is_null($valid->id)){
-            DB::connection("mysql_user")->table("user_session")->where(["session" => $session])->delete();
+        if(!$this->ConfirmCaptcha($session,$captcha,"register"))
             return array("status"=>"failure","message"=>"验证码无效或不正确");
-        } else {
-            DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "register", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
-        }
         $headers = array('content-type:application/vnd.api+json');
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, "https://forum.nfls.io/api/users");
@@ -332,13 +338,8 @@ class UserCenterController extends Controller
 
     function RecoverPassword($email,$session,$captcha)
     {
-        $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "recover", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
-        if(@is_null($valid->id)){
-            DB::connection("mysql_user")->table("user_session")->where(["session" => $session])->delete();
+        if(!$this->ConfirmCaptcha($session,$captcha,"recover"))
             return array("status"=>"failure","message"=>"验证码无效或不正确");
-        } else {
-            DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => "recover", "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
-        }
         $headers = array('content-type:application/vnd.api+json',);
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, "https://forum.nfls.io/api/forgot");

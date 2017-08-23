@@ -136,7 +136,6 @@ class CertificationController extends Controller
     ];
 
 
-
     function getCurrentStep(Request $request)
     {
         $id = $this->getUser(Cookie::get('token'));
