@@ -59,6 +59,9 @@ class StudentsListController extends Controller
                 return "未知，请联系管理员";
         }
     }
+    function addQueryTime($id){
+        DB::connection("mysql_alumni")->table("user_auth")->where(["id"=>$id]);
+    }
     function getNameList(Request $request){
         $id = $this->getUser(Cookie::get('token'));
         if($request->has(["name","session","captcha"])){
