@@ -13,9 +13,11 @@ class StudentsListController extends Controller
 {
     function getClassDetail($id){
         $class = DB::connection("mysql_alumni")->table("classes")->where(["id"=>$id])->first();
-        return array("year"=>$class->year,"class"=>$class->class,"type"=>$class->type);
+        return @array("year"=>$class->year,"class"=>$class->class,"type"=>$class->type,"comment"=>$class->comment);
     }
     function numToChn($num){
+        if($num == -1)
+            return "--";
         $cn_arr = array("〇","一","二","三","四","五","六","七","八","九");
         $str = "";
         while ($num>10){
@@ -25,7 +27,11 @@ class StudentsListController extends Controller
         return $str.$cn_arr[$num];
     }
     function getReadableClass($array){
-        return $this->decodeClassType($array["type"]).$this->numToChn($array["year"])."届".$this->numToChn($array["class"])."班";
+        $str = $this->decodeClassType($array["type"]).$this->numToChn($array["year"])."届".$this->numToChn($array["class"])."班";
+        if(@!is_null($array["comment"]) || $array["comment"] != ""){
+            $str = $str . "（" . $array["comment"] . "）";
+        }
+        return $str;
     }
     function decodeClassType($str){
         switch($str){
@@ -62,7 +68,7 @@ class StudentsListController extends Controller
             foreach($names as $name){
                 array_push($array,array("name"=>$name->name,"class"=>$this->getReadableClass($this->getClassDetail($name->class_id))));
             }
-            return Response::json($names);
+            return Response::json($array);
         } else {
             abort(404);
         }
