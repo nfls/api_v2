@@ -60,6 +60,7 @@ class StudentsListController extends Controller
         }
     }
     function getNameList(Request $request){
+        $id = $this->getUser(Cookie::get('token'));
         if($request->has(["name","session","captcha"])){
             //if(!UserCenterController::ConfirmCaptcha($request->input("session"), $request->input("captcha"), "nameQuery"))
             //    return array("status"=>"failure","message"=>"验证码无效或不正确");
@@ -68,7 +69,7 @@ class StudentsListController extends Controller
             foreach($names as $name){
                 array_push($array,$this->getReadableClass($this->getClassDetail($name->class_id)));
             }
-            return Response::json($array);
+            return Response::json($array,200);
         } else {
             abort(404);
         }
