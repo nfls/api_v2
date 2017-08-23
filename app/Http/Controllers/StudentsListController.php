@@ -13,7 +13,7 @@ class StudentsListController extends Controller
 {
     function getClassDetail($id){
         $class = DB::connection("mysql_alumni")->table("classes")->where(["id"=>$id])->first();
-        return array("year"=>$class->year,"class"=>$class->class,"type"=>$this->$class->type);
+        return array("year"=>$class->year,"class"=>$class->class,"type"=>$class->type);
     }
     function numToChn($num){
         $cn_arr = array("〇","一","二","三","四","五","六","七","八","九");
