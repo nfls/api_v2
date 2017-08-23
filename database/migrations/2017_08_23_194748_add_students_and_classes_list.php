@@ -20,7 +20,7 @@ class AddStudentsAndClassesList extends Migration
             $table->boolean("used")->default(false)->comment("是否使用");
             $table->text("comment")->nullable()->comment("备注");
         });
-        Schema::connection('mysql_alumni')->create('students', function (Blueprint $table) {
+        Schema::connection('mysql_alumni')->create('classes', function (Blueprint $table) {
             $table->increments("id")->index()->unique()->comment("ID")->unique();
             $table->text("type")->comment("班级类型");
             $table->integer("year")->comment("届");
