@@ -14,7 +14,7 @@ class AddQueryTimeList extends Migration
     public function up()
     {
         Schema::connection('mysql_alumni')->table('user_auth', function (Blueprint $table) {
-            $table->json("query_time")->comment("查询请求时间")->default("[]");
+            $table->json("query_time")->comment("查询请求时间");
         });
         Schema::connection('mysql_user')->table('user_list', function (Blueprint $table) {
             $table->text("2fa")->comment("二次认证密钥");
