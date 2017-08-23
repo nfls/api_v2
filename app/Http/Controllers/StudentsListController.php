@@ -20,6 +20,9 @@ class StudentsListController extends Controller
             }
             return Response::json($names);
         } else {
+            echo $request->get("name");
+            echo $request->get("session");
+            echo $request->get("captcha");
             abort(404);
         }
     }
