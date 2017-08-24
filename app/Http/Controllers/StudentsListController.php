@@ -95,7 +95,9 @@ class StudentsListController extends Controller
                 foreach ($names as $name) {
                     array_push($array, $this->getReadableClass($this->getClassDetail($name->class_id)));
                 }
-                return Response::json($array, 200);
+                return Response::json(array("code"=>200,"info"=>$array));
+            } else {
+                return Response::json(array("code"=>403,"info"=>"您已超出24小时内查询限制，请稍候再试"));
             }
         } else {
             abort(404);
