@@ -65,7 +65,7 @@ class StudentsListController extends Controller
     }
     function addQueryTime($id){
         $user = DB::connection("mysql_alumni")->table("user_auth")->where(["id"=>$id])->first();
-        if(@!is_null($user->query_time)){
+        if(@!is_null(json_decode($user->query_time,true))){
             $old_times = json_decode($user->query_time, true);
             $times = array();
             foreach($old_times as $time){
