@@ -13,7 +13,7 @@ class StudentsListController extends Controller
 {
     const INFO = "您可以在此处根据您的姓名查询对应班级信息，快速填写认证表格。数据库截止到2016届。";
     function getInfo(){
-        return Response::json(array("code"=>200,"info"=>self::INFO."您在24小时内最多可查询 ".$this->getUserLimit(UserCenterController::GetUserId(Cookie::get("token")))."次。"));
+        return Response::json(array("code"=>200,"info"=>self::INFO."您在24小时内最多可查询 ".$this->getUserLimit(UserCenterController::GetUserId(Cookie::get("token")))."次。（注：请不要多次点击查询按钮）"));
     }
     function getClassDetail($id){
         $class = DB::connection("mysql_alumni")->table("classes")->where(["id"=>$id])->first();
@@ -95,7 +95,7 @@ class StudentsListController extends Controller
         $id = UserCenterController::GetUserId(Cookie::get('token'));
         if($request->has(["name","session","captcha"])){
             if(!UserCenterController::ConfirmCaptcha($request->input("session"), $request->input("captcha"), "nameQuery"))
-                return array("status"=>"failure","message"=>"验证码无效或不正确");
+                return array("code"=>403,"message"=>"验证码无效或不正确");
             if($this->addQueryTime($id)) {
                 $array = array();
                 $names = DB::connection("mysql_alumni")->table("students")->where(["name" => $request->input("name"), "used" => false])->get();
