@@ -69,7 +69,7 @@ class StudentsListController extends Controller
             $old_times = json_decode($user->query_time, true);
             $times = array();
             foreach($old_times as $time){
-                if(strtotime($time) > date('Y-m-d h:i:s',strtotime('-24 hours'))){
+                if(strtotime($time) > strtotime('-24 hours')){
                     array_push($times,$time);
                 }
             }
