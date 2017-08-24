@@ -59,20 +59,43 @@ class StudentsListController extends Controller
                 return "未知，请联系管理员";
         }
     }
+
+    function getUserLimit($id){
+        return 5;
+    }
     function addQueryTime($id){
-        DB::connection("mysql_alumni")->table("user_auth")->where(["id"=>$id]);
+        $user = DB::connection("mysql_alumni")->table("user_auth")->where(["id"=>$id])->first();
+        if(@!is_null($user->query_time)){
+            $old_times = json_decode($user->query_time, true);
+            $times = array();
+            foreach($old_times as $time){
+                if(strtotime($time) > date('Y-m-d h:i:s',strtotime('-24 hours'))){
+                    array_push($times);
+                }
+            }
+            if(count($times) > $this->getUserLimit($id)){
+                return false;
+            } else {
+                array_push($times, date('Y-m-d h:i:s'));
+            }
+        } else {
+            $times = array(date('Y-m-d h:i:s'));
+        }
+        DB::connection("mysql_alumni")->table("user_auth")->where(["id"=>$id])->update(["query_time"=>json_encode($times)]);
     }
     function getNameList(Request $request){
         $id = $this->getUser(Cookie::get('token'));
         if($request->has(["name","session","captcha"])){
             //if(!UserCenterController::ConfirmCaptcha($request->input("session"), $request->input("captcha"), "nameQuery"))
             //    return array("status"=>"failure","message"=>"验证码无效或不正确");
-            $array = array();
-            $names = DB::connection("mysql_alumni")->table("students")->where(["name"=>$request->input("name"),"used"=>false])->get();
-            foreach($names as $name){
-                array_push($array,$this->getReadableClass($this->getClassDetail($name->class_id)));
+            if($this->addQueryTime($id)) {
+                $array = array();
+                $names = DB::connection("mysql_alumni")->table("students")->where(["name" => $request->input("name"), "used" => false])->get();
+                foreach ($names as $name) {
+                    array_push($array, $this->getReadableClass($this->getClassDetail($name->class_id)));
+                }
+                return Response::json($array, 200);
             }
-            return Response::json($array,200);
         } else {
             abort(404);
         }
