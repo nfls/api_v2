@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class StudentsListController extends Controller
 {
+    const INFO = "您可以在此处根据您的姓名查询对应班级信息，快速填写认证表格。数据库截止到2016届。";
+    function getInfo(){
+        return Response::json(array("code"=>200,"info"=>self::INFO."您在24小时内最多可查询 ".$this->getUserLimit(UserCenterController::GetUserId(Cookie::get("token")))."次。"));
+    }
     function getClassDetail($id){
         $class = DB::connection("mysql_alumni")->table("classes")->where(["id"=>$id])->first();
         return @array("year"=>$class->year,"class"=>$class->class,"type"=>$class->type,"comment"=>$class->comment);
@@ -55,6 +59,8 @@ class StudentsListController extends Controller
                 return "基础教育初中课程";
             case "StandardEducationPrimary":
                 return "基础教育小学课程";
+            case "BCASenior":
+                return "中加国际课程";
             default:
                 return "未知，请联系管理员";
         }

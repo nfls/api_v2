@@ -221,6 +221,7 @@ class UserCenterController extends Controller
     }
 
     static function ConfirmCaptcha($session,$captcha,$operation){
+        DB::connection("mysql_user")->table("user_session")->where("valid_before","<",date('Y-m-d h:i:s'))->delete();
         $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => $operation, "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
         if(@is_null($valid->id)){
             DB::connection("mysql_user")->table("user_session")->where(["session" => $session])->delete();
