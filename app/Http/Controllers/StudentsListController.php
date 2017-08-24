@@ -95,7 +95,7 @@ class StudentsListController extends Controller
         $id = UserCenterController::GetUserId(Cookie::get('token'));
         if($request->has(["name","session","captcha"])){
             if(!UserCenterController::ConfirmCaptcha($request->input("session"), $request->input("captcha"), "nameQuery"))
-                return array("code"=>403,"message"=>"验证码无效或不正确");
+                return array("code"=>403,"info"=>"验证码无效或不正确");
             if($this->addQueryTime($id)) {
                 $array = array();
                 $names = DB::connection("mysql_alumni")->table("students")->where(["name" => $request->input("name"), "used" => false])->get();
