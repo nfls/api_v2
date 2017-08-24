@@ -82,6 +82,7 @@ class StudentsListController extends Controller
             $times = array(date('Y-m-d h:i:s'));
         }
         DB::connection("mysql_alumni")->table("user_auth")->where(["id"=>$id])->update(["query_time"=>json_encode($times)]);
+        return true;
     }
     function getNameList(Request $request){
         $id = UserCenterController::GetUserId(Cookie::get('token'));
