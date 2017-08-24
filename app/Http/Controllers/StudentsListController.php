@@ -70,7 +70,7 @@ class StudentsListController extends Controller
             $times = array();
             foreach($old_times as $time){
                 if(strtotime($time) > date('Y-m-d h:i:s',strtotime('-24 hours'))){
-                    array_push($times);
+                    array_push($times,$time);
                 }
             }
             if(count($times) > $this->getUserLimit($id)){
