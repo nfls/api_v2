@@ -166,7 +166,7 @@ class UserCenterController extends Controller
         $google2fa_url = $google2fa->getQRCodeGoogleUrl(
             'nfls.io',
             self::GetUsernameById($id),
-            $google2fa->generateSecretKey();
+            $google2fa->generateSecretKey()
         );
         return $google2fa_url;
     }
