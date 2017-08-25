@@ -67,7 +67,7 @@ class StudentsListController extends Controller
     }
 
     function getUserLimit($id){
-        return 5;
+        return 9999999;
     }
     function addQueryTime($id){
         $user = DB::connection("mysql_alumni")->table("user_auth")->where(["id"=>$id])->first();
@@ -100,7 +100,7 @@ class StudentsListController extends Controller
                 $array = array();
                 $names = DB::connection("mysql_alumni")->table("students")->where(["name" => $request->input("name"), "used" => 0])->get();
                 foreach ($names as $name) {
-                    array_push($array, array("name" => $this->getReadableClass($this->getClassDetail($name->class_id)), "id" => $name->class_id));
+                    array_push($array, array("name" => $this->getReadableClass($this->getClassDetail($name->class_id)), "id" => $name->id));
                 }
                 return Response::json(array("code"=>200,"info"=>$array));
             } else {
