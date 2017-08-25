@@ -520,7 +520,7 @@ class CertificationController extends Controller
     }
 
 
-    function schoolYearCheck(&$enter_year, &$graduated_year, $minimum_year, $maximum_year, $interval, $remark, $name, &$message)
+    function schoolYearCheck(&$enter_year, &$graduated_year, $minimum_year, $maximum_year, $interval, $remark, $name, &$message, $strict = true)
     {
         $enter_year = (int)($enter_year);
         $graduated_year = (int)($graduated_year);
@@ -531,8 +531,11 @@ class CertificationController extends Controller
         $valid = new Between(['min' => $minimum_year + $interval, 'max' => $maximum_year + $interval]);
         if (!$valid->isValid($graduated_year) || !is_integer($graduated_year))
             array_push($message, $name . '毕业年份不正确。');
-        if ($enter_year + $interval != $graduated_year && (@$this->isEmpty($remark)))
-            array_push($message, $name . '毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。');
+        if ($enter_year + $interval != $graduated_year && (@$this->isEmpty($remark))){
+            if($strict)
+                array_push($message, $name . '毕业年份与入学年份不对应！如果有特殊情况，请在备注中注明。');
+        }
+
     }
 
     function structureCheck($info, $count, &$message)
@@ -630,6 +633,7 @@ class CertificationController extends Controller
                     @$this->emptyCheck(self::SCHOOL_NAME, $info->primary_school_name, '其他小学', $message);
                     @$passed = @$this->emptyCheck(self::ENTER_YAER, $info->primary_school_enter_year, '小学', $message);
                     @$passed = $passed && @$this->emptyCheck(self::GRADUATED_YEAR, $info->primary_school_graduated_year, '小学', $message);
+                    @$this->schoolYearCheck($info->primary_school_enter_year, $info->primary_school_graduated_year, 1963, 1979, 4, $info->junior_remark, '小学', $message, false);
                     $this->structureCheck($info, 5, $message);
                     break;
                 default:
@@ -753,7 +757,7 @@ class CertificationController extends Controller
                     break;
                 case self::NFLS_SENIOR_JAPANESE:
                     $this->emptyCheck(self::GRADUATED_YEAR,$info->senior_school_graduated_year,'高中',$message);
-                    $passed = $passed && $this->emptyCheck(self::GRADUATED_YEAR,$info->senior_school_graduated_year,'高中',$message);
+                    $passed = $this->emptyCheck(self::GRADUATED_YEAR,$info->senior_school_graduated_year,'高中',$message);
                     $this->structureCheck($info,4,$message);
                     break;
                 case self::NFLS_SENIOR_ALEVEL:
