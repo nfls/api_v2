@@ -569,28 +569,6 @@ class CertificationController extends Controller
         } else {
             array_push($message, '真实姓名内容不符合要求。请输入2-4个中文字符');
         }
-        if (@$this->emptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message)) {
-            if (!preg_match('/^1[34578]\d{9}$/', (string)($info->phone_domestic))) {
-                array_push($message, '国内手机号码不正确！');
-            }
-        }
-        if (@$this->emptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message, false)) {
-            try {
-                $phone_validate = \libphonenumber\PhoneNumberUtil::getInstance();
-                $phone_number = $phone_validate->parse($info->phone_international, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
-                if ($phone_validate->isValidNumber($phone_number)) {
-                    array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
-                }
-            } catch (NumberParseException $e) {
-                array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
-            }
-        }
-        if (@$this->emptyCheck(self::OTHER, $info->nickname, '昵称', $message, false)) {
-            $names = explode('，', $info->nickname);
-            if (count($names) > 1) {
-                array_push($message, '昵称分隔错误，请检查您的输入内容。');
-            }
-        }
         if (@$this->emptyCheck(self::OTHER, $info->english_name, '英文名', $message)) {
             $names = explode('，', $info->english_name);
             if (count($names) > 1) {
@@ -625,7 +603,7 @@ class CertificationController extends Controller
                 array_push($message, '曾用名内容不符合要求。请输入2-4个中文字符');
             }
         }
-        $this->structureCheck($info,10,$message);
+        $this->structureCheck($info,7,$message);
         return $message;
     }
 
@@ -775,7 +753,8 @@ class CertificationController extends Controller
                     break;
                 case self::NFLS_SENIOR_JAPANESE:
                     $this->emptyCheck(self::GRADUATED_YEAR,$info->senior_school_graduated_year,'高中',$message);
-                    $this->structureCheck($info,3,$message);
+                    $passed = $passed && $this->emptyCheck(self::GRADUATED_YEAR,$info->senior_school_graduated_year,'高中',$message);
+                    $this->structureCheck($info,4,$message);
                     break;
                 case self::NFLS_SENIOR_ALEVEL:
                     @$passed = $this->emptyCheck(self::ENTER_YAER, $info->senior_school_enter_year, '高中', $message);
@@ -884,17 +863,17 @@ class CertificationController extends Controller
         $passed = false;
         $grid_count = 0;
         if(@!$this->isEmpty($info->college) && $info->college == true)
-            $passed = $this->collegeInfoCheck("college",$info,$message,"专科",$grid_count);
+            $passed = $passed || $this->collegeInfoCheck("college",$info,$message,"专科",$grid_count);
         if(@!$this->isEmpty($info->undergraduate) && $info->undergraduate == true)
-            $passed = $this->collegeInfoCheck("undergraduate",$info,$message,"本科",$grid_count);
+            $passed = $passed || $this->collegeInfoCheck("undergraduate",$info,$message,"本科",$grid_count);
         if(@!$this->isEmpty($info->master) && $info->master == true)
-            $passed = $this->collegeInfoCheck("master",$info,$message,"硕士",$grid_count);
+            $passed = $passed || $this->collegeInfoCheck("master",$info,$message,"硕士",$grid_count);
         if(@!$this->isEmpty($info->doctor) && $info->doctor == true)
-            $passed = $this->collegeInfoCheck("doctor",$info,$message,"博士",$grid_count);
+            $passed = $passed || $this->collegeInfoCheck("doctor",$info,$message,"博士",$grid_count);
         if(@!$this->isEmpty($info->other) && $info->other == true)
-            $passed = $this->collegeInfoCheck("other",$info,$message,"其他",$grid_count);
+            $passed = $passed || $this->collegeInfoCheck("other",$info,$message,"其他",$grid_count);
         if(!$passed)
-            array_push($message,"请至少选择一个进行填写！");
+            //array_push($message,"请至少选择一个进行填写！");
         $this->structureCheck($info,$grid_count+6,$message);
         return $message;
     }
@@ -957,7 +936,7 @@ class CertificationController extends Controller
 
     function authStep7($info){
         $message = array();
-        $this->structureCheck($info,1,$message);
+        $this->structureCheck($info,4,$message);
         return $message;
     }
 
@@ -965,9 +944,34 @@ class CertificationController extends Controller
         $message = array();
         $contact_count = 0;
         $content_count = 0;
-        $this->structureCheck($info,16,$message);
         if(@$this->isEmpty($info->personal_info))
             array_push($message,"请填写自我介绍。");
+        if (@$this->emptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message)) {
+            if (!preg_match('/^1[34578]\d{9}$/', (string)($info->phone_domestic))) {
+                array_push($message, '国内手机号码不正确！');
+            }
+        }
+        if (@$this->emptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message, false)) {
+            try {
+                $phone_validate = \libphonenumber\PhoneNumberUtil::getInstance();
+                $phone_number = $phone_validate->parse($info->phone_international, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
+                if ($phone_validate->isValidNumber($phone_number)) {
+                    array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
+                }
+            } catch (NumberParseException $e) {
+                array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
+            }
+        }
+        if (@$this->emptyCheck(self::OTHER, $info->nickname, '昵称', $message, false)) {
+            $names = explode('，', $info->nickname);
+            if (count($names) > 1) {
+                array_push($message, '昵称分隔错误，请检查您的输入内容。');
+            }
+        }
+        if(@$this->isEmpty($info->club))
+            array_push($message,"请填写参加过的社团。");
+        if(@$this->isEmpty($info->live_place))
+            array_push($message,"请填写常住地区。");
         foreach($info as $key=>$value){
             switch($key){
                 case "wechat":
@@ -985,6 +989,7 @@ class CertificationController extends Controller
                 case "instagram":
                 case "snapchat":
                 case "groupme":
+                case "other_com":
                     $contact_count++;
                     if(@!$this->isEmpty($value))
                         $content_count++;
@@ -995,6 +1000,7 @@ class CertificationController extends Controller
         }
         if($content_count == 0)
             array_push($message,"请至少填写一个联系方式。");
+        $this->structureCheck($info,20,$message);
         return $message;
     }
 
