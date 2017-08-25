@@ -161,8 +161,14 @@ class UserCenterController extends Controller
     }
 
     function get2fakey(){
+        $id = self::GetUserId(Cookie::get("token"));
         $google2fa = new Google2FA();
-        return $google2fa->generateSecretKey();
+        $google2fa_url = $google2fa->getQRCodeGoogleUrl(
+            'nfls.io',
+            self::GetUsernameById($id),
+            $google2fa->generateSecretKey();
+        );
+        return $google2fa_url;
     }
 
     function getDevice(){
