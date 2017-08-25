@@ -362,7 +362,7 @@ class CertificationController extends Controller
                     $return_array['info'] = json_decode($info, true);
                 return Response::json($return_array);
             case self::CHECK_INFO:
-                $return_array['info']['confirm_info'] = $this->authStep5($return_array['id']);
+                $return_array['info'] = $this->authStep5($return_array['id']);
                 if(count($return_array['info'])==0)
                     array_push($return_array['info'],"如果确认输入无误的话，请点击下一步进行提交。");
                 else
