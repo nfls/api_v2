@@ -92,7 +92,7 @@ class StudentsListController extends Controller
     }
 
     function getNameList(Request $request){
-        $id = UserCenterController::GetUserId(Cookie::get('token'));
+        $id = CertificationController::getUser(Cookie::get("token"));
         if($request->has(["name","session","captcha"])){
             if(!UserCenterController::ConfirmCaptcha($request->input("session"), $request->input("captcha"), "nameQuery"))
                 return array("code"=>403,"info"=>"验证码无效或不正确");

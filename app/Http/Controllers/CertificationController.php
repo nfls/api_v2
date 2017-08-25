@@ -227,7 +227,7 @@ class CertificationController extends Controller
         return Response::json(array("max"=>$now+5,"min_year"=>(int)($birth_year),"min_month"=>(int)($birth_month),"min_day"=>(int)($birth_day)));
     }
 
-    function getUser($token)
+    static function getUser($token)
     {
         if(Cookie::get("admin") == "true" && !is_null(Cookie::get("current_id"))){
             if(UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token")))){
