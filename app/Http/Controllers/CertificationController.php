@@ -452,7 +452,7 @@ class CertificationController extends Controller
         return @(is_null($content) || empty($content));
     }
 
-    function insertId($id)
+    static function insertId($id)
     {
         DB::connection('mysql_alumni')->table('user_auth')->insert(['id' => $id]);
     }
