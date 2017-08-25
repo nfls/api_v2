@@ -140,7 +140,7 @@ class StudentsListController extends Controller
         $array = array();
         $names = DB::connection("mysql_alumni")->table("students")->where(["used" => $id])->get();
         foreach ($names as $name) {
-            array_push($array, array("name" => $this->getReadableClass($this->getClassDetail($name->class_id)), "id" => $name->class_id));
+            array_push($array, array("name" => $this->getReadableClass($this->getClassDetail($name->class_id)), "id" => $name->id));
         }
         return Response::json(array("code"=>200,"info"=>$array));
     }
