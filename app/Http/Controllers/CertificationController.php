@@ -667,7 +667,7 @@ class CertificationController extends Controller
                     @$passed = $passed && $this->emptyCheck(self::GRADUATED_YEAR, $info->junior_school_graduated_year, '初中', $message);
                     @$passed = $passed && $this->emptyCheck(self::CLASS_NO, $info->junior_class, '初中', $message);
                     if ($passed) {
-                        @$this->schoolYearCheck($info->junior_school_enter_year, $info->junior_school_graduated_year, self::SCHOOL_START_YEAR, date('Y') - 6, 3, $info->junior_remark, '初中', $message);
+                        @$this->schoolYearCheck($info->junior_school_enter_year, $info->junior_school_graduated_year, 1973, date('Y') - 6, 3, $info->junior_remark, '初中', $message);
                         @$this->classNoCheck($info->junior_class, 1, 12, '初中', $message);
                     }
                     $this->structureCheck($info, 5, $message);
@@ -729,7 +729,7 @@ class CertificationController extends Controller
                     @$passed = $passed && $this->emptyCheck(self::CLASS_NO, $info->senior_class_31, '高三上', $message);
                     @$passed = $passed && $this->emptyCheck(self::CLASS_NO, $info->senior_class_32, '高三下', $message);
                     if ($passed) {
-                        @$this->schoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::SCHOOL_START_YEAR, date('Y') - 3, 3, $info->senior_remark, '高中', $message);//
+                        @$this->schoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, 1970, date('Y') - 3, 3, $info->senior_remark, '高中', $message);//
                         //self::
                         $this->classNoCheck($info->senior_class_11, 1, 8, '高一上', $message);
                         $this->classNoCheck($info->senior_class_12, 0, 8, '高一下', $message);
