@@ -110,4 +110,38 @@ class StudentsListController extends Controller
             abort(404);
         }
     }
+
+    function useName(Request $request){
+        $id = CertificationController::getUser(Cookie::get("token"));
+        $names = DB::connection("mysql_alumni")->table("students")->where(["used" => $id])->get();
+        if(count($names)==3){
+            abort(403);
+        }
+        if($request->has(["id","name"])) {
+            DB::connection("mysql_alumni")->table("students")->where(["id" => $request->input("id"), "used" => 0, "name"=>$request->input("name")])->update(["used"=>$id]);
+            return Response::json(array("code" => 200));
+        } else {
+            abort(404);
+        }
+    }
+
+    function unuseName(Request $request){
+        $id = CertificationController::getUser(Cookie::get("token"));
+        if($request->has(["id","name"])) {
+            DB::connection("mysql_alumni")->table("students")->where(["id" => $request->input("id"), "used" => $id, "name"=>$request->input("name")])->update(["used"=>0]);
+            return Response::json(array("code" => 200));
+        } else {
+            abort(404);
+        }
+    }
+
+    function getUsedName(Request $request){
+        $id = CertificationController::getUser(Cookie::get("token"));
+        $array = array();
+        $names = DB::connection("mysql_alumni")->table("students")->where(["name" => $request->input("name"), "used" => $id])->get();
+        foreach ($names as $name) {
+            array_push($array, array("name" => $this->getReadableClass($this->getClassDetail($name->class_id)), "id" => $name->class_id));
+        }
+        return Response::json(array("code"=>200,"info"=>$array));
+    }
 }
