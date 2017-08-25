@@ -184,7 +184,7 @@ class UserCenterController extends Controller
             $clientInfo = $dd->getClient(); // holds information about browser, feed reader, media player, ...
             if($clientInfo["type"]!="browser"){
                 $allow = false;
-                $message = "由于iOS的WebKit与本站存在兼容性问题，导致无法正常登陆，请使用我们的<a href='https://app.nfls.io'>客户端</a>进行访问。";
+                $message = "请使用浏览器访问本页（微信可右上角然后使用浏览器打开）。";
             } else {
                 $osInfo = $dd->getOs();
                 $device = $dd->getDevice();
@@ -193,9 +193,16 @@ class UserCenterController extends Controller
                 if($osInfo['name'] == "iOS"){
                     $allow = false;
                     $message = "由于iOS的WebKit与本站存在兼容性问题，导致无法正常登陆，请使用我们的<a href='https://app.nfls.io'>客户端</a>进行访问。";
+                } else if($clientInfo["name"] == "Safari") {
+                    $allow = false;
+                    $message = "由于OS X上的Webview与本站存在兼容性问题，导致无法登陆，请使用Google Chrome进行访问";
                 } else {
                     if($clientInfo['name']!="Chrome" && $clientInfo['name']!="Chrome Mobile"){
                         $message = "本站建议使用Chrome进行访问，不保证对于其他浏览器完全兼容。";
+                    } else {
+                        if(version_compare($clientInfo['version'],"54.0","<")){
+                            $message = "Chrome版本过老！请考虑升级。";
+                        }
                     }
                 }
 
