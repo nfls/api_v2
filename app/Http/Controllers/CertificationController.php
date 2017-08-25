@@ -76,6 +76,7 @@ class CertificationController extends Controller
         '对于您提供的信息，您可在认证结束后自行修改相关隐私设置（默认设置为：同一届同学可见）',
         '所有入学/毕业日期只记录年份',
         '所有学校名称请使用完整的官方名称，不要使用任何简写、简拼等',
+        '本表格所有课程均指的是南外的课程，（基础教育课程仅适用于73年之前的校友）'
     ];
 
     const STEP1 = [
@@ -104,7 +105,7 @@ class CertificationController extends Controller
         '请在本页填写您的高中信息',
         '普高请填写6个学期的班级号，一位阿拉伯数字。如果存在不适用的情况（如提前高考或者是提前出国），请在对应班级号处填写0，请不要填写英语小班分班号',
         '病假／休学等特殊情况导致在校时间超过3年或者存在多个班级号的情况，请在备注中详细注明相关情况（请假开始的学期等等）',
-        'IB/ALEVEL请填写一位阿拉伯数字班级号，中加请填将字母转换成对应的数字1-6',
+        'IB/ALEVEL请填写一位阿拉伯数字班级号，中加请填将字母转换成对应的数字1-7，ESL为6班',
     ];
 
     const STEP5 = [
@@ -788,7 +789,7 @@ class CertificationController extends Controller
                     @$passed = $passed && $this->emptyCheck(self::GRADUATED_YEAR, $info->senior_school_graduated_year, '高中', $message);
                     if ($passed) {
                         @$this->schoolYearCheck($info->senior_school_enter_year, $info->senior_school_graduated_year, self::BCA_START_YEAR, date('Y') - 3, 3, $info->remark, '高中', $message);
-                        @$this->classNoCheck($info->senior_class, 1, 6, '高中', $message);
+                        @$this->classNoCheck($info->senior_class, 1, 7, '高中', $message);
                     }
                     $this->structureCheck($info, 5, $message);
                     break;
