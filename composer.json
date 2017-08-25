@@ -13,6 +13,7 @@
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
         "piwik/device-detector": "^3.8",
+        "pragmarx/google2fa": "^2.0",
         "qiniu/php-sdk": "^7.1",
         "zendframework/zend-validator": "^2.9"
     },

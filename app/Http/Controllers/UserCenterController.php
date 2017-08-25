@@ -11,6 +11,7 @@ use Gregwar\Captcha\CaptchaBuilder;
 use Gregwar\Captcha\PhraseBuilder;
 use DeviceDetector\DeviceDetector;
 use DeviceDetector\Parser\Device\DeviceParserAbstract;
+use PragmaRX\Google2FA\Google2FA;
 
 
 class UserCenterController extends Controller
@@ -135,6 +136,10 @@ class UserCenterController extends Controller
                 if($request->isMethod("get"))
                     $info = $this->getNotice();
                 break;
+            case "get2faKey":
+                if($request->isMethod("get"))
+                    $info = $this->get2fakey();
+                break;
             default:
                 break;
         }
@@ -153,6 +158,11 @@ class UserCenterController extends Controller
 
     function renameAccount(){
 
+    }
+
+    function get2fakey(){
+        $google2fa = new Google2FA();
+        return $google2fa->generateSecretKey();
     }
 
     function getDevice(){
