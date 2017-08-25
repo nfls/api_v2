@@ -138,7 +138,7 @@ class StudentsListController extends Controller
     function getUsedName(Request $request){
         $id = CertificationController::getUser(Cookie::get("token"));
         $array = array();
-        $names = DB::connection("mysql_alumni")->table("students")->where(["name" => $request->input("name"), "used" => $id])->get();
+        $names = DB::connection("mysql_alumni")->table("students")->where(["used" => $id])->get();
         foreach ($names as $name) {
             array_push($array, array("name" => $this->getReadableClass($this->getClassDetail($name->class_id)), "id" => $name->class_id));
         }
