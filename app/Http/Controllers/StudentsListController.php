@@ -127,8 +127,8 @@ class StudentsListController extends Controller
 
     function unuseName(Request $request){
         $id = CertificationController::getUser(Cookie::get("token"));
-        if($request->has(["id","name"])) {
-            DB::connection("mysql_alumni")->table("students")->where(["id" => $request->input("id"), "used" => $id, "name"=>$request->input("name")])->update(["used"=>0]);
+        if($request->has(["id"])) {
+            DB::connection("mysql_alumni")->table("students")->where(["id" => $request->input("id"), "used" => $id])->update(["used"=>0]);
             return Response::json(array("code" => 200));
         } else {
             abort(404);
