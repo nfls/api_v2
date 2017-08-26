@@ -230,7 +230,7 @@ class StudentsListController extends Controller
                 case 3:
                     if(count($senior)>0)
                         abort(403);
-                    $primary = array("senior_school_no"=>$type_id,"senior_school_graduated_year"=>$detail["year"],"senior_class"=>$detail->["class"],"senior_remark"=>$this->getReadableClass($detail));
+                    $primary = array("senior_school_no"=>$type_id,"senior_school_graduated_year"=>$detail["year"],"senior_class"=>$detail["class"],"senior_remark"=>$this->getReadableClass($detail));
                     break;
                 default:
                     break;
