@@ -64,27 +64,9 @@ class UserCenterController extends Controller
                 if ($request->isMethod("get"))
                     $info = $this->GetUsernameById(self::GetUserId(Cookie::get('token')));
                 break;
-            case "forumLogin":
-                if ($request->only(['username', 'password', 'token']) && $request->isMethod("post"))
-                    $info = $this->ForumLogin($request->input("username"), $request->input("password"), $request->input("token"));
-                break;
-            case "wikiLogin":
-                if ($request->isMethod("get"))
-                    $info = $this->LoginWikiAccountById(self::GetUserId(Cookie::get('token')));
-                break;
-            case "shareLogin":
-                if ($request->isMethod("get"))
-                    $info = $this->LoginShareAccountById(self::GetUserId(Cookie::get('token')));
-                break;
             case "wikiRegister":
                 if ($request->isMethod("get")) {
                     $this->CreateWikiAccountById(self::GetUserId(Cookie::get('token')));
-                    $info['status'] = "succeed";
-                }
-                break;
-            case "shareRegister":
-                if ($request->isMethod("get")) {
-                    $this->CreateShareAccountById(self::GetUserId(Cookie::get('token')));
                     $info['status'] = "succeed";
                 }
                 break;
@@ -103,10 +85,6 @@ class UserCenterController extends Controller
             case "wikiInfo":
                 if ($request->isMethod("get"))
                     $info = $this->GetUserWikiInfoByWikiId($this->GetUserAssociatedIdById(self::GetUserId(Cookie::get('token')), "wiki"));
-                break;
-            case "shareInfo":
-                if ($request->isMethod("get"))
-                    $info = $this->GetUserShareInfoByShareId($this->GetUserAssociatedIdById(self::GetUserId(Cookie::get('token')), "share"));
                 break;
             case "systemMessage":
                 if ($request->isMethod("get"))
@@ -165,6 +143,10 @@ class UserCenterController extends Controller
 
     function renameAccount(){
 
+    }
+
+    function regenerateToken($id){
+        $this->GenerateToken($id);
     }
 
     function get2fakey(){
@@ -639,91 +621,6 @@ class UserCenterController extends Controller
         return array("status"=>"success");
     }
 
-    function LoginWikiAccountById($id)//登录wiki账户
-    {
-        $wiki_id=$this->GetUserAssociatedIdById($id,"wiki");
-        if($wiki_id==-1){
-            return [];
-        }
-        $username=urlencode(self::GetUsernameById($id));
-        $password = $this->GetAssociatePassword($id);
-
-        $cookie = tempnam('./','cookie');
-        $cookie2 = tempnam('./','cookie2');
-        $headers = array('Content-Type: application/x-www-form-urlencoded','Cache-Control: no-cache','Api-User-Agent: Example/1.0',);
-        $ch = curl_init();
-        curl_setopt ($ch, CURLOPT_URL, "https://wiki.nfls.io/api.php?action=query&type=login&meta=tokens&format=json");
-        curl_setopt ($ch, CURLOPT_POST, 1);
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 120);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch,CURLOPT_COOKIEJAR,$cookie);
-        $file_contents = curl_exec($ch);
-        curl_close($ch);
-        $detail=(array)json_decode($file_contents,true);
-        $wiki_token=urlencode($detail['query']['tokens']['logintoken']);
-        unset($ch);
-
-        $ch = curl_init();
-        curl_setopt ($ch, CURLOPT_URL, "https://wiki.nfls.io/api.php?action=clientlogin");
-        curl_setopt ($ch, CURLOPT_POST, 1);
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 120);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch,CURLOPT_COOKIEFILE,$cookie);
-        curl_setopt($ch,CURLOPT_COOKIEJAR,$cookie2);
-        $url=urlencode("https://login.nfls.io");
-        $post_data = "username=$username&password=$password&logintoken=$wiki_token&format=json&loginreturnurl=$url&rememberMe=true";
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
-        $file_contents = curl_exec($ch);
-        //echo $file_contents ;
-        preg_match_all("/Set\-cookie:([^\r\n]*)/i",$file_contents,$str);
-        $opt_cookie=array();
-        for($i=0;$i<4;$i++)
-        {
-            $opt_cookie[$i]=urldecode(substr($str[1][$i],1));
-        }
-        //echo json_encode($opt_cookie);
-        curl_close($ch);
-        unset($ch);
-        return $opt_cookie;
-    }
-
-    function LoginShareAccountById($id)//登录Share账户
-    {
-        $id=$this->GetUserAssociatedIdById($id,"share");
-        if($id==-1){
-            return [];
-        }
-        $user = DB::connection("mysql_share")->table("users")->where(["id"=>$id])->first();
-        $info=array();
-        $info['c_secure_uid']=urlencode(base64_encode($user->id));
-        $info['c_secure_pass']=urlencode(md5($user->passhash));
-        $info['c_secure_ssl']=urlencode(base64_encode("yeah"));
-        $info['c_secure_tracker_ssl']=urlencode(base64_encode("yeah"));
-        $info['c_secure_login']=urlencode(base64_encode("nope"));
-        return $info;
-    }
-
-    function CreateShareAccountById($id)//注册share账户
-    {
-        if($this->GetUserAssociatedIdById($id,"share")!=-1)
-            abort(403);
-        $secret=$this->mksecret();
-        $password=$this->GetAssociatePassword($id);
-        $info=$this->GetPersonalGeneralInfoById($id);
-        $email=$info['email'];
-        $username=$info['username'];
-        $wantpasshash = md5($secret . $password . $secret);
-        $time=date('Y-m-d h:i:s',time());
-        DB::connection("mysql_share")->select("SET sql_mode = 'ALLOW_INVALID_DATES'");
-        DB::connection("mysql_share")->table("users")->insert(["username"=>$username,"passhash"=>$wantpasshash,"secret"=>$secret,"email"=>$email,"added"=>$time,"last_login"=>$time,"status"=>"confirmed"]);
-        $user = DB::connection("mysql_share")->table("users")->where(["username"=>$username])->first();
-        DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["share_account"=>$user->id]);
-        return array("status"=>"success");
-    }
 
     function GetNoticeType($type)//获取通知类型
     {
