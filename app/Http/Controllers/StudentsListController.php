@@ -169,6 +169,7 @@ class StudentsListController extends Controller
         }
         if($request->has(["id","name"])) {
             DB::connection("mysql_alumni")->table("students")->where(["id" => $request->input("id"), "used" => 0, "name"=>$request->input("name")])->update(["used"=>$id]);
+            $this->generateIndex($id);
             return Response::json(array("code" => 200));
         } else {
             abort(404);
@@ -195,11 +196,10 @@ class StudentsListController extends Controller
         return Response::json(array("code"=>200,"info"=>$array));
     }
 
-    function generateIndex(Request $request){
-        $id = CertificationController::getUser(Cookie::get("token"));
+    function generateIndex($id){
         $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
         if($user->current_step>5)
-            abort(404);
+            return false;
         $names = DB::connection("mysql_alumni")->table("students")->where(["used" => $id])->get();
         $primary = array();
         $junior = array();
@@ -230,6 +230,7 @@ class StudentsListController extends Controller
             }
         }
         DB::connection("mysql_alumni")->table("user_auth")->where(["id"=>$id])->update(["primary_school"=>json_encode($primary),"junior_school"=>json_encode($junior),"senior_school"=>json_encode($senior)]);
+        return true;
     }
 
 }
