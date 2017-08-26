@@ -185,7 +185,7 @@ class UserCenterController extends Controller
 
     function enable2fa($id,$code,$key){
         $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
-        if(@is_null($user["2fa"]) || $user["2fa"] != ""){
+        if(@is_null($user->{'2fa'}) || $user->{'2fa'} != ""){
             return null;
         }
         $google2fa = new Google2FA();
