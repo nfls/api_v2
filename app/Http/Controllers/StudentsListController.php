@@ -148,6 +148,9 @@ class StudentsListController extends Controller
 
     function getNameList(Request $request){
         $id = CertificationController::getUser(Cookie::get("token"));
+        $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
+        if($user->current_step>5)
+            abort(403);
         if($request->has(["name","session","captcha"])){
             if(!UserCenterController::ConfirmCaptcha($request->input("session"), $request->input("captcha"), "nameQuery"))
                 return array("code"=>403,"info"=>"验证码无效或不正确");
@@ -159,7 +162,7 @@ class StudentsListController extends Controller
                 }
                 return Response::json(array("code"=>200,"info"=>$array));
             } else {
-                return Response::json(array("code"=>403,"info"=>"您已超出24小时内查询限制，请稍候再试"));
+                return Response::json(array("code"=>403,"info"=>"您已超出24小时内查询限制，请稍候再试"),403);
             }
         } else {
             abort(404);
