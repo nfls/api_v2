@@ -11,9 +11,14 @@ use Illuminate\Support\Facades\DB;
 
 class StudentsListController extends Controller
 {
-    const INFO = "您可以在此处根据您的姓名查询对应班级信息，快速填写认证表格。数据库截止到2016届。";
+    const INFO = "您可以在此处根据您的姓名查询对应班级信息，快速填写认证表格，您每次修改都会同步更新您填写的实名认证表格。数据库截止到2016届。<br/>";
     function getInfo(){
-        return Response::json(array("code"=>200,"info"=>self::INFO."您在24小时内最多可查询 ".$this->getUserLimit(UserCenterController::GetUserId(Cookie::get("token")))."次。（注：请不要多次点击查询按钮）"));
+        $id = UserCenterController::GetUserId(Cookie::get("token"));
+        $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
+        if($user->current_step>5)
+            return Response::json(array("code"=>403,"info"=>"您已经提交了实名认证申请，无法进行修改或查询了。"));
+        else
+            return Response::json(array("code"=>200,"info"=>self::INFO."您目前的用户组在24小时内最多可查询 ".$this->getUserLimit(UserCenterController::GetUserId(Cookie::get("token")))."次。（注：请不要多次点击查询按钮）<br/>"));
     }
     function getClassDetail($id){
         $class = DB::connection("mysql_alumni")->table("classes")->where(["id"=>$id])->first();
