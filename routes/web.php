@@ -35,6 +35,7 @@ Route::get("student/info","StudentsListController@getInfo");
 Route::post("student/use","StudentsListController@useName");
 Route::post("student/unuse","StudentsListController@unuseName");
 Route::get("student/list","StudentsListController@getUsedName");
+Route::get("student/update","StudentsListController@generateIndex");
 
 Route::get("admin/auth/list","CertificationManagementController@getSubmittedUserList");
 Route::post("admin/auth/detail","CertificationManagementController@getUserDetail");

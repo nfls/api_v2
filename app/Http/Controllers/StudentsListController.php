@@ -65,6 +65,56 @@ class StudentsListController extends Controller
                 return "未知，请联系管理员";
         }
     }
+    function getClassType($str,&$type,&$id){
+        switch($str){
+            case "GeneralJunior":
+                $type = 2;
+                $id = 1;
+                break;
+            case "GeneralSenior":
+                $type = 3;
+                $id = 1;
+                break;
+            case "ALevelSenior":
+                $type = 3;
+                $id = 3;
+                break;
+            case "IBSenior":
+                $type = 3;
+                $id = 2;
+                break;
+            case "UNSW":
+                $type = 3;
+                $id = 5;
+                break;
+            case "TeacherSenior":
+                $type = 3;
+                $id = 7;
+                break;
+            case "Japanese":
+                $type = 3;
+                $id = 6;
+                break;
+            case "StandardEducationSenior":
+                $type = 3;
+                $id = 8;
+                break;
+            case "StandardEducationJunior":
+                $type = 2;
+                $id = 2;
+                break;
+            case "StandardEducationPrimary":
+                $type = 1;
+                $id = 1;
+                break;
+            case "BCASenior":
+                $type = 3;
+                $id = 4;
+                break;
+            default:
+                break;
+        }
+    }
 
     function getUserLimit($id){
         return 9999999;
@@ -144,4 +194,42 @@ class StudentsListController extends Controller
         }
         return Response::json(array("code"=>200,"info"=>$array));
     }
+
+    function generateIndex(Request $request){
+        $id = CertificationController::getUser(Cookie::get("token"));
+        $user = DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->first();
+        if($user->current_step>5)
+            abort(404);
+        $names = DB::connection("mysql_alumni")->table("students")->where(["used" => $id])->get();
+        $primary = array();
+        $junior = array();
+        $senior = array();
+        foreach($names as $name){
+            $type = 0;
+            $type_id = 0;
+            $detail = $this->getClassDetail($name->class_id);
+            $this->getClassType($detail->type,$type,$type_id);
+            switch($type){
+                case 1:
+                    if(count($primary)>0)
+                        abort(403);
+                    $primary = array("primary_school_no"=>$type_id,"primary_school_graduated_year"=>$detail->year,"primary_class"=>$detail->class,"primary_remark"=>$this->getReadableClass($detail));
+                    break;
+                case 2:
+                    if(count($junior)>0)
+                        abort(403);
+                    $primary = array("junior_school_no"=>$type_id,"junior_school_graduated_year"=>$detail->year,"junior_class"=>$detail->class,"junior_remark"=>$this->getReadableClass($detail));
+                    break;
+                case 3:
+                    if(count($senior)>0)
+                        abort(403);
+                    $primary = array("senior_school_no"=>$type_id,"senior_school_graduated_year"=>$detail->year,"senior_class"=>$detail->class,"senior_remark"=>$this->getReadableClass($detail));
+                    break;
+                default:
+                    break;
+            }
+        }
+        DB::connection("mysql_alumni")->table("user_auth")->where(["id"=>$id])->update(["primary_school"=>json_encode($primary),"junior_school"=>json_encode($junior),"senior_school"=>json_encode($senior)]);
+    }
+
 }
