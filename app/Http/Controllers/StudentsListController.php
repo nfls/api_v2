@@ -212,11 +212,13 @@ class StudentsListController extends Controller
         $junior = array();
         $senior = array();
         foreach($names as $name){
-            dump($name);
             $type = 0;
             $type_id = 0;
             $detail = $this->getClassDetail($name->class_id);
             $this->getClassType($detail["type"],$type,$type_id);
+            dump($detail);
+            dump($type);
+            dump($type_id);
             switch($type){
 
                 case 1:
@@ -235,7 +237,7 @@ class StudentsListController extends Controller
                     $primary = array("senior_school_no"=>$type_id,"senior_school_graduated_year"=>$detail["year"],"senior_class"=>$detail["class"],"senior_remark"=>$this->getReadableClass($detail));
                     break;
                 default:
-                    dump($type);
+
                     break;
             }
         }
