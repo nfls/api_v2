@@ -169,8 +169,12 @@ class StudentsListController extends Controller
         }
         if($request->has(["id","name"])) {
             DB::connection("mysql_alumni")->table("students")->where(["id" => $request->input("id"), "used" => 0, "name"=>$request->input("name")])->update(["used"=>$id]);
-            $this->generateIndex($id);
-            return Response::json(array("code" => 200));
+            if($this->generateIndex($id)){
+                return Response::json(array("code" => 200));
+            } else {
+                DB::connection("mysql_alumni")->table("students")->where(["id" => $request->input("id"), "used" => $id])->update(["used"=>0]);
+                abort(403);
+            }
         } else {
             abort(404);
         }
@@ -180,7 +184,10 @@ class StudentsListController extends Controller
         $id = CertificationController::getUser(Cookie::get("token"));
         if($request->has(["id"])) {
             DB::connection("mysql_alumni")->table("students")->where(["id" => $request->input("id"), "used" => $id])->update(["used"=>0]);
-            return Response::json(array("code" => 200));
+            if($this->generateIndex($id))
+                return Response::json(array("code" => 200));
+            else
+                abort(403);
         } else {
             abort(404);
         }
@@ -208,7 +215,7 @@ class StudentsListController extends Controller
             $type = 0;
             $type_id = 0;
             $detail = $this->getClassDetail($name->class_id);
-            $this->getClassType($detail->type,$type,$type_id);
+            $this->getClassType($detail["type"],$type,$type_id);
             switch($type){
                 case 1:
                     if(count($primary)>0)
