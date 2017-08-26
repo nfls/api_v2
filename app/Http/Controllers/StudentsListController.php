@@ -220,17 +220,17 @@ class StudentsListController extends Controller
                 case 1:
                     if(count($primary)>0)
                         abort(403);
-                    $primary = array("primary_school_no"=>$type_id,"primary_school_graduated_year"=>$detail->year,"primary_class"=>$detail->class,"primary_remark"=>$this->getReadableClass($detail));
+                    $primary = array("primary_school_no"=>$type_id,"primary_school_graduated_year"=>$detail["year"],"primary_class"=>$detail["class"],"primary_remark"=>$this->getReadableClass($detail));
                     break;
                 case 2:
                     if(count($junior)>0)
                         abort(403);
-                    $primary = array("junior_school_no"=>$type_id,"junior_school_graduated_year"=>$detail->year,"junior_class"=>$detail->class,"junior_remark"=>$this->getReadableClass($detail));
+                    $primary = array("junior_school_no"=>$type_id,"junior_school_graduated_year"=>$detail["year"],"junior_class"=>$detail["class"],"junior_remark"=>$this->getReadableClass($detail));
                     break;
                 case 3:
                     if(count($senior)>0)
                         abort(403);
-                    $primary = array("senior_school_no"=>$type_id,"senior_school_graduated_year"=>$detail->year,"senior_class"=>$detail->class,"senior_remark"=>$this->getReadableClass($detail));
+                    $primary = array("senior_school_no"=>$type_id,"senior_school_graduated_year"=>$detail["year"],"senior_class"=>$detail->["class"],"senior_remark"=>$this->getReadableClass($detail));
                     break;
                 default:
                     break;
