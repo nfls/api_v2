@@ -236,7 +236,7 @@ class StudentsListController extends Controller
                     break;
             }
         }
-        DB::connection("mysql_alumni")->table("user_auth")->where(["id"=>$id])->update(["primary_school"=>json_encode($primary),"junior_school"=>json_encode($junior),"senior_school"=>json_encode($senior)]);
+        DB::connection("mysql_alumni")->table("user_auth")->where(["id"=>$id])->update(["primary_school"=>json_encode($primary),"junior_school"=>json_encode($junior),"senior_school"=>json_encode($senior),"current_step"=>1]);
         return true;
     }
 
