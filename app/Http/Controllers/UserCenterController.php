@@ -188,6 +188,9 @@ class UserCenterController extends Controller
         if(@is_null($user->{'2fa'}) || $user->{'2fa'} != ""){
             return null;
         }
+        if(@is_null($code)){
+            return null;
+        }
         $google2fa = new Google2FA();
         $valid = $google2fa->verifyKey($key,$code);
         if($valid){
