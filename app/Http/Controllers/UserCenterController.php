@@ -47,98 +47,103 @@ class UserCenterController extends Controller
     }
 
     function requestHandler(Request $request, $type){
-        switch($type){
+        switch($type) {
             case "login":
-                if($request->only(['username','password','session','captcha'] && $request->isMethod("post")))
-                    $info = $this->UserLogin($request->input("username"), $request->input("password"),$request->input("session"),$request->input("captcha"));
+                if ($request->only(['username', 'password', 'session', 'captcha'] && $request->isMethod("post")))
+                    $info = $this->UserLogin($request->input("username"), $request->input("password"), $request->input("session"), $request->input("captcha"));
                 break;
             case "recover":
-                if($request->only(['email','session','captcha']) && $request->isMethod("post"))
-                    $info = $this->RecoverPassword($request->input("email"),$request->input("session"),$request->input("captcha"));
+                if ($request->only(['email', 'session', 'captcha']) && $request->isMethod("post"))
+                    $info = $this->RecoverPassword($request->input("email"), $request->input("session"), $request->input("captcha"));
                 break;
             case "register":
-                if($request->only(['username','password','email',"session","captcha"]) && $request->isMethod("post"))
-                    $info = $this->UserRegister($request->input("email"),$request->input("password"),$request->input("username"),$request->input("session"),$request->input("captcha"));
+                if ($request->only(['username', 'password', 'email', "session", "captcha"]) && $request->isMethod("post"))
+                    $info = $this->UserRegister($request->input("email"), $request->input("password"), $request->input("username"), $request->input("session"), $request->input("captcha"));
                 break;
             case "username":
-                if($request->isMethod("get"))
+                if ($request->isMethod("get"))
                     $info = $this->GetUsernameById(self::GetUserId(Cookie::get('token')));
                 break;
             case "forumLogin":
-                if($request->only(['username','password','token']) && $request->isMethod("post"))
+                if ($request->only(['username', 'password', 'token']) && $request->isMethod("post"))
                     $info = $this->ForumLogin($request->input("username"), $request->input("password"), $request->input("token"));
                 break;
             case "wikiLogin":
-                if($request->isMethod("get"))
+                if ($request->isMethod("get"))
                     $info = $this->LoginWikiAccountById(self::GetUserId(Cookie::get('token')));
                 break;
             case "shareLogin":
-                if($request->isMethod("get"))
+                if ($request->isMethod("get"))
                     $info = $this->LoginShareAccountById(self::GetUserId(Cookie::get('token')));
                 break;
             case "wikiRegister":
-                if($request->isMethod("get")) {
+                if ($request->isMethod("get")) {
                     $this->CreateWikiAccountById(self::GetUserId(Cookie::get('token')));
                     $info['status'] = "succeed";
                 }
                 break;
             case "shareRegister":
-                if($request->isMethod("get")) {
+                if ($request->isMethod("get")) {
                     $this->CreateShareAccountById(self::GetUserId(Cookie::get('token')));
                     $info['status'] = "succeed";
                 }
                 break;
             case "avatar":
-                if($request->isMethod("get"))
+                if ($request->isMethod("get"))
                     $info['url'] = $this->GetAvatarById($this->GetUserId(Cookie::get('token')));
                 break;
             case "generalInfo":
-                if($request->isMethod("get"))
+                if ($request->isMethod("get"))
                     $info = $this->GetPersonalGeneralInfoById(self::GetUserId(Cookie::get('token')));
                 break;
             case "forumInfo":
-                if($request->isMethod("get"))
+                if ($request->isMethod("get"))
                     $info = $this->GetPersonalForumInfoById(self::GetUserId(Cookie::get('token')));
                 break;
             case "wikiInfo":
-                if($request->isMethod("get"))
-                    $info = $this->GetUserWikiInfoByWikiId($this->GetUserAssociatedIdById(self::GetUserId(Cookie::get('token')),"wiki"));
+                if ($request->isMethod("get"))
+                    $info = $this->GetUserWikiInfoByWikiId($this->GetUserAssociatedIdById(self::GetUserId(Cookie::get('token')), "wiki"));
                 break;
             case "shareInfo":
-                if($request->isMethod("get"))
-                    $info = $this->GetUserShareInfoByShareId($this->GetUserAssociatedIdById(self::GetUserId(Cookie::get('token')),"share"));
+                if ($request->isMethod("get"))
+                    $info = $this->GetUserShareInfoByShareId($this->GetUserAssociatedIdById(self::GetUserId(Cookie::get('token')), "share"));
                 break;
             case "systemMessage":
-                if($request->isMethod("get"))
+                if ($request->isMethod("get"))
                     $info = $this->GetSystemNoticeById(self::GetUserId(Cookie::get('token')));
                 break;
             case "registerCaptcha":
-                if($request->isMethod("get"))
-                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'],"register");
+                if ($request->isMethod("get"))
+                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'], "register");
                 break;
             case "loginCaptcha":
-                if($request->isMethod("get"))
-                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'],"login");
+                if ($request->isMethod("get"))
+                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'], "login");
                 break;
             case "recoverCaptcha":
-                if($request->isMethod("get"))
-                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'],"recover");
+                if ($request->isMethod("get"))
+                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'], "recover");
                 break;
             case "nameQueryCaptcha":
-                if($request->isMethod("get"))
-                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'],"nameQuery");
+                if ($request->isMethod("get"))
+                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'], "nameQuery");
                 break;
             case "device":
-                if($request->isMethod("get"))
+                if ($request->isMethod("get"))
                     $info = $this->getDevice();
                 break;
             case "notice":
-                if($request->isMethod("get"))
+                if ($request->isMethod("get"))
                     $info = $this->getNotice();
                 break;
             case "get2faKey":
-                if($request->isMethod("get"))
+                if ($request->isMethod("get"))
                     $info = $this->get2fakey();
+                break;
+            case "enable2fa":
+                if ($request->isMethod("post") && $request->only(['code', 'key'])) {
+                    $info = $this->enable2fa(self::GetUserId(Cookie::get("token")),$request->input("code"),$request->input("key"));
+                }
                 break;
             default:
                 break;
@@ -147,13 +152,15 @@ class UserCenterController extends Controller
         if(@is_null($info)||empty($info)){
             $json_mes['code'] = 403;
             $json_mes['status'] = "error";
+            return Response::json($json_mes,403);
         }
         else{
             $json_mes['code'] = 200;
             $json_mes['status'] = "succeed";
             $json_mes['info'] = $info;
+            return Response::json($json_mes,200);
         }
-        return Response::json($json_mes);
+
     }
 
     function renameAccount(){
@@ -162,6 +169,10 @@ class UserCenterController extends Controller
 
     function get2fakey(){
         $id = self::GetUserId(Cookie::get("token"));
+        $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
+        if(@is_null($user["2fa"]) || $user["2fa"] != ""){
+            return null;
+        }
         $google2fa = new Google2FA();
         $key = $google2fa->generateSecretKey();
         $google2fa_url = $google2fa->getQRCodeGoogleUrl(
@@ -170,6 +181,21 @@ class UserCenterController extends Controller
             $key
         );
         return array("img"=>$google2fa_url,"code"=>$key);
+    }
+
+    function enable2fa($id,$code,$key){
+        $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
+        if(@is_null($user["2fa"]) || $user["2fa"] != ""){
+            return null;
+        }
+        $google2fa = new Google2FA();
+        $valid = $google2fa->verifyKey($key,$code);
+        if($valid){
+            DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["2fa"=>$key]);
+            return "ok";
+        } else {
+            return null;
+        }
     }
 
     function getDevice(){
