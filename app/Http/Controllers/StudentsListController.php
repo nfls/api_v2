@@ -216,11 +216,7 @@ class StudentsListController extends Controller
             $type_id = 0;
             $detail = $this->getClassDetail($name->class_id);
             $this->getClassType($detail["type"],$type,$type_id);
-            dump($detail);
-            dump($type);
-            dump($type_id);
             switch($type){
-
                 case 1:
                     if(count($primary)>0)
                         return false;
@@ -229,15 +225,14 @@ class StudentsListController extends Controller
                 case 2:
                     if(count($junior)>0)
                         return false;
-                    $primary = array("junior_school_no"=>$type_id,"junior_school_graduated_year"=>$detail["year"],"junior_class"=>$detail["class"],"junior_remark"=>$this->getReadableClass($detail));
+                    $junior = array("junior_school_no"=>$type_id,"junior_school_graduated_year"=>$detail["year"],"junior_class"=>$detail["class"],"junior_remark"=>$this->getReadableClass($detail));
                     break;
                 case 3:
                     if(count($senior)>0)
                         return false;
-                    $primary = array("senior_school_no"=>$type_id,"senior_school_graduated_year"=>$detail["year"],"senior_class"=>$detail["class"],"senior_remark"=>$this->getReadableClass($detail));
+                    $senior = array("senior_school_no"=>$type_id,"senior_school_graduated_year"=>$detail["year"],"senior_class"=>$detail["class"],"senior_remark"=>$this->getReadableClass($detail));
                     break;
                 default:
-
                     break;
             }
         }
