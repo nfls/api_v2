@@ -102,10 +102,6 @@ class UserCenterController extends Controller
                 if ($request->isMethod("get"))
                     $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'], "recover");
                 break;
-            case "nameQueryCaptcha":
-                if ($request->isMethod("get"))
-                    $info = $this->CreateCaptcha($_SERVER['REMOTE_ADDR'], "nameQuery");
-                break;
             case "device":
                 if ($request->isMethod("get"))
                     $info = $this->getDevice();
@@ -121,6 +117,12 @@ class UserCenterController extends Controller
             case "enable2fa":
                 if ($request->isMethod("post") && $request->only(['code', 'key'])) {
                     $info = $this->enable2fa(self::GetUserId(Cookie::get("token")),$request->input("code"),$request->input("key"));
+                }
+                break;
+            case "regenToken":
+                if ($request->isMethod("get")){
+                    $info = "ok";
+                    $this->regenerateToken(self::GetUserId(Cookie::get("token")));;
                 }
                 break;
             default:
