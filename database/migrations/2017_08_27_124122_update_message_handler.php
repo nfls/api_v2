@@ -50,6 +50,7 @@ class UpdateMessageHandler extends Migration
         Schema::connection('mysql_user')->table('user_list', function (Blueprint $table) {
             $table->dropColumn("ss_account");
             $table->dropColumn("share_account");
+            $table->smallInteger("rename_cards")->default(0);
         });
     }
 
@@ -73,6 +74,7 @@ class UpdateMessageHandler extends Migration
         Schema::connection('mysql_user')->table('user_list', function (Blueprint $table) {
             $table->integer("ss_account")->default(-1);
             $table->integer("share_account")->default(-1);
+            $table->dropColumn("rename_cards");
         });
     }
 }

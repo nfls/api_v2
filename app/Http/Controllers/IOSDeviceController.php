@@ -83,8 +83,7 @@ class IOSDeviceController extends Controller
     }
 
     function getNotice(){
-        $message = DB::connection("mysql_user")->table("app_startup_notice")->select("id","title","text")->orderBy("id","desc")->first();
-        return Response::json(array("code"=>200,"info"=>$message));
+        return Response::json(array("code"=>200,"info"=>array("id"=>100,"title"=>"维护通知","text"=>"客户端相关服务维护，可能会闪退")));
     }
 
     function compareAuthDatabase(Request $request){
