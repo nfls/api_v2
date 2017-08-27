@@ -120,10 +120,14 @@ class UserCenterController extends Controller
                 }
                 break;
             case "regenToken":
-                if ($request->isMethod("get")){
+                if ($request->isMethod("get")) {
                     $info = "ok";
                     $this->regenerateToken(self::GetUserId(Cookie::get("token")));;
                 }
+                break;
+            case "card":
+                if ($request->isMethod("get"))
+                    $info = $this->getRenameCardCount(Cookie::get("token"));
                 break;
             default:
                 break;
@@ -141,6 +145,10 @@ class UserCenterController extends Controller
             return Response::json($json_mes,200);
         }
 
+    }
+
+    function getRenameCardCount($id){
+        return DB::connection("mysql_user")->table("user_list")->select("rename_cards")->where(["id"=>$id]);
     }
 
     function renameAccount(){
@@ -515,27 +523,10 @@ class UserCenterController extends Controller
         return $info;
     }
 
-    function GetUserShareInfoByShareId($id)//根据shareid获取share信息
-    {
-        if($id==-1)
-            return [];
-        $user = DB::connection("mysql_share")->table("users")->where(["id"=>$id])->first();
-        $info=array();
-        $info['user_id']=$user->id;
-        $info['user_name']=$user->username;
-        $info['user_touched']=$user->last_login;
-        $info['user_registration']=$user->added;
-        $info['user_ip']=$user->ip;
-        $info['user_uploaded']=$user->uploaded;
-        $info['user_downloaded']=$user->downloaded;
-        return $info;
-    }
     function GetUserAssociatedIdById($id,$service)
     {
         $user = DB::connection("mysql_user")->table("user_list")->where("id", $id)->first();
         switch($service) {
-            case "share":
-                return $user->share_account;
             case "wiki":
                 return $user->wiki_account;
             default:
