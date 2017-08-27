@@ -148,7 +148,7 @@ class UserCenterController extends Controller
     }
 
     function getRenameCardCount($id){
-        return DB::connection("mysql_user")->table("user_list")->select("rename_cards")->where(["id"=>$id]);
+        return DB::connection("mysql_user")->table("user_list")->select("rename_cards")->where(["id"=>$id])->first();
     }
 
     function renameAccount(){
