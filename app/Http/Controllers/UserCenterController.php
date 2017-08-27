@@ -151,8 +151,8 @@ class UserCenterController extends Controller
         return DB::connection("mysql_user")->table("user_list")->select("rename_cards")->where(["id"=>$id])->first();
     }
 
-    function renameAccount(){
-
+    function renameAccount($id){
+        //DB::connection("mysql_forum")->
     }
 
     function regenerateToken($id){
