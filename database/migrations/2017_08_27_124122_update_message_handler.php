@@ -14,7 +14,7 @@ class UpdateMessageHandler extends Migration
     public function up()
     {
         //
-        Schema::connection('mysql_alumni')->table('clubs', function (Blueprint $table) {
+        Schema::connection('mysql_alumni')->create('clubs', function (Blueprint $table) {
             $table->increments("id")->comment("ID");
             $table->text("name")->comment("社团名");
             $table->integer("added_by")->comment("创建者");
@@ -22,7 +22,7 @@ class UpdateMessageHandler extends Migration
             $table->boolean("isEnabled")->comment("是否启用")->default(false);
             $table->json("members")->comment("成员")->nullable();
         });
-        Schema::connection('mysql_alumni')->table('universities', function (Blueprint $table) {
+        Schema::connection('mysql_alumni')->create('universities', function (Blueprint $table) {
             $table->increments("id")->comment("ID");
             $table->text("name")->comment("大学名称");
             $table->text("country")->comment("国家");
@@ -30,7 +30,7 @@ class UpdateMessageHandler extends Migration
             $table->text("comment")->comment("备注")->nullable();
             $table->boolean("isEnabled")->comment("是否启用")->default(false);
         });
-        Schema::connection('mysql_user')->table("user_logs", function(Blueprint $table){
+        Schema::connection('mysql_user')->create("user_logs", function(Blueprint $table){
             $table->bigIncrements("id")->comment("ID");
             $table->unsignedTinyInteger("level")->comment("等级");
             $table->timestamp("time")->comment("时间");
@@ -38,7 +38,7 @@ class UpdateMessageHandler extends Migration
             $table->integer("userid")->comment("触发用户");
             $table->text("info")->comment("信息");
         });
-        Schema::connection('mysql_user')->table("user_messages", function(Blueprint $table){
+        Schema::connection('mysql_user')->create("user_messages", function(Blueprint $table){
             $table->bigIncrements("id")->comment("ID");
             $table->integer("startuser")->comment("发起人");
             $table->integer("touser")->comment("接收人");
