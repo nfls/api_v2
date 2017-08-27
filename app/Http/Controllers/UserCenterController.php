@@ -127,7 +127,7 @@ class UserCenterController extends Controller
                 break;
             case "card":
                 if ($request->isMethod("get"))
-                    $info = $this->getRenameCardCount(Cookie::get("token"));
+                    $info = $this->getRenameCardCount(self::GetUserId(Cookie::get("token")));
                 break;
             default:
                 break;
@@ -148,7 +148,7 @@ class UserCenterController extends Controller
     }
 
     function getRenameCardCount($id){
-        return DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first()->rename_cards;
+        return DB::connection("mysql_user")->table("user_list")->select("rename_cards")->where(["id"=>$id])->first();
     }
 
     function renameAccount(){
