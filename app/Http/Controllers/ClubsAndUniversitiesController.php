@@ -78,7 +78,7 @@ class ClubsAndUniversitiesController extends Controller
         if(UserCenterController::checkAdmin($id) && $request->has("enabled")){
             $enabled = $request->input("enabled");
         } else {
-            $enabled = DB::connection("mysql_alumni")->table("universities")->where(["id"=>$request->input("id")])->get()->isEnabled;
+            $enabled = DB::connection("mysql_alumni")->table("universities")->where(["id"=>$request->input("id")])->first()->isEnabled;
         }
         if ($request->has(["id","country", "name"])) {
             DB::connection("mysql_alumni")->table("universities")->where(["id"=>$request->input("id")])->update([
@@ -100,7 +100,7 @@ class ClubsAndUniversitiesController extends Controller
         } else {
             $enabled = false;
         }
-        if ($request->has(["id","country", "name"])) {
+        if ($request->has(["country", "name"])) {
             DB::connection("mysql_alumni")->table("universities")->insert([
                 "name" => $request->input("name"),
                 "shortName" => $request->input("shortName"),
