@@ -31,7 +31,7 @@ class ClubsAndUniversitiesController extends Controller
                     $enabled = (bool)$request->has("enabled");
                 }
             }
-            if($request->has("name")){
+            if(!$request->has("name")){
                 $result = DB::connection("mysql_alumni")
                     ->table("universities")
                     ->where(["isEnabled"=>$enabled])
