@@ -81,8 +81,7 @@ class ClubsAndUniversitiesController extends Controller
             $enabled = DB::connection("mysql_alumni")->table("universities")->where(["id"=>$request->input("id")])->first()->isEnabled;
         }
         if ($request->has(["id","country", "name"])) {
-            DB::connection("mysql_alumni")->table("universities")->where(["id"=>$request->input("id")])->update([
-                "name" => $request->input("name"),
+            DB::connection("mysql_alumni")->table("universities")->where(["id"=>$request->input("id"),"name"=>$request->input("name")])->update([
                 "shortName" => $request->input("shortName"),
                 "chineseName" => $request->input("chineseName"),
                 "chineseShortName" => $request->input("chineseShortName"),
