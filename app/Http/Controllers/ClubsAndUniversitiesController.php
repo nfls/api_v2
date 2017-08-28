@@ -50,7 +50,7 @@ class ClubsAndUniversitiesController extends Controller
             ->offset($startWith)
             ->select("id", "name", "shortName", "chineseName", "chineseShortName", "country", "comment");
 
-        if (!$request->has("name"))
+        if ($request->has("name"))
             $result->where(function ($query) use ($request) {
                 $query->where("name", "like", "%" . $request->input("name") . "%")
                     ->orWhere("shortName", "like", "%" . $request->input("name") . "%")
