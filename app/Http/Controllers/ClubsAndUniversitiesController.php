@@ -55,7 +55,7 @@ class ClubsAndUniversitiesController extends Controller
                     ->select("id","name","shortName","chineseName","chineseShortName","country","comment")
                     ->get();
             }
-            dd(DB::getQueryLog());
+            dump(DB::getQueryLog());
             return Response::json(array("code"=>200,"info"=>$result));
         }
     }
