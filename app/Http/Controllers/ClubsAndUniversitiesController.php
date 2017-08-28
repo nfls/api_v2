@@ -31,6 +31,7 @@ class ClubsAndUniversitiesController extends Controller
                     $enabled = (bool)$request->has("enabled");
                 }
             }
+            DB::enableQueryLog();
             if(!$request->has("name")){
                 $result = DB::connection("mysql_alumni")
                     ->table("universities")
@@ -54,7 +55,7 @@ class ClubsAndUniversitiesController extends Controller
                     ->select("id","name","shortName","chineseName","chineseShortName","country","comment")
                     ->get();
             }
-            DB::enableQueryLog();
+
             return Response::json(array("code"=>200,"info"=>$result,"log"=>DB::getQueryLog()));
         }
     }
