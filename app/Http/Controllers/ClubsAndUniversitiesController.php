@@ -62,8 +62,12 @@ class ClubsAndUniversitiesController extends Controller
     }
 
     function getAUniversity(Request $request){
-        if($request->has("id"))
-            return Response::json(array("code" => 200, "info" => DB::connection("mysql_alumni")->table("universities")->where(["id"=>$request->input("id")])->get()));
+        if($request->has("id")){
+            $info = DB::connection("mysql_alumni")->table("universities")->where(["id"=>$request->input("id")])->first();
+            $info->added_by = UserCenterController::GetUserNickname($info->added_by);
+            return Response::json(array("code"=>200,"info" => $info));
+        }
+
     }
 
     function editUniversity(Request $request)
