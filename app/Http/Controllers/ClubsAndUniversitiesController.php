@@ -47,7 +47,6 @@ class ClubsAndUniversitiesController extends Controller
 
         $result = DB::connection("mysql_alumni")
             ->table("universities")
-            ->where(["isEnabled" => $enabled])
             ->limit($limit)
             ->offset($startWith)
             ->select("id", "name", "shortName", "chineseName", "chineseShortName", "country", "comment");
@@ -94,11 +93,6 @@ class ClubsAndUniversitiesController extends Controller
 
     function addUniversity(Request $request){
         $id = UserCenterController::GetUserId(Cookie::get("token"));
-        if(UserCenterController::checkAdmin($id) && $request->has("enabled")){
-            $enabled = $request->input("enabled");
-        } else {
-            $enabled = false;
-        }
         if ($request->has(["country", "name"])) {
             DB::connection("mysql_alumni")->table("universities")->insert([
                 "name" => $request->input("name"),
@@ -107,7 +101,7 @@ class ClubsAndUniversitiesController extends Controller
                 "chineseShortName" => $request->input("chineseShortName"),
                 "country" => $request->input("country"),
                 "added_by" => $id,
-                "isEnabled" => $enabled]);
+                "isEnabled" => false]);
             return Response::json(array("code" => 200, "info" => DB::connection("mysql_alumni")->table("universities")->where(["name"=>$request->input("name")])->orderBy('id', 'desc')->first()));
         }
     }

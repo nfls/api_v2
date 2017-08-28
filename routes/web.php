@@ -39,7 +39,7 @@ Route::get("student/list","StudentsListController@getUsedName");
 Route::post("university/list","ClubsAndUniversitiesController@listUniversities");
 Route::post("university/get","ClubsAndUniversitiesController@getAUniversity");
 Route::post("university/edit","ClubsAndUniversitiesController@editUniversity");
-Route::post("university/add","ClubsAndUniversitiesController@addUniversity");
+Route::post("university/new","ClubsAndUniversitiesController@addUniversity");
 Route::get("university/intro","ClubsAndUniversitiesController@getIntro");
 
 Route::get("admin/auth/list","CertificationManagementController@getSubmittedUserList");
