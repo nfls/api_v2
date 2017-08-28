@@ -22,6 +22,7 @@ class ClubsAndUniversitiesController extends Controller
                    "您可以通过学校的名称搜索，如果有人为该校添加过中文或是简写后，您也可以通过此类信息搜索到<br/>" .
                    "如果您是第一个选择该学校的，您需要帮助我们完善学校信息，如当地语言的简称，中文翻译，中文简称等等<br/>" .
                    "如果您搜索不到您的学校，请选择添加大学，并按照表格完善相关信息，方便二次使用，添加的学校需要审核后才会显示在您的个人信息里<br/>";
+        return Response::json(array("code"=>200,"info"=>$message));
     }
 
     function listUniversities(Request $request)
