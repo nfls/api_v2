@@ -979,10 +979,20 @@ class CertificationController extends Controller
                 array_push($message, '昵称分隔错误，请检查您的输入内容。');
             }
         }
-        if(@$this->isEmpty($info->club))
-            array_push($message,"请填写参加过的社团。");
-        if(@$this->isEmpty($info->live_place))
-            array_push($message,"请填写常住地区。");
+        if (@$this->emptyCheck(self::OTHER, $info->club, '社团', $message, false)) {
+            $names = explode('，', $info->club);
+            if (count($names) < 1) {
+                array_push($message, '昵称分隔错误，请检查您的输入内容。');
+            } else {
+                $info->club = $names;
+            }
+        }
+        if(@$this->isEmpty($info->country))
+            array_push($message,"请填写常住国家。");
+        if(@$this->isEmpty($info->region))
+            array_push($message,'请填写常住省/洲/地区。');
+        if(@$this->isEmpty($info->city))
+            array_push($message,"请填写常住城市。");
         foreach($info as $key=>$value){
             switch($key){
                 case "wechat":
@@ -1000,6 +1010,7 @@ class CertificationController extends Controller
                 case "instagram":
                 case "snapchat":
                 case "groupme":
+                case "linkedin":
                 case "other_com":
                     $contact_count++;
                     if(@!$this->isEmpty($value))
@@ -1011,7 +1022,7 @@ class CertificationController extends Controller
         }
         if($content_count == 0)
             array_push($message,"请至少填写一个在线联系方式。");
-        $this->structureCheck($info,22,$message);
+        $this->structureCheck($info,26,$message);
         return $message;
     }
 
