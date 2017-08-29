@@ -964,17 +964,14 @@ class CertificationController extends Controller
             }
         }
         if (@$this->emptyCheck(self::OTHER, $info->club, '社团', $message, false)) {
-            $names = explode('，', $info->club);
-            if (count($names) < 1) {
-                array_push($message, '昵称分隔错误，请检查您的输入内容。');
-            } else {
+            $names = explode(',', $info->club);
                 $info->club = $names;
-            }
+           //continue
         }
         if(@$this->isEmpty($info->country)){
             array_push($message,"请填写常住国家。");
         } else {
-            if($this->country == "China"){
+            if($info->country == "China"){
                 if (@$this->emptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message)) {
                     if (!preg_match('/^1[34578]\d{9}$/', (string)($info->phone_domestic))) {
                         array_push($message, '国内手机号码不正确！');
