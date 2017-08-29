@@ -170,7 +170,7 @@ class UserCenterController extends Controller
         else
             $count--;
         $matches = array();
-        preg_match(preg_quote("[A-Za-z0-9_\-\u0800-\u9fa5]{3,16}"), $name, $matches);
+        preg_match("/".preg_quote("[A-Za-z0-9_\-\u0800-\u9fa5]{3,16}")."/", $name, $matches);
         //var_dump($matches);
         if ($matches[0] != $name)
             abort(403);
