@@ -956,25 +956,7 @@ class CertificationController extends Controller
         $contact_count = 0;
         $content_count = 0;
         if(@$this->isEmpty($info->personal_info))
-            array_push($message,"请填写自我介绍。");
-        if (@$this->emptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message,false)) {
-            if (!preg_match('/^1[34578]\d{9}$/', (string)($info->phone_domestic))) {
-                array_push($message, '国内手机号码不正确！');
-            }
-        } else if (@$this->emptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message, false)){
-            array_push($message, '请至少填写一个手机号！');
-        }
-        if (@$this->emptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message, false)) {
-            try {
-                $phone_validate = \libphonenumber\PhoneNumberUtil::getInstance();
-                $phone_number = $phone_validate->parse($info->phone_international, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
-                if ($phone_validate->isValidNumber($phone_number)) {
-                    array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
-                }
-            } catch (NumberParseException $e) {
-                array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
-            }
-        }
+            array_push($message,"请填写自我介绍（个人简介）。");
         if (@$this->emptyCheck(self::OTHER, $info->nickname, '昵称', $message, false)) {
             $names = explode('，', $info->nickname);
             if (count($names) > 1) {
@@ -989,8 +971,31 @@ class CertificationController extends Controller
                 $info->club = $names;
             }
         }
-        if(@$this->isEmpty($info->country))
+        if(@$this->isEmpty($info->country)){
             array_push($message,"请填写常住国家。");
+        } else {
+            if($this->country == "China"){
+                if (@$this->emptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message)) {
+                    if (!preg_match('/^1[34578]\d{9}$/', (string)($info->phone_domestic))) {
+                        array_push($message, '国内手机号码不正确！');
+                    }
+                }
+            } else {
+                if (@$this->emptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message)) {
+                    try {
+                        $phone_validate = \libphonenumber\PhoneNumberUtil::getInstance();
+                        $phone_number = $phone_validate->parse($info->phone_international, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
+                        if ($phone_validate->isValidNumber($phone_number)) {
+                            array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
+                        }
+                    } catch (NumberParseException $e) {
+                        array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
+                    }
+                }
+            }
+        }
+
+
         if(@$this->isEmpty($info->region))
             array_push($message,'请填写常住省/洲/地区。');
         if(@$this->isEmpty($info->city))
