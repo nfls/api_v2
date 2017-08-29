@@ -551,7 +551,7 @@ class UserCenterController extends Controller
         curl_setopt($ch,CURLOPT_COOKIEJAR,$cookie);
         $file_contents = curl_exec($ch);
         curl_close($ch);
-        //var_dump($file_contents);
+        var_dump($file_contents);
         $detail=(array)json_decode($file_contents,true);
         $wiki_token=urlencode($detail['query']['tokens']['logintoken']);
         unset($ch);
@@ -569,6 +569,7 @@ class UserCenterController extends Controller
         $post_data = "username=".env("WIKI_BOT")."&password=".env("BOT_PASS")."&logintoken=$wiki_token&format=json&loginreturnurl=$url";
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
         $file_contents = curl_exec($ch);
+        var_dump($file_contents);
         curl_close($ch);
         unset($ch);
 
@@ -584,6 +585,7 @@ class UserCenterController extends Controller
         curl_setopt($ch,CURLOPT_COOKIEFILE,$cookie2);
         $file_contents = curl_exec($ch);
         curl_close($ch);
+        var_dump($file_contents);
         $detail=(array)json_decode($file_contents,true);
         unset($ch);
 
@@ -605,6 +607,7 @@ class UserCenterController extends Controller
         curl_setopt($ch, CURLOPT_HEADER, false);
         $file_contents = curl_exec($ch);
         curl_close($ch);
+        var_dump($file_contents);
         $detail=(array)json_decode($file_contents,true);
         $username = ucfirst(str_replace("_", " ", $username));
         $user = DB::connection("mysql_wiki")->table("wiki_user")->where(["user_name"=>$username])->first();
