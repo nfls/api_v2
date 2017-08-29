@@ -957,10 +957,12 @@ class CertificationController extends Controller
         $content_count = 0;
         if(@$this->isEmpty($info->personal_info))
             array_push($message,"请填写自我介绍。");
-        if (@$this->emptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message)) {
+        if (@$this->emptyCheck(self::OTHER, $info->phone_domestic, '手机号码（国内）', $message,false)) {
             if (!preg_match('/^1[34578]\d{9}$/', (string)($info->phone_domestic))) {
                 array_push($message, '国内手机号码不正确！');
             }
+        } else if (@$this->emptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message, false)){
+            array_push($message, '请至少填写一个手机号！');
         }
         if (@$this->emptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message, false)) {
             try {
