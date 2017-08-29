@@ -130,7 +130,7 @@ class CertificationController extends Controller
         '本区域可自由发挥，可填写自我介绍等各类关于自己的内容。文本框会根据内容自动调整大小',
         '手机号请务必填写正确，在未来可能会启用手机号验证系统',
         '出国的同学请填写自己的国外手机号，并请加上正确的国际区号，以便联系，“手机号码（国外）”仅需要长期不在国内的校友填写，格式为+[国际区号][手机号]',
-        '常住地请按照国家-地区/城市的格式填写',
+        '常住地城市请填写英文，如南京就写Nanjing，其余请通过列表选择（备注：由于我们使用的是Github上开源的一个国家地区包，部分可能标注不正确，敬请谅解）',
 		'底下的联系方式，可根据自己的情况选填，但至少必须填写一个',
         '建议填写各社交软件的用户名等等，如果跟手机号相同，可填写"同手机号"防止隐私泄露'
     ];
@@ -883,7 +883,7 @@ class CertificationController extends Controller
         return $message;
     }
 
-    function collegeInfoCheck($index,$info,&$message,$name,&$count){
+    function collegeInfoCheck($index,$info,&$message,$name,&$count,$valid_id = true){
         //array_push($message,"1");
         $min_year = 1900;
         $max_year = 2100;
@@ -921,8 +921,14 @@ class CertificationController extends Controller
                         array_push($message, $name . '专业方向未填写。');
                     break;
                 case $index."_school":
-                    if (@$this->isEmpty($value))
-                        array_push($message, $name . '就读院校未填写。');
+                    if(@$valid_id && is_null(DB::connection("mysql_alumni")->table("universities")->where(["id"=>$value])->first()->name)){
+                        array_push($message, $name . '就读院校ID未选择。');
+                    }
+                    if(!$valid_id){
+                        if (@$this->isEmpty($value)){
+                            array_push($message, $name . '就读院校未填写。');
+                        }
+                    }
                     break;
                 case $index."_type":
                     if (@$this->isEmpty($value) && $index == "other") {

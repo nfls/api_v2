@@ -551,6 +551,7 @@ class UserCenterController extends Controller
         curl_setopt($ch,CURLOPT_COOKIEJAR,$cookie);
         $file_contents = curl_exec($ch);
         curl_close($ch);
+        var_dump($file_contents);
         $detail=(array)json_decode($file_contents,true);
         $wiki_token=urlencode($detail['query']['tokens']['logintoken']);
         unset($ch);
