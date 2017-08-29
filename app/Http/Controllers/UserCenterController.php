@@ -562,7 +562,7 @@ class UserCenterController extends Controller
         $email=urlencode($info['email']);
         $username=$info['username'];
         $password=$this->GetAssociatePassword($id);
-
+        $url = "https://nfls.io";
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, "https://wiki.nfls.io/api.php?action=createaccount");
         curl_setopt ($ch, CURLOPT_POST, 1);
