@@ -550,7 +550,7 @@ class UserCenterController extends Controller
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_HEADER, false);
         //curl_setopt($ch,CURLOPT_COOKIEFILE,$cookie);
-        curl_setopt($ch,CURLOPT_COOKIEFILE,$cookie2);
+        curl_setopt($ch,CURLOPT_COOKIEJAR,$cookie2);
         $file_contents = curl_exec($ch);
         curl_close($ch);
         var_dump($file_contents);
@@ -558,7 +558,7 @@ class UserCenterController extends Controller
         unset($ch);
 
 
-        $headers = array('Content-Type: application/x-www-form-urlencoded','Cache-Control: no-cache','Api-User-Agent: Example/1.0');
+        //$headers = array('Content-Type: application/x-www-form-urlencoded','Cache-Control: no-cache','Api-User-Agent: Example/1.0');
         $wiki_token=urlencode($detail['query']['tokens']['createaccounttoken']);
         $info=$this->GetPersonalGeneralInfoById($id);
         $email=urlencode($info['email']);
