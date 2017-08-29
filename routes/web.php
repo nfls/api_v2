@@ -42,6 +42,12 @@ Route::post("university/edit","ClubsAndUniversitiesController@editUniversity");
 Route::post("university/new","ClubsAndUniversitiesController@addUniversity");
 Route::get("university/intro","ClubsAndUniversitiesController@getIntro");
 
+Route::post("club/list","ClubsAndUniversitiesController@listClubs");
+Route::post("club/get","ClubsAndUniversitiesController@getAClub");
+Route::post("club/edit","ClubsAndUniversitiesController@editAClub");
+Route::post("club/new","ClubsAndUniversitiesController@addClub");
+Route::get("club/intro","ClubsAndUniversitiesController@getClubIntro");
+
 Route::get("admin/auth/list","CertificationManagementController@getSubmittedUserList");
 Route::post("admin/auth/detail","CertificationManagementController@getUserDetail");
 Route::post("admin/auth/index","CertificationManagementController@generateIndex");

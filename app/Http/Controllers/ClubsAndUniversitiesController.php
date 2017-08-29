@@ -22,7 +22,7 @@ class ClubsAndUniversitiesController extends Controller
                    "4. 您可以通过学校的名称搜索，如果有人为该校添加过中文或是简写后，您也可以通过此类信息搜索到<br/>" .
                    "5. 如果您是第一个选择该学校的，您需要帮助我们完善学校信息，如当地语言的简称，中文翻译，中文简称等等<br/>" .
                    "6. 如果学校的相关信息有多个的话，可以用空格分隔<br/>" .
-                   "7. 如果您搜索不到您的学校，请选择添加大学，并按照表格完善相关信息，方便二次使用，添加的学校需要审核后才会显示在您的个人信息里<br/>";
+                   "7. 如果您搜索不到您的学校，请选择添加大学，并按照表格完善相关信息，方便二次使用，学校名称一经添加无法修改，请慎重！<br/>";
         return Response::json(array("code"=>200,"info"=>$message));
     }
 
@@ -38,18 +38,12 @@ class ClubsAndUniversitiesController extends Controller
         } else {
             $limit = 20;
         }
-        $enabled = true;
-        if ($request->has("enabled")) {
-            if (UserCenterController::checkAdmin(Cookie::get("token"))) {
-                $enabled = (bool)$request->has("enabled");
-            }
-        }
 
         $result = DB::connection("mysql_alumni")
             ->table("universities")
             ->limit($limit)
             ->offset($startWith)
-            ->select("id", "name", "shortName", "chineseName", "chineseShortName", "country", "comment");
+            ->select("id", "name");
 
         if ($request->has("name"))
             $result->where(function ($query) use ($request) {
@@ -84,6 +78,7 @@ class ClubsAndUniversitiesController extends Controller
                 "shortName" => $request->input("shortName"),
                 "chineseName" => $request->input("chineseName"),
                 "chineseShortName" => $request->input("chineseShortName"),
+                "comment" => $request->input("comment"),
                 "country" => $request->input("country"),
                 "isEnabled" => $enabled]);
             return Response::json(array("code" => 200, "info" => DB::connection("mysql_alumni")->table("universities")->where(["id"=>$request->input("id")])->get()));
@@ -99,6 +94,7 @@ class ClubsAndUniversitiesController extends Controller
                 "shortName" => $request->input("shortName"),
                 "chineseName" => $request->input("chineseName"),
                 "chineseShortName" => $request->input("chineseShortName"),
+                "comment" => $request->input("comment"),
                 "country" => $request->input("country"),
                 "added_by" => $id,
                 "isEnabled" => false]);
@@ -111,6 +107,72 @@ class ClubsAndUniversitiesController extends Controller
         $id = UserCenterController::GetUserId(Cookie::get("token"));
         if(UserCenterController::checkAdmin($id)){
             DB::connection("mysql_alumni")->table("universities")->where(["id"=>$request->input("id")])->delete();
+            return array("code"=>200);
+        } else {
+            abort(403);
+        }
+    }
+
+    function getClubIntro(){
+        $message = "1. 在本页，您可以查询，修改或添加社团<br/>" .
+            "2. 此处社团不区分本部、国际部，也不区分成立的年份等等，只是作为显示相关信息使用<br/>" .
+            "3. 内容及性质类似的社团请不要重复添加，否则将被管理员删除并合并，添加社团请务必填写备注（如简要的活动内容等等）<br/>" .
+            "4. 您也可以添加非官方注册的社团，但为了您和我们的人身安全，严禁添加膜ha社等明显不符合相关国内规定的社团<br/>";
+        return Response::json(array("code"=>200,"info"=>$message));
+    }
+
+    function listClubs(Request $request){
+        $result = DB::connection("mysql_alumni")
+            ->table("clubs")
+            ->select("id", "name");
+        if ($request->has("name"))
+            $result->where("name", "like", "%" . $request->input("name") . "%");
+        return Response::json(array("code" => 200, "info" => $result->get()));
+    }
+
+    function getAClub(Request $request){
+        if($request->has("id")){
+            $info = DB::connection("mysql_alumni")->table("clubs")->where(["id"=>$request->input("id")])->first();
+            $info->added_by = UserCenterController::GetUserNickname($info->added_by);
+            return Response::json(array("code"=>200,"info" => $info));
+        }
+
+    }
+
+    function editAClub(Request $request)
+    {
+        $id = UserCenterController::GetUserId(Cookie::get("token"));
+        if(UserCenterController::checkAdmin($id) && $request->has("enabled")){
+            $enabled = $request->input("enabled");
+        } else {
+            $enabled = DB::connection("mysql_alumni")->table("clubs")->where(["id"=>$request->input("id")])->first()->isEnabled;
+        }
+        if ($request->has(["id", "name"])) {
+            DB::connection("mysql_alumni")->table("universities")->where(["id"=>$request->input("id")])->update([
+                "name"=>$request->input("name"),
+                "comment" => $request->input("comment")]);
+            return Response::json(array("code" => 200, "info" => DB::connection("mysql_alumni")->table("clubs")->where(["id"=>$request->input("id")])->get()));
+        }
+
+    }
+
+    function addClub(Request $request){
+        $id = UserCenterController::GetUserId(Cookie::get("token"));
+        if ($request->has(["name"])) {
+            DB::connection("mysql_alumni")->table("clubs")->insert([
+                "name" => $request->input("name"),
+                "comment" => $request->input("comment"),
+                "added_by" => $id,
+                "isEnabled" => false]);
+            return Response::json(array("code" => 200, "info" => DB::connection("mysql_alumni")->table("clubs")->where(["name"=>$request->input("name")])->orderBy('id', 'desc')->first()));
+        }
+    }
+
+    function deleteAClub(Request $request)
+    {
+        $id = UserCenterController::GetUserId(Cookie::get("token"));
+        if(UserCenterController::checkAdmin($id)){
+            DB::connection("mysql_alumni")->table("clubs")->where(["id"=>$request->input("id")])->delete();
             return array("code"=>200);
         } else {
             abort(403);
