@@ -557,6 +557,8 @@ class UserCenterController extends Controller
         $detail=(array)json_decode($file_contents,true);
         unset($ch);
 
+
+        $headers = array('Content-Type: application/x-www-form-urlencoded','Cache-Control: no-cache','Api-User-Agent: Example/1.0');
         $wiki_token=urlencode($detail['query']['tokens']['createaccounttoken']);
         $info=$this->GetPersonalGeneralInfoById($id);
         $email=urlencode($info['email']);
