@@ -540,42 +540,9 @@ class UserCenterController extends Controller
             abort(403);
         $cookie = tempnam('/tmp/','cookie');
         $cookie2 = tempnam('/tmp/','cookie2');
-        $headers = array('Content-Type: application/x-www-form-urlencoded','Cache-Control: no-cache','Api-User-Agent: Example/1.0',);
-        $ch = curl_init();
-        curl_setopt ($ch, CURLOPT_URL, "https://wiki.nfls.io/api.php?action=query&type=login&meta=tokens&format=json");
-        curl_setopt ($ch, CURLOPT_POST, 1);
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 120);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch,CURLOPT_COOKIEJAR,$cookie);
-        $file_contents = curl_exec($ch);
-        curl_close($ch);
-        var_dump($file_contents);
-        $detail=(array)json_decode($file_contents,true);
-        $wiki_token=urlencode($detail['query']['tokens']['logintoken']);
-        dump($wiki_token);
-        unset($ch);
+        $headers = array('Content-Type: application/x-www-form-urlencoded','Cache-Control: no-cache','Api-User-Agent: Example/1.0', 'Cookie: token=81de2b47637655f34cc7f58cca330884a77d519ada4af7b4bcac016cbfad8d0f');
 
         $ch = curl_init();
-        curl_setopt ($ch, CURLOPT_URL, "https://wiki.nfls.io/api.php?action=clientlogin");
-        curl_setopt ($ch, CURLOPT_POST, 1);
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 120);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_HEADER, FALSE);
-        $url=urlencode("https://login.nfls.io");
-        curl_setopt($ch,CURLOPT_COOKIEFILE,$cookie);
-        curl_setopt($ch,CURLOPT_COOKIEJAR,$cookie2);
-        $post_data = "username=".env("WIKI_BOT")."&password=".env("BOT_PASS")."&logintoken=$wiki_token&format=json&loginreturnurl=$url";
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
-        $file_contents = curl_exec($ch);
-        var_dump($file_contents);
-        curl_close($ch);
-        unset($ch);
-
-        $ch = curl_init();
-
         curl_setopt ($ch, CURLOPT_URL, "https://wiki.nfls.io/api.php?action=query&type=createaccount&meta=tokens&format=json");
         curl_setopt ($ch, CURLOPT_POST, 1);
         curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
