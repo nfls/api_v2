@@ -151,7 +151,7 @@ class ClubsAndUniversitiesController extends Controller
             $enabled = DB::connection("mysql_alumni")->table("clubs")->where(["id"=>$request->input("id")])->first()->isEnabled;
         }
         if ($request->has(["id", "name"])) {
-            DB::connection("mysql_alumni")->table("universities")->where(["id"=>$request->input("id")])->update([
+            DB::connection("mysql_alumni")->table("clubs")->where(["id"=>$request->input("id")])->update([
                 "name"=>$request->input("name"),
                 "comment" => $request->input("comment")]);
             return Response::json(array("code" => 200, "info" => DB::connection("mysql_alumni")->table("clubs")->where(["id"=>$request->input("id")])->get()));
