@@ -479,7 +479,7 @@ class UserCenterController extends Controller
         curl_close($ch);
         $detail=(array)json_decode($file_contents,true);
         $url = $detail['data']['attributes']['avatarUrl'];
-        if (strpos($url, 'null') === false) {
+        if (@is_null($url)) {
             $url = "https://center.nfls.io/center/js/no_head.png";
         }
         return $url;
