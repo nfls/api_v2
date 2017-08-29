@@ -137,7 +137,7 @@ class UserCenterController extends Controller
                 break;
             case "rename":
                 if ($request->isMethod("post") && $request->has(['name'])) {
-                    $info = $this->renameAccount(self::GetUserId(Cookie::get("token"), $request->input("name")));
+                    $info = $this->renameAccount(self::GetUserId(Cookie::get("token")), $request->input("name"));
                 }
                 break;
             default:
@@ -171,7 +171,7 @@ class UserCenterController extends Controller
             $count--;
         $matches = array();
         preg_match("[A-Za-z0-9_\-\u0800-\u9fa5]{3,16}", $name, $matches);
-        var_dump($matches);
+        //var_dump($matches);
         if ($matches[0] != $name)
             abort(403);
         DB::connection("mysql_forum")->table("nfls_users")->where(["id" => $id])->update(["username" => $name]);
