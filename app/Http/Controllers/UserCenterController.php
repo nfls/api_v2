@@ -550,7 +550,7 @@ class UserCenterController extends Controller
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_HEADER, false);
         //curl_setopt($ch,CURLOPT_COOKIEFILE,$cookie);
-        curl_setopt($ch,CURLOPT_COOKIEJAR,$cookie2);
+        //curl_setopt($ch,CURLOPT_COOKIEJAR,$cookie2);
         $file_contents = curl_exec($ch);
         curl_close($ch);
         var_dump($file_contents);
@@ -573,7 +573,7 @@ class UserCenterController extends Controller
         curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 120);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch,CURLOPT_COOKIEFILE,$cookie2);
+        //curl_setopt($ch,CURLOPT_COOKIEFILE,$cookie2);
         curl_setopt($ch, CURLOPT_HEADER, false);
         $file_contents = curl_exec($ch);
         curl_close($ch);
