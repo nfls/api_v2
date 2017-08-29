@@ -478,7 +478,11 @@ class UserCenterController extends Controller
         $file_contents = curl_exec($ch);
         curl_close($ch);
         $detail=(array)json_decode($file_contents,true);
-        return $detail['data']['attributes']['avatarUrl'];
+        $url = $detail['data']['attributes']['avatarUrl'];
+        if (strpos($url, 'null') === false) {
+            $url = "https://center.nfls.io/center/js/no_head.png";
+        }
+        return $url;
     }
 
     function GetPersonalGeneralInfoById($id)//根据id获取综合信息
