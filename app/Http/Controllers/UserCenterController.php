@@ -171,7 +171,7 @@ class UserCenterController extends Controller
             $count--;
         $matches = array();
         preg_match('/[A-Za-z0-9_\-\x{0800}-\x{9fa5}]{3,16}/u', $name, $matches);
-        var_dump($matches);
+        //var_dump($matches);
         if ($matches[0] != $name)
             abort(403);
         DB::connection("mysql_forum")->table("nfls_users")->where(["id" => $id])->update(["username" => $name]);
