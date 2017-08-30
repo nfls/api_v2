@@ -76,7 +76,8 @@ class CertificationController extends Controller
         '对于您提供的信息，您可在认证结束后自行修改相关隐私设置',
         '所有入学/毕业日期只记录年份',
         '所有学校名称请使用完整的官方名称，不要使用任何简写、简拼等',
-        '本表格所有课程均指的是南外的课程，（基础教育课程仅适用于73年之前的校友）'
+        '本表格所有课程均指的是南外的课程，（基础教育课程仅适用于73年之前的校友）',
+        '（备注：由于我们使用的是Github上开源的一个国家地区包，部分可能标注不正确，敬请谅解）'
     ];
 
     const STEP1 = [
@@ -88,7 +89,7 @@ class CertificationController extends Controller
 
     const STEP2 = [
         '请在本页填写您的小学信息',
-        '如果您就读过南外小学部，请在“小学就读学校”处填写就读的小学；毕业和入学日期均是指离开或是进入南外小学部的年份。',
+        '如果您就读过南外小学部，请在“小学就读学校”处填写就读的小学；毕业和入学日期均是指离开或是进入南外小学部的年份，如果当时没有分班，请填写0',
         '如果存在其他特殊情况，请在备注中详细注明具体情况'
     ];
 
@@ -130,7 +131,7 @@ class CertificationController extends Controller
         '本区域可自由发挥，可填写自我介绍等各类关于自己的内容。文本框会根据内容自动调整大小',
         '手机号请务必填写正确，在未来可能会启用手机号验证系统',
         '出国的同学请填写自己的国外手机号，并请加上正确的国际区号，以便联系，“手机号码（国外）”仅需要长期不在国内的校友填写，格式为+[国际区号][手机号]',
-        '常住地城市请填写英文，如南京就写Nanjing，其余请通过列表选择（备注：由于我们使用的是Github上开源的一个国家地区包，部分可能标注不正确，敬请谅解）',
+        '常住地城市请填写英文，如南京就写Nanjing，其余请通过列表选择',
 		'底下的联系方式，可根据自己的情况选填，但至少必须填写一个',
         '建议填写各社交软件的用户名等等，如果跟手机号相同，可填写"同手机号"防止隐私泄露'
     ];
@@ -638,7 +639,11 @@ class CertificationController extends Controller
                     @$this->emptyCheck(self::SCHOOL_NAME, $info->primary_school_name, '其他小学', $message);
                     @$passed = @$this->emptyCheck(self::ENTER_YAER, $info->primary_school_enter_year, '小学', $message);
                     @$passed = $passed && @$this->emptyCheck(self::GRADUATED_YEAR, $info->primary_school_graduated_year, '小学', $message);
-                    @$this->schoolYearCheck($info->primary_school_enter_year, $info->primary_school_graduated_year, 1963, 1979, 4, $info->junior_remark, '小学', $message, false);
+                    if($passed){
+                        @$this->schoolYearCheck($info->primary_school_enter_year, $info->primary_school_graduated_year, 1963, 1979, 4, $info->junior_remark, '小学', $message, false);
+                        @$this->classNoCheck($info->primary_class, 0, 12, '小学', $message);
+                    }
+
                     $this->structureCheck($info, 5, $message);
                     break;
                 default:
