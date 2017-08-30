@@ -69,3 +69,8 @@ Route::post('weather/update',"WeatherController@updateData");
 Route::get('weather/list',"WeatherController@getStationList");
 Route::post('weather/data',"WeatherController@getStationData");
 Route::post('weather/history',"WeatherController@getHistoryData");
+
+Route::post("redirect/forum", function(Request $request){
+    return redirect("https://forum.nfls.io")->cookie("token", $request->input("token"), 0, "/", "nfls.io",
+        true, true);
+});
