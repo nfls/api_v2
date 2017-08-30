@@ -37,6 +37,7 @@ class CertificationController extends Controller
     const NFLS_OLD_SENIOR  = 8;
     const OTHER_SENIOR = -1;
     const NO_SENIOR = -2;
+    const AMERICAN_SENIOR = -3;
 
     const BASIC_INFO = 1;
     const PRIMARY_INFO = 2;
@@ -105,6 +106,7 @@ class CertificationController extends Controller
         '普高请填写6个学期的班级号，一位阿拉伯数字。如果存在不适用的情况（如提前高考或者是提前出国），请在对应班级号处填写0，请不要填写英语小班分班号',
         '病假／休学等特殊情况导致在校时间超过3年或者存在多个班级号的情况，请在备注中详细注明相关情况（请假开始的学期等等）',
         'IB/ALEVEL请填写一位阿拉伯数字班级号，中加请填将字母转换成对应的数字1-7，ESL为6班',
+        '美高的校友可选择美高选项'
     ];
 
     const STEP5 = [
@@ -727,6 +729,7 @@ class CertificationController extends Controller
                 case self::NO_SENIOR:
                     break;
                 case self::OTHER_SENIOR:
+                case self::AMERICAN_SENIOR:
                     @$this->emptyCheck(self::SCHOOL_NAME, $info->senior_school_name, '高中', $message);
                     $this->structureCheck($info, 3, $message);
                     break;
