@@ -691,7 +691,7 @@ class CertificationController extends Controller
                     @$passed = $passed && $this->emptyCheck(self::CLASS_NO, $info->junior_class, '初中', $message);
                     if ($passed) {
                         @$this->schoolYearCheck($info->junior_school_enter_year, $info->junior_school_graduated_year, 1963, 1971, 3, $info->junior_remark, '初中', $message);
-                        @$this->classNoCheck($info->junior_class, 1, 4, '初中', $message);
+                        @$this->classNoCheck($info->junior_class, 0, 4, '初中', $message);
                     }
                     $this->structureCheck($info, 5, $message);
                     break;
@@ -880,6 +880,8 @@ class CertificationController extends Controller
         $message = array();
         $passed = false;
         $grid_count = 0;
+        if(@!$this->isEmpty($info->summer) && $info->summer == true)
+            $passed = $passed || $this->collegeInfoCheck("summer",$info,$message,"夏校",$grid_count);
         if(@!$this->isEmpty($info->college) && $info->college == true)
             $passed = $passed || $this->collegeInfoCheck("college",$info,$message,"专科",$grid_count);
         if(@!$this->isEmpty($info->undergraduate) && $info->undergraduate == true)
@@ -892,7 +894,7 @@ class CertificationController extends Controller
             $passed = $passed || $this->collegeInfoCheck("other",$info,$message,"其他",$grid_count);
         if(!$passed)
             //array_push($message,"请至少选择一个进行填写！");
-        $this->structureCheck($info,$grid_count+6,$message);
+        $this->structureCheck($info,$grid_count+7,$message);
         return $message;
     }
 
