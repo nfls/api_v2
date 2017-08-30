@@ -89,7 +89,8 @@ class CertificationController extends Controller
 
     const STEP2 = [
         '请在本页填写您的小学信息',
-        '如果您就读过南外小学部，请在“小学就读学校”处填写就读的小学；毕业和入学日期均是指离开或是进入南外小学部的年份，如果当时没有分班，请填写0',
+        '如果您就读过南外小学部，请在“小学就读学校”处填写在进入南外就读的小学；毕业和入学日期均是指离开或是进入南外小学部的年份，如果当时没有分班，请填写0',
+        '请在备注中注明学制（默认为4年制，三年级起点）',
         '如果存在其他特殊情况，请在备注中详细注明具体情况'
     ];
 
@@ -644,7 +645,7 @@ class CertificationController extends Controller
                         @$this->classNoCheck($info->primary_class, 0, 12, '小学', $message);
                     }
 
-                    $this->structureCheck($info, 5, $message);
+                    $this->structureCheck($info, 6, $message);
                     break;
                 default:
                     array_push($message, '小学信息不正确！请重新选择。');
