@@ -578,7 +578,9 @@ class CertificationController extends Controller
             if (count($names) > 1) {
                 array_push($message, '英文名分隔错误，请检查您的输入内容。');
             }
-            $names = explode(',', $info->english_name);
+            $names = array_filter(array_unique(explode(',', $info->english_name)));
+            if(count($names) == 0)
+                array_push($message,"请填写您的英文名");
             $info->english_name = $names;
         }
         if (@$this->emptyCheck(self::OTHER, $info->birthday, '出生日期', $message)) {
