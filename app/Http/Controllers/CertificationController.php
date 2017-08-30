@@ -548,7 +548,7 @@ class CertificationController extends Controller
 
     //auth data
 
-    function authStep1($info)
+    function authStep1(&$info)
     {
         /*
             JSON格式：
@@ -578,6 +578,8 @@ class CertificationController extends Controller
             if (count($names) > 1) {
                 array_push($message, '英文名分隔错误，请检查您的输入内容。');
             }
+            $names = explode(',', $info->english_name);
+            $info->english_name = $names;
         }
         if (@$this->emptyCheck(self::OTHER, $info->birthday, '出生日期', $message)) {
             $validator = new Date(['format' => 'Y/m/d']);
@@ -926,7 +928,7 @@ class CertificationController extends Controller
                     }
                     if(!$valid_id){
                         if (@$this->isEmpty($value)){
-                            array_push($message, $name . '就读院校未填写。');
+                            array_push($message, $name . '就读院校未填写或不正确。');
                         }
                     }
                     break;
@@ -947,11 +949,18 @@ class CertificationController extends Controller
 
     function authStep7($info){
         $message = array();
-        $this->structureCheck($info,4,$message);
+        if(@!$this->isEmpty($info->country)){
+            if(@$this->isEmpty($info->region))
+                array_push($message,'请填写常住省/洲/地区。');
+            if(@$this->isEmpty($info->city))
+                array_push($message,"请填写常住城市。");
+        }
+
+        $this->structureCheck($info,7,$message);
         return $message;
     }
 
-    function authStep8($info){
+    function authStep8(&$info){
         $message = array();
         $contact_count = 0;
         $content_count = 0;
@@ -962,11 +971,17 @@ class CertificationController extends Controller
             if (count($names) > 1) {
                 array_push($message, '昵称分隔错误，请检查您的输入内容。');
             }
+            $names = explode(',', $info->nickname);
+            $info->nickname = $names;
         }
         if (@$this->emptyCheck(self::OTHER, $info->club, '社团', $message, false)) {
             $names = explode(',', $info->club);
-                $info->club = $names;
-           //continue
+            $final = array();
+            foreach($names as $name){
+                $name = (int)$name;
+                array_push($final,$name);
+            }
+            $info->club = $final;
         }
         if(@$this->isEmpty($info->country)){
             array_push($message,"请填写常住国家。");
@@ -991,8 +1006,6 @@ class CertificationController extends Controller
                 }
             }
         }
-
-
         if(@$this->isEmpty($info->region))
             array_push($message,'请填写常住省/洲/地区。');
         if(@$this->isEmpty($info->city))
