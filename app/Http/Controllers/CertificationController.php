@@ -641,7 +641,7 @@ class CertificationController extends Controller
                     @$passed = @$this->emptyCheck(self::ENTER_YAER, $info->primary_school_enter_year, '小学', $message);
                     @$passed = $passed && @$this->emptyCheck(self::GRADUATED_YEAR, $info->primary_school_graduated_year, '小学', $message);
                     if($passed){
-                        @$this->schoolYearCheck($info->primary_school_enter_year, $info->primary_school_graduated_year, 1963, 1979, 4, $info->junior_remark, '小学', $message, false);
+                        @$this->schoolYearCheck($info->primary_school_enter_year, $info->primary_school_graduated_year, 1963, 1979, 4, $info->primary_remark, '小学', $message, false);
                         @$this->classNoCheck($info->primary_class, 0, 12, '小学', $message);
                     }
 
