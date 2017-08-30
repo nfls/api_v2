@@ -531,7 +531,7 @@ class CertificationController extends Controller
         if (!$valid->isValid($enter_year) || !is_integer($enter_year))
             array_push($message, $name . '入学年份不正确。');
         unset($valid);
-        $valid = new Between(['min' => $minimum_year + $interval, 'max' => $maximum_year + $interval]);
+        $valid = new Between(['min' => $minimum_year + 1, 'max' => $maximum_year + $interval]);
         if (!$valid->isValid($graduated_year) || !is_integer($graduated_year))
             array_push($message, $name . '毕业年份不正确。');
         if ($enter_year + $interval != $graduated_year && (@$this->isEmpty($remark))){
