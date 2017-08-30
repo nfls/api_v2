@@ -71,5 +71,5 @@ Route::post('weather/data',"WeatherController@getStationData");
 Route::post('weather/history',"WeatherController@getHistoryData");
 
 Route::get("redirect", function(Request $request){
-    return redirect("https://" . $request->input("to") . ".nfls.io");
+    return redirect($request->input("to"));
 });
