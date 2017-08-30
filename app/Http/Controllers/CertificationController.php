@@ -949,10 +949,10 @@ class CertificationController extends Controller
 
     function authStep7($info){
         $message = array();
-        if(@!$this->isEmpty($info->country)){
-            if(@$this->isEmpty($info->region))
+        if(@!$this->isEmpty($info->work_country)){
+            if(@$this->isEmpty($info->work_region))
                 array_push($message,'请填写常住省/洲/地区。');
-            if(@$this->isEmpty($info->city))
+            if(@$this->isEmpty($info->work_city))
                 array_push($message,"请填写常住城市。");
         }
 
