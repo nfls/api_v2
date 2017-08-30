@@ -70,12 +70,14 @@ class ClubsAndUniversitiesController extends Controller
     function editUniversity(Request $request)
     {
         $id = UserCenterController::GetUserId(Cookie::get("token"));
+
         if(UserCenterController::checkAdmin($id) && $request->has("enabled")){
             $enabled = $request->input("enabled");
         } else {
             $enabled = DB::connection("mysql_alumni")->table("universities")->where(["id"=>$request->input("id")])->first()->isEnabled;
         }
         if ($request->has(["id","country", "name"])) {
+            LogController::writeLog("univeristy.edit","修改了id=".$request->input("id")."的大学");
             DB::connection("mysql_alumni")->table("universities")->where(["id"=>$request->input("id"),"name"=>$request->input("name")])->update([
                 "shortName" => $request->input("shortName"),
                 "chineseName" => $request->input("chineseName"),
@@ -91,6 +93,7 @@ class ClubsAndUniversitiesController extends Controller
     function addUniversity(Request $request){
         $id = UserCenterController::GetUserId(Cookie::get("token"));
         if ($request->has(["country", "name"])) {
+            LogController::writeLog("univeristy.add","添加了name=".$request->input("name")."的大学");
             DB::connection("mysql_alumni")->table("universities")->insert([
                 "name" => $request->input("name"),
                 "shortName" => $request->input("shortName"),
@@ -145,12 +148,14 @@ class ClubsAndUniversitiesController extends Controller
     function editAClub(Request $request)
     {
         $id = UserCenterController::GetUserId(Cookie::get("token"));
+
         if(UserCenterController::checkAdmin($id) && $request->has("enabled")){
             $enabled = $request->input("enabled");
         } else {
             $enabled = DB::connection("mysql_alumni")->table("clubs")->where(["id"=>$request->input("id")])->first()->isEnabled;
         }
         if ($request->has(["id", "name"])) {
+            LogController::writeLog("club.edit","修改了id=".$request->input("id")."的社团");
             DB::connection("mysql_alumni")->table("clubs")->where(["id"=>$request->input("id")])->update([
                 "name"=>$request->input("name"),
                 "comment" => $request->input("comment")]);
@@ -162,6 +167,7 @@ class ClubsAndUniversitiesController extends Controller
     function addClub(Request $request){
         $id = UserCenterController::GetUserId(Cookie::get("token"));
         if ($request->has(["name"])) {
+            LogController::writeLog("club.add","添加了name=".$request->input("name")."的社团");
             DB::connection("mysql_alumni")->table("clubs")->insert([
                 "name" => $request->input("name"),
                 "comment" => $request->input("comment"),

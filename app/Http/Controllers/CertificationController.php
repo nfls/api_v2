@@ -893,7 +893,7 @@ class CertificationController extends Controller
         if(@!$this->isEmpty($info->other) && $info->other == true)
             $passed = $passed || $this->collegeInfoCheck("other",$info,$message,"其他",$grid_count);
         if(!$passed)
-            //array_push($message,"请至少选择一个进行填写！");
+            array_push($message,"请至少选择一个进行填写！");
         $this->structureCheck($info,$grid_count+7,$message);
         return $message;
     }
