@@ -973,11 +973,13 @@ class CertificationController extends Controller
             if (count($names) > 1) {
                 array_push($message, '昵称分隔错误，请检查您的输入内容。');
             }
-            $names = explode(',', $info->nickname);
+            $names = array_filter(array_unique(explode(',', $info->nickname)));
+            if(count($names) == 0)
+                array_push($message, "请填写您的昵称");
             $info->nickname = $names;
         }
         if (@$this->emptyCheck(self::OTHER, $info->club, '社团', $message, false)) {
-            $names = explode(',', $info->club);
+            $names = array_filter(array_unique(explode(',', $info->club)));
             $final = array();
             foreach($names as $name){
                 $name = (int)$name;
