@@ -310,7 +310,7 @@ class CertificationController extends Controller
                             return Response::json(array('code' => 200, 'message' => $message));
                         } else {
                             array_unshift($message, '非常抱歉，您提交的数据在以下部分存在问题：');
-                            return Response::json(array('code' => '403.1', 'message' => $message));
+                            return Response::json(array('code' => 403, 'message' => $message));
                         }
                     } else if ((int)$action == -1){
                         DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => (int)$user->current_step - 1]);
