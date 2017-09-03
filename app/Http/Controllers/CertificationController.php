@@ -21,23 +21,23 @@ class CertificationController extends Controller
     const FINISHED = 2;
 
     const NFLS_PRIMARY = 1;
-    const OTHER_PRIMARY = -1;
+    const OTHER_PRIMARY = 0;
 
     const NFLS_OLD_JUNIOR = 2;
     const NFLS_JUNIOR = 1;
-    const OTHER_JUNIOR = -1;
+    const OTHER_JUNIOR = 0;
 
-    const NFLS_SENIOR_GENERAL = 1;
-    const NFLS_SENIOR_IB = 2;
-    const NFLS_SENIOR_ALEVEL = 3;
-    const NFLS_SENIOR_BCA = 4;
-    const NFLS_SENIOR_AUSTRALIA = 5;
-    const NFLS_SENIOR_JAPANESE = 6;
-    const NFLS_SENIOR_TEACHER = 7;
-    const NFLS_OLD_SENIOR  = 8;
-    const OTHER_SENIOR = -1;
-    const NO_SENIOR = -2;
-    const AMERICAN_SENIOR = -3;
+    const NFLS_SENIOR_GENERAL = 3;
+    const NFLS_SENIOR_IB = 4;
+    const NFLS_SENIOR_ALEVEL = 5;
+    const NFLS_SENIOR_BCA = 6;
+    const NFLS_SENIOR_AUSTRALIA = 7;
+    const NFLS_SENIOR_JAPANESE = 8;
+    const NFLS_SENIOR_TEACHER = 9;
+    const NFLS_OLD_SENIOR  = 10;
+    const OTHER_SENIOR = 1;
+    const NO_SENIOR = 0;
+    const AMERICAN_SENIOR = 2;
 
     const BASIC_INFO = 1;
     const PRIMARY_INFO = 2;
@@ -601,7 +601,7 @@ class CertificationController extends Controller
         }
         if (@$this->emptyCheck(self::OTHER, $info->gender, '性别', $message)) {
             $info->gender = (int)($info->gender);
-            $valid = new Between(['min' => self::GENDER_MALE, 'max' => self::GENDER_OTHER]);
+            $valid = new Between(['min' => 0, 'max' => 2]);
             if (!$valid->isValid($info->gender))
                 array_push($message, '性别不正确。');
         }
