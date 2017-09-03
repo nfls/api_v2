@@ -470,7 +470,7 @@ class CertificationController extends Controller
     {
         switch ($type) {
             case self::SCHOOL_NO:
-                if ($this->isEmpty($info)) {
+                if (!isset($info)) {
                     $info = (int)$info;
                     if ($addMessage)
                         array_push($message, '请选择您所就读的' . $name . '。');
