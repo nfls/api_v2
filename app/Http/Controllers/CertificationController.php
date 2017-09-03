@@ -458,7 +458,7 @@ class CertificationController extends Controller
     function isEmpty($content)
     {
         if(@is_int($content))
-            return @isset($content);
+            return @!isset($content);
         else return @(is_null($content) || empty($content));
     }
 
