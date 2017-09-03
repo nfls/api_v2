@@ -853,7 +853,7 @@ class CertificationController extends Controller
             $j_enter = $junior->junior_school_enter_year;
             $j_graduate = $junior->junior_school_graduated_year;
         }
-        if($senior->senior_school_no > 0){
+        if($senior->senior_school_no > 2){
             if(-$birth_year + $senior->senior_school_graduated_year > 21)
                 array_push($return_array,"高中毕业年份与生日差大于21年！");
             if(-$birth_year + $senior->senior_school_graduated_year < 18)
