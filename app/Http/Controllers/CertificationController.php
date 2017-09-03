@@ -457,7 +457,9 @@ class CertificationController extends Controller
 
     function isEmpty($content)
     {
-        return @(is_null($content) || empty($content));
+        if(@is_int($content))
+            return @isset($content);
+        else return @(is_null($content) || empty($content));
     }
 
     static function insertId($id)
