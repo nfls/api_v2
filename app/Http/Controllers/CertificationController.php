@@ -887,18 +887,18 @@ class CertificationController extends Controller
         $grid_count = 0;
         Log::notice(print_r($info,true));
         if(@!$this->isEmpty($info->summer) && $info->summer == true)
-            $passed = $this->collegeInfoCheck("summer",$info,$message,"夏校",$grid_count) || $passed;
+             $this->collegeInfoCheck("summer",$info,$message,"夏校",$grid_count);
         if(@!$this->isEmpty($info->college) && $info->college == true)
-            $passed = $this->collegeInfoCheck("college",$info,$message,"专科",$grid_count) || $passed;
+             $this->collegeInfoCheck("college",$info,$message,"专科",$grid_count);
         if(@!$this->isEmpty($info->undergraduate) && $info->undergraduate == true)
-            $passed = $this->collegeInfoCheck("undergraduate",$info,$message,"本科",$grid_count) || $passed;
+             $this->collegeInfoCheck("undergraduate",$info,$message,"本科",$grid_count);
         if(@!$this->isEmpty($info->master) && $info->master == true)
-            $passed = $this->collegeInfoCheck("master",$info,$message,"硕士",$grid_count) || $passed;
+             $this->collegeInfoCheck("master",$info,$message,"硕士",$grid_count);
         if(@!$this->isEmpty($info->doctor) && $info->doctor == true)
-            $passed = $this->collegeInfoCheck("doctor",$info,$message,"博士",$grid_count) || $passed;
+             $this->collegeInfoCheck("doctor",$info,$message,"博士",$grid_count);
         if(@!$this->isEmpty($info->other) && $info->other == true)
-            $passed = $this->collegeInfoCheck("other",$info,$message,"其他",$grid_count,false) || $passed;
-        if(!$passed)
+             $this->collegeInfoCheck("other",$info,$message,"其他",$grid_count,false);
+        if($grid_count == 0)
             array_push($message,"请至少选择一个进行填写！");
         $this->structureCheck($info,$grid_count+7,$message);
 
