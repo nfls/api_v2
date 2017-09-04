@@ -885,7 +885,7 @@ class CertificationController extends Controller
         $message = array();
         $passed = false;
         $grid_count = 0;
-        Log::notice(print_r($info,true));
+        //Log::notice(print_r($info,true));
         if(@!$this->isEmpty($info->summer) && $info->summer == true)
              $this->collegeInfoCheck("summer",$info,$message,"夏校",$grid_count);
         if(@!$this->isEmpty($info->college) && $info->college == true)
@@ -910,7 +910,8 @@ class CertificationController extends Controller
         $min_year = 1900;
         $max_year = 2100;
         $count = $count + 4;
-        Log::notice($name.":".$count);
+        //
+        //Log::notice($name.":".$count);
         $c = 0;
         foreach($info as $key=>$value){
             switch($key){
@@ -985,9 +986,9 @@ class CertificationController extends Controller
         $message = array();
         if(@!$this->isEmpty($info->work_country)){
             if(@$this->isEmpty($info->work_region))
-                array_push($message,'请填写常住省/洲/地区。');
+                array_push($message,'请填写工作地所在省/洲/地区。');
             if(@$this->isEmpty($info->work_city))
-                array_push($message,"请填写常住城市。");
+                array_push($message,"请填写工作地城市。");
         }
 
         $this->structureCheck($info,7,$message);
