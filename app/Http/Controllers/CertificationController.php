@@ -883,6 +883,7 @@ class CertificationController extends Controller
         $message = array();
         $passed = false;
         $grid_count = 0;
+        Log::notice(print_r($info,true));
         if(@!$this->isEmpty($info->summer) && $info->summer == true)
             $passed = $passed || $this->collegeInfoCheck("summer",$info,$message,"夏校",$grid_count);
         if(@!$this->isEmpty($info->college) && $info->college == true)
@@ -898,7 +899,7 @@ class CertificationController extends Controller
         if(!$passed)
             array_push($message,"请至少选择一个进行填写！");
         $this->structureCheck($info,$grid_count+7,$message);
-        Log::notice(print_r($message,true));
+
         return $message;
     }
 
