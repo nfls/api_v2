@@ -548,6 +548,8 @@ class CertificationController extends Controller
 
     function structureCheck($info, $count, &$message)
     {
+        Log::notice(count((array)$info));
+        Log::notice($count);
         if (count((array)$info) != $count)
             array_push($message, '您提交的信息存在结构性问题，请重试或解决上面提到的任何错误。如果此错误持续发生，请联系管理员。');
     }
