@@ -948,7 +948,7 @@ class CertificationController extends Controller
                     $c++;
                     break;
                 case $index."_school":
-                    if(@$valid_id && is_null(DB::connection("mysql_alumni")->table("universities")->where(["id"=>$value])->first()->name)){
+                    if(@$valid_id && @is_null(DB::connection("mysql_alumni")->table("universities")->where(["id"=>$value])->first()->name)){
                         array_push($message, $name . '就读院校ID未选择。');
                     }
                     if(!$valid_id){
