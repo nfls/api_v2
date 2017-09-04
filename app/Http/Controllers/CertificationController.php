@@ -898,7 +898,7 @@ class CertificationController extends Controller
         if(!$passed)
             array_push($message,"请至少选择一个进行填写！");
         $this->structureCheck($info,$grid_count+7,$message);
-        Log::notice(print_r($message),true);
+        Log::notice(print_r($message,true));
         return $message;
     }
 
