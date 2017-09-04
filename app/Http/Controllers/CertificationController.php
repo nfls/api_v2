@@ -909,10 +909,10 @@ class CertificationController extends Controller
         //array_push($message,"1");
         $min_year = 1900;
         $max_year = 2100;
+        $count = $count + 4;
         foreach($info as $key=>$value){
             switch($key){
                 case $index."_start":
-                    $count = $count + 4;
                     if (@$this->isEmpty($value)) {
                         array_push($message, $name . '入学年份未填写。');
                     }
