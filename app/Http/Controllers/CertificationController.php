@@ -910,6 +910,7 @@ class CertificationController extends Controller
         $min_year = 1900;
         $max_year = 2100;
         $count = $count + 4;
+        $c = 0;
         foreach($info as $key=>$value){
             switch($key){
                 case $index."_start":
@@ -924,6 +925,7 @@ class CertificationController extends Controller
                         else
                             $start_year = $value;
                     }
+                    $c++;
                     break;
                 case $index."_end":
                     if (@$this->isEmpty($value)) {
@@ -937,10 +939,12 @@ class CertificationController extends Controller
                         else
                             $end_year = $value;
                     }
+                    $c++;
                     break;
                 case $index."_major":
                     if (@$this->isEmpty($value))
                         array_push($message, $name . '专业方向未填写。');
+                    $c++;
                     break;
                 case $index."_school":
                     if(@$valid_id && is_null(DB::connection("mysql_alumni")->table("universities")->where(["id"=>$value])->first()->name)){
@@ -951,18 +955,27 @@ class CertificationController extends Controller
                             array_push($message, $name . '就读院校未填写或不正确。');
                         }
                     }
+                    $c++;
                     break;
                 case $index."_type":
                     if (@$this->isEmpty($value) && $index == "other") {
                         array_push($message, $name . '院校类型未填写。');
                         $count++;
                     }
+                    $c++;
                     break;
             }
         }
         if(@!is_null($start_year) && !is_null($end_year)){
             if($start_year>$end_year)
                 array_push($message,$name . "入学年份大于毕业年份。");
+        }
+        if($index == "other"){
+            if($c != 5)
+                array_push($message,$name . "信息不完整，请补充。");
+        } else {
+            if($c != 4)
+                array_push($message,$name . "信息不完整，请补充。");
         }
         return true;
     }
