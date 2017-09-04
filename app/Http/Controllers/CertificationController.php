@@ -910,6 +910,7 @@ class CertificationController extends Controller
         $min_year = 1900;
         $max_year = 2100;
         $count = $count + 4;
+        Log::notice($name.":".$count);
         $c = 0;
         foreach($info as $key=>$value){
             switch($key){
