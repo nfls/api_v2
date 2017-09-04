@@ -13,6 +13,7 @@ use libphonenumber\NumberParseException;
 use Zend\Validator\Between;
 use Zend\Validator\Date;
 use Response;
+use Illuminate\Support\Facades\Log;
 
 class CertificationController extends Controller
 {
@@ -893,10 +894,11 @@ class CertificationController extends Controller
         if(@!$this->isEmpty($info->doctor) && $info->doctor == true)
             $passed = $passed || $this->collegeInfoCheck("doctor",$info,$message,"博士",$grid_count);
         if(@!$this->isEmpty($info->other) && $info->other == true)
-            $passed = $passed || $this->collegeInfoCheck("other",$info,$message,"其他",$grid_count);
+            $passed = $passed || $this->collegeInfoCheck("other",$info,$message,"其他",$grid_count,false);
         if(!$passed)
             array_push($message,"请至少选择一个进行填写！");
         $this->structureCheck($info,$grid_count+7,$message);
+        Log::notice(print_r($message),true);
         return $message;
     }
 
