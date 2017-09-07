@@ -145,6 +145,11 @@ class UserCenterController extends Controller
                     $info = $this->getUnreadCount(self::GetUserId(Cookie::get("token")));
                 }
                 break;
+            case "last":
+                if($request->isMethod("get")){
+                    $info = $this->getFirstMessage(self::GetUserId(Cookie::get("token")));
+                }
+                break;
             default:
                 break;
         }
@@ -631,20 +636,41 @@ class UserCenterController extends Controller
     {
         DB::connection("mysql_user")->table("user_list")->where(["id" => $id])->first();
         $messages = DB::connection("mysql_user")->table("system_message")->where(["receiver" => $id])->orWhere(["receiver" => -1])->get();
+        $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
+        $last = $user->last_sysmessage_read;
         $count = 0;
+        $c = 0;
         foreach ($messages as $message) {
             $info[$count]['time'] = $message->time;
             $info[$count]['title'] = $message->title;
             $info[$count]['type'] = $this->GetNoticeType($message->type);
             $info[$count]['detail'] = $message->detail;
+            if($last>$message->id){
+                $info[$count]['isRead'] = true;
+            } else {
+                $info[$count]['isRead'] = false;
+            }
+            $c = max($c,$message->id);
             $count++;
         }
+        DB::connection("mysql_user")->table("user_list")->where(["id" => $id])->update(["last_sysmessage_read"=>$c]);
         return $info;
     }
 
+    function getFirstMessage($id){
+        DB::connection("mysql_user")->table("user_list")->where(["id" => $id])->first();
+        $message = DB::connection("mysql_user")->table("system_message")->where(["receiver" => $id])->orWhere(["receiver" => -1])->orderBy("id","desc")->first();
+        $info['id'] = $message->id;
+        $info['title'] = $message->title;
+        $info['text'] = $message->detail;
+        return $info;
+    }
     function getUnreadCount($id){
-        $message = DB::connection("mysql_user")->table("system_message")->orderBy("id","desc")->first();
         $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
-        return ((int)($message->id) - (int)($user->last_sysmessage_read));
+        $last = $user->last_sysmessage_read;
+        $message = DB::connection("mysql_user")->table("system_message")->where("id",">",$last)->where(function($query) use($id){
+            $query->where(["receiver" => $id])->orWhere(["receiver" => -1]);
+        })->get();
+        return count($message);
     }
 }
