@@ -125,6 +125,7 @@ class WeatherController extends Controller
                         $info['id'] = $conf["identification"];
                         $info['sensor_name'] = $conf["visualSensorName"];
                         $info['isDigital'] = $conf["isDigital"];
+                        $info['unit'] = $conf["unit"];
                         $info['value'] = $data[$i];
                         $i++;
                         array_push($return_array,$info);
