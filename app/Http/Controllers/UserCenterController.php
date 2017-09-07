@@ -140,6 +140,11 @@ class UserCenterController extends Controller
                     $info = $this->renameAccount(self::GetUserId(Cookie::get("token")), $request->input("name"));
                 }
                 break;
+            case "count":
+                if($request->isMethod("get")){
+                    $info = $this->getUnreadCount(self::GetUserId(Cookie::get("token")));
+                }
+                break;
             default:
                 break;
         }
@@ -174,6 +179,9 @@ class UserCenterController extends Controller
         //var_dump($matches);
         if ($matches[0] != $name)
             abort(403);
+        if (!@is_null(DB::connection("mysql_forum")->table("nfls_users")->where(["username" => $name])->first()->id)){
+            abort(403);
+        }
         DB::connection("mysql_forum")->table("nfls_users")->where(["id" => $id])->update(["username" => $name]);
         if ($this->GetUserAssociatedIdById($id, "wiki") > 0) {
             $name = str_replace("_", " ", $name);
@@ -632,76 +640,11 @@ class UserCenterController extends Controller
             $count++;
         }
         return $info;
-        /*
-        if(mysqli_num_rows($result)==1)
-        {
-
-            $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-            if($is_push)//测试中，请勿投入使用
-            {
-                $push_text=array();
-                $last_id = $row['last_sysmessage_pushed'];
-                $message = mysqli_query($con,"SELECT * FROM system_message WHERE id > $last_id");
-                if(mysqli_num_rows($result)<1)
-                {
-                    return 1;
-                }
-                while($row = mysqli_fetch_array($result,MYSQLI_ASSOC))
-                {
-                    if($row['push_text']!="")
-                        array_push($push_text,$row['push_text']);
-                }
-                return $push_text;
-            }
-            else
-            {
-                $count=1;
-                $mes_text=array();
-                $last_id = $row['last_sysmessage_read'];
-                $message = mysqli_query($con,"SELECT * FROM system_message order by id desc limit 10");
-                if(mysqli_num_rows($result)<1)
-                {
-                    return 1;
-                }
-                while($row = mysqli_fetch_array($message,MYSQLI_ASSOC))
-                {
-
-                    if($only_not_read)
-                    {
-                        if($row['id']>=$last_id)
-                        {
-                            $mes_text[$count]['time']=$row['time'];
-                            $mes_text[$count]['title']=$row['title'];
-                            $mes_text[$count]['type']=GetNoticeType($row['type']);
-                            $mes_text[$count]['detail']=$row['detail'];
-                        }
-                    }
-                    else
-                    {
-                        $mes_text[$count]['time']=$row['time'];
-                        $mes_text[$count]['title']=$row['title'];
-                        $mes_text[$count]['type']=GetNoticeType($row['type']);
-                        $mes_text[$count]['detail']=$row['detail'];
-                    }
-                    $count++;
-                }
-                return $mes_text;
-            }
-        }
-        else
-        {
-            return false;
-        }
-        */
     }
 
-
-    function mksecret($len = 20)
-    {//share secret制作
-        $ret = "";
-        for ($i = 0; $i < $len; $i++)
-            $ret .= chr(mt_rand(100, 120));
-        return $ret;
+    function getUnreadCount($id){
+        $message = DB::connection("mysql_user")->table("system_message")->orderBy("id")->latest();
+        $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
+        return ($message->id - $user->last_sysmessage_read);
     }
-
 }
