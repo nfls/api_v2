@@ -61,6 +61,7 @@ Route::post('device/purchase',"IOSDeviceController@iapPurchase");
 Route::get('device/status',"IOSDeviceController@confirmLoggedIn");
 Route::get('device/notice',"IOSDeviceController@getNotice");
 Route::post('device/auth',"IOSDeviceController@compareAuthDatabase");
+Route::get('device/pics',"IOSDeviceController@getStartUpPictures");
 
 Route::get('weather/ping',"WeatherController@ping");
 Route::post('weather/test',"WeatherController@testKey");

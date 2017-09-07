@@ -97,4 +97,12 @@ class IOSDeviceController extends Controller
         }
 
     }
+
+    function getStartUpPictures(){
+        $query = DB::connection("mysql_user")->table("app_startup_pics")->where(["groups"=>-1]);
+        if(UserCenterController::checkAdmin(Cookie::get("id"))){
+            $query = $query->orWhere(["groups"=>0]);
+        }
+        return Response::json($query->orderBy("id","desc")->first());
+    }
 }
