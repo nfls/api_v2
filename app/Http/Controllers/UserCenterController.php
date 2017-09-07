@@ -645,7 +645,7 @@ class UserCenterController extends Controller
             $info[$count]['title'] = $message->title;
             $info[$count]['type'] = $this->GetNoticeType($message->type);
             $info[$count]['detail'] = $message->detail;
-            if($last>$message->id){
+            if($last>=$message->id){
                 $info[$count]['isRead'] = true;
             } else {
                 $info[$count]['isRead'] = false;
