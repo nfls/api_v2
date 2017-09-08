@@ -301,13 +301,13 @@ class UserCenterController extends Controller
 
     static function CreateCaptcha($ip, $operation)
     {
-        DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d h:i:s'))->delete();
+        DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
         $phraseBuilder = new PhraseBuilder(10);
         $builder = new CaptchaBuilder(null, $phraseBuilder);
         $builder->buildAgainstOCR($width = 300, $height = 100, $font = null);
         //header('Content-type: image/jpeg');
         $phrase = $builder->getPhrase();
-        $time = date('Y-m-d h:i:s', strtotime('+10 minutes'));
+        $time = date('Y-m-d H:i:s', strtotime('+10 minutes'));
         $session = self::random_str(16);
         DB::connection("mysql_user")->table("user_session")->insert(["phrase" => $phrase, "ip" => $ip, "valid_before" => $time, "session" => $session, "operation" => $operation]);
         $image = 'data:image/jpeg;base64,' . base64_encode($builder->get($quality = 100));
@@ -316,7 +316,7 @@ class UserCenterController extends Controller
 
     static function ConfirmCaptcha($session, $captcha, $operation)
     {
-        DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d h:i:s'))->delete();
+        DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
         $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => $operation, "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
         if (@is_null($valid->id)) {
             DB::connection("mysql_user")->table("user_session")->where(["session" => $session])->delete();

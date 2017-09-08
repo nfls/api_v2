@@ -99,10 +99,24 @@ class IOSDeviceController extends Controller
     }
 
     function getStartUpPictures(){
-        $query = DB::connection("mysql_user")->table("app_startup_pics")->where(["groups"=>-1]);
+        $query = DB::connection("mysql_user")->table("app_startup_pics")->where(function($query){
+            $query->where("invalid_after", ">", date('Y-m-d H:i:s'))->orWhere("invalid_after","=",null);
+        })->where(function($query){
+            $query->where("valid_after", "<", date('Y-m-d H:i:s'))->orWhere("valid_after","=",null);
+        });
         if(UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token")))){
-            $query = $query->orWhere(["groups"=>0]);
+            $query = $query->where(function($query){
+                $query->where(["groups"=>-1])->orWhere(["groups"=>0]);
+            });
+        } else {
+            $query = $query->where(["groups"=>-1]);
         }
-        return Response::json($query->orderBy("id","desc")->first());
+        $response = $query->orderBy("id","desc")->first();
+        $array["code"] = 200;
+        $array["info"]["id"] = $response->id;
+        $array["info"]["text"] = $response->text;
+        $array["info"]["url"] = $response->url;
+        $array["info"]["invalid_after"] = $response->invalid_after;
+        return Response::json($array);
     }
 }
