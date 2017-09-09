@@ -432,6 +432,8 @@ class UserCenterController extends Controller
         $token = $this->CheckIfTokenExists($id);
         if (!$token)
             $token = $this->GenerateToken($id);
+        if ($this->GetUserAssociatedIdById($id,"wiki") == -1)
+            $this->CreateWikiAccountById($id);
         return ($token);
     }
 

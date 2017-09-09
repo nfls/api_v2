@@ -316,7 +316,7 @@ class CertificationController extends Controller
                     {
                         if (empty($message)) {
                             array_push($message, '您提交的数据已保存至数据库，即将进入下一步。');
-                            DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => $step + 1, 'submit_time' => date('y-m-d h:i:s')]);
+                            DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update(['current_step' => $step + 1, 'submit_time' => date('y-m-d H:i:s')]);
                             return Response::json(array('code' => 200, 'message' => $message));
                         } else {
                             array_unshift($message, '非常抱歉，您提交的数据在以下部分存在问题：');
@@ -430,7 +430,7 @@ class CertificationController extends Controller
                     break;
             }
             if ($insert) {
-                DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => json_encode($content), 'current_step' => $step + $action, 'edit_time' => date('y-m-d h:i:s')]);
+                DB::connection('mysql_alumni')->table('user_auth')->where('id', $id)->update([$name => json_encode($content), 'current_step' => $step + $action, 'edit_time' => date('y-m-d H:i:s')]);
             }
              return Response::json(array('code' => 200, 'message' => $message));
         } else {
