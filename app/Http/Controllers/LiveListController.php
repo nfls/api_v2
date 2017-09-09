@@ -11,4 +11,8 @@ class LiveListController extends Controller
     function getLiveList(){
         return Response::json(DB::connection("mysql_live")->table("activity")->orderby("start","desc")->get());
     }
+
+    function getVideoList(){
+        return Response::json(DB::connection("mysql_media")->table("videos")->orderBy("time","desc")->get());
+    }
 }

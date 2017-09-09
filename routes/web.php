@@ -29,6 +29,7 @@ Route::get('media/gallery/getlist',"AlbumController@getAlbumList");
 Route::any('media/gallery/update',"AlbumController@updateAnAlbum");
 
 Route::get("live/list","LiveListController@getLiveList");
+Route::get("video/list","LiveListController@getVideoList");
 
 Route::post("student/query","StudentsListController@getNameList");
 Route::get("student/info","StudentsListController@getInfo");
