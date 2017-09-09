@@ -89,8 +89,16 @@ class UserCenterController extends Controller
                     $info = $this->GetPersonalForumInfoById(self::GetUserId(Cookie::get('token')));
                 break;
             case "wikiInfo":
-                if ($request->isMethod("get"))
-                    $info = $this->GetUserWikiInfoByWikiId($this->GetUserAssociatedIdById(self::GetUserId(Cookie::get('token')), "wiki"));
+                if ($request->isMethod("get")){
+                    $id = $this->GetUserAssociatedIdById(self::GetUserId(Cookie::get('token')), "wiki");
+                    if($id == -1){
+                        $this->CreateWikiAccountById(self::GetUserId(Cookie::get('token')));
+                        $id = $this->GetUserAssociatedIdById(self::GetUserId(Cookie::get('token')));
+                        $info = $this->GetUserWikiInfoByWikiId($id);
+                    }else{
+                        $info = $this->GetUserWikiInfoByWikiId($id);
+                    }
+                }
                 break;
             case "systemMessage":
                 if ($request->isMethod("get"))
