@@ -216,7 +216,7 @@ class CertificationController extends Controller
                 array_push($return, $this->getStatusArray("审核员",UserCenterController::GetUserNickname($user->operator)));
         }
         if (!is_null($user->edit_time))
-            array_push($return, $this->getStatusArray("最近一次编辑时间",$user->edit_time));
+            array_push($return, $this->getStatusArray("最近编辑",$user->edit_time));
         if (is_null($user->submit_time)){
             array_push($return, $this->getStatusArray("是否提交","未提交"));
             array_push($return, $this->getStatusArray("编辑权限","1-5步"));
