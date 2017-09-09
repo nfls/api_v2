@@ -20,6 +20,7 @@ class AddMediaTables extends Migration
            $table->dateTime("time")->nullable()->comment("上传时间");
            $table->text("avid")->comment("av号");
            $table->text("uploader")->comment("UP主");
+           $table->text("name")->comment("视频名称");
            $table->integer("group_id")->default(-1)->comment("组号");
         });
         Schema::connection("mysql_alumni")->table("user_auth", function (Blueprint $table){
