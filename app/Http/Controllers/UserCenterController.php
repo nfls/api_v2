@@ -655,6 +655,7 @@ class UserCenterController extends Controller
             $info[$count]['title'] = $message->title;
             $info[$count]['type'] = $this->GetNoticeType($message->type);
             $info[$count]['detail'] = $message->detail;
+            $info[$count]['push'] = $message->push_text;
             if($last>=$message->id){
                 $info[$count]['isRead'] = true;
             } else {
@@ -673,6 +674,7 @@ class UserCenterController extends Controller
         $info['id'] = $message->id;
         $info['title'] = $message->title;
         $info['text'] = $message->detail;
+        $info['push'] = $message->push_text;
         return $info;
     }
     function getUnreadCount($id){
