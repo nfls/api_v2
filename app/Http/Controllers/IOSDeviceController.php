@@ -7,6 +7,9 @@ use Cookie;
 use Illuminate\Pagination\PaginationServiceProvider;
 use Response;
 use Illuminate\Support\Facades\DB;
+use ApnsPHP_Push;
+use ApnsPHP_Abstract;
+use ApnsPHP_Message;
 
 class IOSDeviceController extends Controller
 {
@@ -118,5 +121,27 @@ class IOSDeviceController extends Controller
         $array["info"]["url"] = $response->url;
         $array["info"]["invalid_after"] = $response->invalid_after;
         return Response::json($array);
+    }
+
+    function pushAMessage(){
+        $push = new ApnsPHP_Push(
+            ApnsPHP_Abstract::ENVIRONMENT_SANDBOX,
+            '/etc/cert/push.pem'
+        );
+        $push->setRootCertificationAuthority('/etc/cert/entrust.pem');
+        $push->connect();
+        $message = new ApnsPHP_Message('f3f471ff078a21ecb766a18aaae2d67ebd802a4ac6f235d72824e0bf5316ff52');
+        $message->setCustomIdentifier("Message-Badge-3");
+        $message->setBadge(3);
+        $message->setText('Hello APNs-enabled device!');
+        $message->setSound();
+        $message->setExpiry(30);
+        $push->add($message);
+        $push->send();
+        $push->disconnect();
+        $aErrorQueue = $push->getErrors();
+        if (!empty($aErrorQueue)) {
+            var_dump($aErrorQueue);
+        }
     }
 }
