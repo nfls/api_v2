@@ -124,19 +124,22 @@ class IOSDeviceController extends Controller
     }
 
     function pushAMessage(){
+        $list = DB::connection("mysql_user")->table("user_device")->get();
         $push = new ApnsPHP_Push(
             ApnsPHP_Abstract::ENVIRONMENT_SANDBOX,
             '/etc/cert/push.pem'
         );
         $push->setRootCertificationAuthority('/etc/cert/entrust.pem');
+        foreach ($list as $device){
+            $message = new ApnsPHP_Message($device->device_id);
+            $message->setCustomIdentifier("Message-Badge-3");
+            $message->setBadge(3);
+            $message->setText('你好！测试员们！');
+            $message->setSound();
+            $message->setExpiry(30);
+            $push->add($message);
+        }
         $push->connect();
-        $message = new ApnsPHP_Message('f3f471ff078a21ecb766a18aaae2d67ebd802a4ac6f235d72824e0bf5316ff52');
-        $message->setCustomIdentifier("Message-Badge-3");
-        $message->setBadge(3);
-        $message->setText('Hello APNs-enabled device!');
-        $message->setSound();
-        $message->setExpiry(30);
-        $push->add($message);
         $push->send();
         $push->disconnect();
         $aErrorQueue = $push->getErrors();
