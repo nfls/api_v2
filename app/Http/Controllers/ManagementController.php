@@ -23,7 +23,7 @@ class ManagementController extends Controller
         } else {
             $startWith = 0;
         }
-        $query = DB::connection("mysql_user")->table("system_message")->orderBy("id","asc")->select("id","time","type","receiver","title")->limit(10)->offset($startWith)->get();
+        $query = DB::connection("mysql_user")->table("system_message")->orderBy("id","desc")->select("id","time","type","receiver","title")->limit(10)->offset($startWith)->get();
         $total = array();
 
         foreach($query as $single){
@@ -36,6 +36,13 @@ class ManagementController extends Controller
             array_push($total,$info);
         }
         Return Response::json(array("code"=>200,"info"=>$total));
+    }
+
+    function getAMessage(Request $request){
+        if($request->has("id") && $this->checkPermission(UserCenterController::GetUserId(Cookie::get),self::MESSAGE_ADD)){
+            $result = DB::connection("mysql_user")->table("system_message")->where(["id"=>$request->input("id")])->first();
+            return Response::json(array("code"=>200,"info"=>$result));
+        }
     }
 
     function getGropus($id){
