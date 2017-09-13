@@ -30,9 +30,9 @@ class ManagementController extends Controller
             $info = array();
             $info["id"] = $single->id;
             $info["time"] = $single->time;
-            $info["type"] = UserCenterController::GetNoticeType($info->type);
-            $info["receiver"] = $this->getGropus($info->receiver);
-            $info["title"] = $info->title;
+            $info["type"] = UserCenterController::GetNoticeType($single->type);
+            $info["receiver"] = $this->getGropus($single->receiver);
+            $info["title"] = $single->title;
             array_push($total,$info);
         }
         Return Response::json(array("code"=>200,"info"=>$total));
