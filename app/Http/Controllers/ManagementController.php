@@ -23,7 +23,7 @@ class ManagementController extends Controller
         } else {
             $startWith = 0;
         }
-        $query = DB::connection("mysql_user")->table("system_message")->orderBy("id","asc")->select("id","time","type","receiver","title")->limit(10)->offset($startWith);
+        $query = DB::connection("mysql_user")->table("system_message")->orderBy("id","asc")->select("id","time","type","receiver","title")->limit(10)->offset($startWith)->get();
         $total = array();
 
         foreach($query as $single){
