@@ -142,9 +142,5 @@ class IOSDeviceController extends Controller
         $push->connect();
         $push->send();
         $push->disconnect();
-        $aErrorQueue = $push->getErrors();
-        if (!empty($aErrorQueue)) {
-            var_dump($aErrorQueue);
-        }
     }
 }

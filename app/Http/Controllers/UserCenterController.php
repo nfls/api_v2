@@ -621,7 +621,7 @@ class UserCenterController extends Controller
     }
 
 
-    function GetNoticeType($type)//获取通知类型
+    static function GetNoticeType($type)//获取通知类型
     {
         switch ($type) {
             case "1":
@@ -635,6 +635,9 @@ class UserCenterController extends Controller
                 break;
             case "4":
                 return "预告";
+                break;
+            case "5":
+                return "推广";
                 break;
             default:
                 return "";
