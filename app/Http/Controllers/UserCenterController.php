@@ -677,7 +677,7 @@ class UserCenterController extends Controller
         $info['id'] = $message->id;
         $info['title'] = $message->title;
         $info['text'] = $message->detail;
-        $info['push'] = $message->push_text;
+        $info['push'] = $message->conf;
         return $info;
     }
     function getUnreadCount($id){
