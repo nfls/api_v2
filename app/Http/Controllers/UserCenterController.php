@@ -658,7 +658,7 @@ class UserCenterController extends Controller
             $info[$count]['title'] = $message->title;
             $info[$count]['type'] = $this->GetNoticeType($message->type);
             $info[$count]['detail'] = $message->detail;
-            $info[$count]['push'] = $message->push_text;
+            $info[$count]['push'] = $message->conf;
             if($last>=$message->id){
                 $info[$count]['isRead'] = true;
             } else {
