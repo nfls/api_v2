@@ -39,7 +39,7 @@ class ManagementController extends Controller
     }
 
     function getAMessage(Request $request){
-        if($request->has("id") && $this->checkPermission(UserCenterController::GetUserId(Cookie::get),self::MESSAGE_ADD)){
+        if($request->has("id") && $this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_ADD)){
             $result = DB::connection("mysql_user")->table("system_message")->where(["id"=>$request->input("id")])->first();
             return Response::json(array("code"=>200,"info"=>$result));
         }
