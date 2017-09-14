@@ -86,7 +86,7 @@ class IOSDeviceController extends Controller
     }
 
     function getNotice(){
-        return Response::json(array("code"=>200,"info"=>array("id"=>100,"title"=>"维护通知","text"=>"客户端相关服务维护，可能会闪退")));
+        return Response::json(array("code"=>200,"info"=>array("id"=>200,"title"=>"更新通知","text"=>"新版本客户端已经发布，请在App Store中下载更新！此版本在本周六（16号）凌晨0点将彻底停用。")));
     }
 
     function compareAuthDatabase(Request $request){
