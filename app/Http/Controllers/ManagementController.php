@@ -10,9 +10,9 @@ use Cookie;
 
 class ManagementController extends Controller
 {
-    const IS_ROOT = 0;
-    const MESSAGE_ADD = 1;
+    const IS_ROOT = 1;
     const MESSAGE_EDIT = 2;
+    const MESSAGE_ADMIN = 3;
     function checkPermission($id,$permission){
         return true;
     }
@@ -38,8 +38,29 @@ class ManagementController extends Controller
         Return Response::json(array("code"=>200,"info"=>$total));
     }
 
+    function saveAMessage(Request $request){
+
+        if($request->has(["title","detail","img","site","url","groups","receiver"]) && $this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_EDIT)){
+            $query = DB::connection("mysql_user")->table("system_message");
+            $conf = json_encode(array("site"=>$request->input("site"),"url"=>$request->input("url")));
+            $array = ["title"=>$request->input("title"),"detail"=>$request->input("detail"),"img"=>$request->input("img"),"conf"=>$conf];
+            if($this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_ADMIN)){
+                $array["groups"] = $request->input("groups");
+                $array["receiver"] = $request->input("receiver");
+            }else{
+                $array["groups"] = 0;
+                $array["receiver"] = UserCenterController::GetUserId(Cookie::get("token"));
+            }
+            if($request->has("id")){
+                $query->where(["id"=>$request->input("id")])->update($array);
+            }else{
+                $query->insert($array);
+            }
+            return Response::json(array("code"=>200));
+        }
+    }
     function getAMessage(Request $request){
-        if($request->has("id") && $this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_ADD)){
+        if($request->has("id") && $this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_EDIT)){
             $result = DB::connection("mysql_user")->table("system_message")->where(["id"=>$request->input("id")])->first();
             return Response::json(array("code"=>200,"info"=>$result));
         }

@@ -58,6 +58,7 @@ Route::post("admin/auth/ignore","CertificationManagementController@ignoreIdentit
 Route::get("admin/auth/instructions","CertificationManagementController@getInstruction");
 Route::get("admin/message/get","ManagementController@getAllMessages");
 Route::post("admin/message/detail","ManagementController@getAMessage");
+Route::post("admin/message/save","ManagementController@saveAMessage");
 
 Route::post('device/register',"IOSDeviceController@registerDevice");
 Route::post('device/purchase',"IOSDeviceController@iapPurchase");
