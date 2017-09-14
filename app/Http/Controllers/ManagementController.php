@@ -18,24 +18,26 @@ class ManagementController extends Controller
     }
 
     function getAllMessages(Request $request){
-        if ($request->has("startFrom")) {
-            $startWith = (int)($request->input("startFrom"));
-        } else {
-            $startWith = 0;
-        }
-        $query = DB::connection("mysql_user")->table("system_message")->orderBy("id","desc")->select("id","time","type","receiver","title")->limit(10)->offset($startWith)->get();
-        $total = array();
+        if($this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_EDIT)){
+            if ($request->has("startFrom")) {
+                $startWith = (int)($request->input("startFrom"));
+            } else {
+                $startWith = 0;
+            }
+            $query = DB::connection("mysql_user")->table("system_message")->orderBy("id","desc")->select("id","time","type","receiver","title")->limit(10)->offset($startWith)->get();
+            $total = array();
 
-        foreach($query as $single){
-            $info = array();
-            $info["id"] = $single->id;
-            $info["time"] = $single->time;
-            $info["type"] = UserCenterController::GetNoticeType($single->type);
-            $info["receiver"] = $this->getGropus($single->receiver);
-            $info["title"] = $single->title;
-            array_push($total,$info);
+            foreach($query as $single){
+                $info = array();
+                $info["id"] = $single->id;
+                $info["time"] = $single->time;
+                $info["type"] = UserCenterController::GetNoticeType($single->type);
+                $info["receiver"] = $this->getGropus($single->receiver);
+                $info["title"] = $single->title;
+                array_push($total,$info);
+            }
+            Return Response::json(array("code"=>200,"info"=>$total));
         }
-        Return Response::json(array("code"=>200,"info"=>$total));
     }
 
     function saveAMessage(Request $request){
@@ -49,7 +51,7 @@ class ManagementController extends Controller
                 else
                     abort(403);
             }
-            if($request->has("site"))
+            if($request->has("site") && $request->input("site") != "none")
                 $array["conf"] = json_encode(array("site"=>$request->input("site"),"url"=>$request->input("url"),"place"=>$request->input("place")));
             if($this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_ADMIN)){
                 if($request->has("receiver"))
