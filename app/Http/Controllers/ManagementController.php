@@ -40,10 +40,17 @@ class ManagementController extends Controller
 
     function saveAMessage(Request $request){
 
-        if($request->has(["title","detail","img","site","url","groups","receiver"]) && $this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_EDIT)){
+        if($request->has(["title","detail","place","groups","receiver"]) && $this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_EDIT)){
             $query = DB::connection("mysql_user")->table("system_message");
-            $conf = json_encode(array("site"=>$request->input("site"),"url"=>$request->input("url")));
-            $array = ["title"=>$request->input("title"),"detail"=>$request->input("detail"),"img"=>$request->input("img"),"conf"=>$conf];
+            $array = ["title"=>$request->input("title"),"detail"=>$request->input("detail")];
+            if($request->input("place") == 2){
+                if($request->has("img"))
+                    $array["img"] = $request->input("img");
+                else
+                    abort(403);
+            }
+            if($request->has("site"))
+                $array["conf"] = json_encode(array("site"=>$request->input("site"),"url"=>$request->input("url"),"place"=>$request->input("place")));
             if($this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_ADMIN)){
                 $array["groups"] = $request->input("groups");
                 $array["receiver"] = $request->input("receiver");
