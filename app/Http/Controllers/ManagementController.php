@@ -69,6 +69,14 @@ class ManagementController extends Controller
             return Response::json(array("code"=>200));
         }
     }
+
+    function deleteAMessage(Request $request){
+        if($request->has("id") && $this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_ADMIN)){
+            DB::connection("mysql_user")->table("system_message")->where(["id"=>$request->input("id")])->delete();
+            return Response::json(array("code"=>200));
+        }
+    }
+
     function getAMessage(Request $request){
         if($request->has("id") && $this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_EDIT)){
             $result = DB::connection("mysql_user")->table("system_message")->where(["id"=>$request->input("id")])->first();

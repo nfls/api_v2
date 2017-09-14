@@ -680,6 +680,7 @@ class UserCenterController extends Controller
         $info['push'] = $message->conf;
         return $info;
     }
+
     function getUnreadCount($id){
         $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
         $last = $user->last_sysmessage_read;
