@@ -51,7 +51,7 @@ class ManagementController extends Controller
                 $array["groups"] = 0;
                 $array["receiver"] = UserCenterController::GetUserId(Cookie::get("token"));
             }
-            if($request->has("id")){
+            if($request->has("id") && $request->input("id") > 0){
                 $query->where(["id"=>$request->input("id")])->update($array);
             }else{
                 $query->insert($array);
