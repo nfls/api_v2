@@ -126,7 +126,7 @@ class IOSDeviceController extends Controller
     function pushAMessage(){
         $list = DB::connection("mysql_user")->table("user_device")->get();
         $push = new ApnsPHP_Push(
-            ApnsPHP_Abstract::ENVIRONMENT_SANDBOX,
+            ApnsPHP_Abstract::ENVIRONMENT_PRODUCTION,
             '/etc/cert/push.pem'
         );
         $push->setRootCertificationAuthority('/etc/cert/entrust.pem');
@@ -134,7 +134,7 @@ class IOSDeviceController extends Controller
             $message = new ApnsPHP_Message($device->device_id);
             $message->setCustomIdentifier("Message-Badge-3");
             $message->setBadge(3);
-            $message->setText('你好！测试员们！');
+            $message->setText('新版本APP已经发布，修复了大量闪退BUG，添加了许多新功能，请尽快更新！老版本App将于本周六停用！');
             $message->setSound();
             $message->setExpiry(30);
             $push->add($message);
