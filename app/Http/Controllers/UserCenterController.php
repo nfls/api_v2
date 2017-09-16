@@ -697,13 +697,18 @@ class UserCenterController extends Controller
         return count($message);
     }
 
-    function getRank($id){
+    function getRank($id,$retrieve = true){
         $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
-        $before = $this->getUserNameList(DB::connection("mysql_user")->table("user_list")->select(["id","score"])->where("score",">",$user->score)->orderBy("score")->limit(10)->get());
-        $after = $this->getUserNameList(DB::connection("mysql_user")->table("user_list")->select(["id","score"])->where("score","<",$user->score)->whereNotNull("lastPlayed")->orderBy("score","desc")->limit(10)->get());
         $count = DB::connection("mysql_user")->table("user_list")->where("score",">",$user->score)->get();
         $count = count($count);
-        return array("before"=>$before,"after"=>$after,"count"=>$count+1,"score"=>$user->score);
+        if($retrieve){
+            $before = $this->getUserNameList(DB::connection("mysql_user")->table("user_list")->select(["id","score"])->where("score",">",$user->score)->orderBy("score")->limit(10)->get());
+            $after = $this->getUserNameList(DB::connection("mysql_user")->table("user_list")->select(["id","score"])->where("score","<",$user->score)->whereNotNull("lastPlayed")->orderBy("score","desc")->limit(10)->get());
+            return array("before"=>$before,"after"=>$after,"count"=>$count+1,"score"=>$user->score);
+        } else {
+            return array("count"=>$count+1,"score"=>$user->score);
+        }
+
     }
 
     function getUserNameList($array){
@@ -716,14 +721,14 @@ class UserCenterController extends Controller
     }
 
     function updateScore($id,$input){
-        $rank = $this->getRank($id);
+        $rank = $this->getRank($id,false);
         if($rank["score"]<$input){
             DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["score"=>$input,"lastPlayed"=> date('Y-m-d H:i:s')]);
-            $rank["newRank"] = $rank["score"];
+            $rank["nowCount"] = $rank["count"];
         } else {
             $count = DB::connection("mysql_user")->table("user_list")->where("score",">",$input)->get();
             $count = count($count);
-            $rank["newRank"] = $count + 1;
+            $rank["nowCount"] = $count + 1;
         }
 
         return $rank;
