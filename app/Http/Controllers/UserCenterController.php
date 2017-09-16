@@ -703,13 +703,13 @@ class UserCenterController extends Controller
         $after = $this->getUserNameList(DB::connection("mysql_user")->table("user_list")->select(["id","score"])->where("score","<",$user->score)->whereNotNull("lastPlayed")->orderBy("score","desc")->limit(10)->get());
         $count = DB::connection("mysql_user")->table("user_list")->where("score",">",$user->score)->get();
         $count = count($count);
-        return array("before"=>$before,"after"=>$after,"count"=>$count);
+        return array("before"=>$before,"after"=>$after,"count"=>$count+1,"score"=>$user->score);
     }
 
     function getUserNameList($array){
         $o = array();
         foreach($array as $single){
-            $single->id = self::GetUserNickname($single->id);
+            $single->username = self::GetUserNickname($single->id);
             array_push($o,$single);
         }
         return $o;
@@ -717,6 +717,6 @@ class UserCenterController extends Controller
 
     function updateScore($id,$input){
         DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["score"=>$input,"lastPlayed"=> date('Y-m-d H:i:s')]);
-        return [];
+        return true;
     }
 }
