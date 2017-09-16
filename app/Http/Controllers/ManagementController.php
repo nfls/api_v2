@@ -77,6 +77,18 @@ class ManagementController extends Controller
         }
     }
 
+    function getPermission(){
+        $id = UserCenterController::GetUserId(Cookie::get("token"));
+        if($this->checkPermission($id,self::MESSAGE_ADMIN)){
+            $info = "您拥有本页上所有内容的管理权限";
+        }else if($this->checkPermission($id,self::MESSAGE_EDIT)){
+            $info = "您拥有添加及修改通知的权限，但是新通知只能发送给自己";
+        }else{
+            $info = "您没有任何权限";
+        }
+        return Response::json(array("code"=>200,"info"=>$info));
+    }
+
     function getAMessage(Request $request){
         if($request->has("id") && $this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_EDIT)){
             $result = DB::connection("mysql_user")->table("system_message")->where(["id"=>$request->input("id")])->first();

@@ -158,6 +158,8 @@ class UserCenterController extends Controller
                     $info = $this->getFirstMessage(self::GetUserId(Cookie::get("token")));
                 }
                 break;
+            case "rank":
+                break;
             default:
                 break;
         }

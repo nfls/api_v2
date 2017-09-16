@@ -60,6 +60,7 @@ Route::get("admin/message/get","ManagementController@getAllMessages");
 Route::post("admin/message/detail","ManagementController@getAMessage");
 Route::post("admin/message/save","ManagementController@saveAMessage");
 Route::post("admin/message/remove","ManagementController@deleteAMessage");
+Route::get("admin/message/permission","ManagementController@getPermission");
 
 Route::post('device/register',"IOSDeviceController@registerDevice");
 Route::post('device/purchase',"IOSDeviceController@iapPurchase");
