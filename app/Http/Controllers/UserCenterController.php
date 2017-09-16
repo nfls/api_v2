@@ -722,34 +722,36 @@ class UserCenterController extends Controller
 
     function updateScore($id,$input){
         $rank = $this->getRank($id,false);
+        $array["playerBefore"] = null;
+        $array["playerAfter"] = null;
         if($rank["score"]<$input){
             DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["score"=>$input,"lastPlayed"=> date('Y-m-d H:i:s')]);
             $rank = $this->getRank($id,false);
             $array["bestScore"] = $rank["score"];
             $array["bestRank"] = $rank["count"];
             $array["nowRank"] = $array["bestRank"];
+            $before = DB::connection("mysql_user")->table("user_list")->where("score",">",$rank->score)->orderBy("score","asc")->first();
+            $after = DB::connection("mysql_user")->table("user_list")->where("score","<",$rank->score)->orderBy("score","desc")->first();
+            if(!is_null($before)){
+                $array["playerBefore"]["username"] = self::GetUserNickname($before->id);
+                $array["playerBefore"]["score"] = $before->score;
+            }else{
+                $array["playerBefore"] = [];
+            }
+            if(!is_null($after)){
+                $array["playerAfter"]["username"] = self::GetUserNickname($after->id);
+                $array["playerAfter"]["score"] = $after->score;
+            }else{
+                $array["playerAfter"] = [];
+            }
         } else {
             $array["bestScore"] = $rank["score"];
             $array["bestRank"] = $rank["count"];
             $count = DB::connection("mysql_user")->table("user_list")->where("score",">",$input)->get();
             $count = count($count);
             $array["nowRank"] = $count + 1;
-        }
-        $before = DB::connection("mysql_user")->table("user_list")->where("score",">",$rank->score)->orderBy("score","asc")->first();
-        $after = DB::connection("mysql_user")->table("user_list")->where("score","<",$rank->score)->orderBy("score","desc")->first();
-        if(!is_null($before)){
-            $array["playerBefore"]["username"] = self::GetUserNickname($before->id);
-            $array["playerBefore"]["score"] = $before->score;
-        }else{
-            $array["playerBefore"] = [];
-        }
-        if(!is_null($after)){
-            $array["playerAfter"]["username"] = self::GetUserNickname($after->id);
-            $array["playerAfter"]["score"] = $after->score;
-        }else{
-            $array["playerAfter"] = [];
-        }
 
+        }
         return $array;
     }
 }
