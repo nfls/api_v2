@@ -738,7 +738,8 @@ class UserCenterController extends Controller
                 $array["playerBefore"]["username"] = self::GetUserNickname($before->id);
                 $array["playerBefore"]["score"] = $before->score;
             }else{
-                $array["playerBefore"] = [];
+                $array["playerBefore"]["username"] = "";
+                $array["playerBefore"]["score"] = "";
             }
             if(!is_null($after)){
                 $array["playerAfter"]["username"] = self::GetUserNickname($after->id);
