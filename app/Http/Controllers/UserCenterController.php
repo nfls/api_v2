@@ -725,12 +725,12 @@ class UserCenterController extends Controller
         if($rank["score"]<$input){
             DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["score"=>$input,"lastPlayed"=> date('Y-m-d H:i:s')]);
             $rank = $this->getRank($id,false);
-            $array["bestScore"] = $rank->score;
-            $array["bestRank"] = $rank->count;
+            $array["bestScore"] = $rank["score"];
+            $array["bestRank"] = $rank["count"];
             $array["nowRank"] = $array["bestRank"];
         } else {
-            $array["bestScore"] = $rank->score;
-            $array["bestRank"] = $rank->count;
+            $array["bestScore"] = $rank["score"];
+            $array["bestRank"] = $rank["count"];
             $count = DB::connection("mysql_user")->table("user_list")->where("score",">",$input)->get();
             $count = count($count);
             $array["nowRank"] = $count + 1;
