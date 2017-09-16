@@ -159,6 +159,11 @@ class UserCenterController extends Controller
                 }
                 break;
             case "rank":
+                if($request->isMethod("get")){
+                    $info = $this->getRank(self::GetUserId(Cookie::get("token")));
+                }else if($request->isMethod("post") && $request->has("score")){
+                    $info = $this->updateScore(self::GetUserId(Cookie::get("token")),$request->input("score"));
+                }
                 break;
             default:
                 break;
@@ -690,5 +695,19 @@ class UserCenterController extends Controller
             $query->where(["receiver" => $id])->orWhere(["receiver" => -1]);
         })->get();
         return count($message);
+    }
+
+    function getRank($id){
+        $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
+        $before = DB::connection("mysql_user")->table("user_list")->select(["id","score"])->where("score",">",$user->score)->orderBy("score")->limit(10)->get();
+        $after = DB::connection("mysql_user")->table("user_list")->select(["id","score"])->where("score","<",$user->score)->orderBy("score","desc")->limit(10)->get();
+        $count = DB::connection("mysql_user")->table("user_list")->where("score",">",$user->score)->get();
+        $count = count($count);
+        return array("before"=>$before,"after"=>$after,"count"=>$count);
+    }
+
+    function updateScore($id,$input){
+        DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["score"=>$input,"lastPlayed"=> date('Y-m-d H:i:s')]);
+        return [];
     }
 }

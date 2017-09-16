@@ -30,7 +30,7 @@ class AddGameRan extends Migration
         //
         Schema::connection("mysql_user")->table("user_list", function (Blueprint $table) {
             $table->dropColumn("score");
-            $table->dropColumn("lastPlayer");
+            $table->dropColumn("lastPlayed");
         });
     }
 }
