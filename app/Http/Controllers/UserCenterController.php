@@ -700,7 +700,7 @@ class UserCenterController extends Controller
     function getRank($id){
         $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
         $before = $this->getUserNameList(DB::connection("mysql_user")->table("user_list")->select(["id","score"])->where("score",">",$user->score)->orderBy("score")->limit(10)->get());
-        $after = $this->getUserNameList(DB::connection("mysql_user")->table("user_list")->select(["id","score"])->where("score","<",$user->score)->orderBy("score","desc")->limit(10)->get());
+        $after = $this->getUserNameList(DB::connection("mysql_user")->table("user_list")->select(["id","score"])->where("score","<",$user->score)->whereNotNull("lastPlayed")->orderBy("score","desc")->limit(10)->get());
         $count = DB::connection("mysql_user")->table("user_list")->where("score",">",$user->score)->get();
         $count = count($count);
         return array("before"=>$before,"after"=>$after,"count"=>$count);
