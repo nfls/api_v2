@@ -731,7 +731,15 @@ class UserCenterController extends Controller
             }
             $array["bestScore"] = $rank["score"];
             $array["bestRank"] = $rank["count"];
-            $array["nowRank"] = $array["bestRank"];
+            if($input != 0){
+                $array["nowRank"] = $array["bestRank"];
+            }else{
+                $count = DB::connection("mysql_user")->table("user_list")->where("score",">",$input)->get();
+                $count = count($count);
+                $array["nowRank"] = $count + 1;
+
+            }
+
             $before = DB::connection("mysql_user")->table("user_list")->where("score",">",$rank["score"])->orderBy("score","asc")->first();
             $after = DB::connection("mysql_user")->table("user_list")->where("score","<",$rank["score"])->orderBy("score","desc")->first();
             if(!is_null($before)){
