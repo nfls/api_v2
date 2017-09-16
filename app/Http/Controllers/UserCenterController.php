@@ -724,13 +724,32 @@ class UserCenterController extends Controller
         $rank = $this->getRank($id,false);
         if($rank["score"]<$input){
             DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["score"=>$input,"lastPlayed"=> date('Y-m-d H:i:s')]);
-            $rank["nowCount"] = $rank["count"];
+            $rank = $this->getRank($id,false);
+            $array["bestScore"] = $rank->score;
+            $array["bestRank"] = $rank->count;
+            $array["nowRank"] = $array["bestRank"];
         } else {
+            $array["bestScore"] = $rank->score;
+            $array["bestRank"] = $rank->count;
             $count = DB::connection("mysql_user")->table("user_list")->where("score",">",$input)->get();
             $count = count($count);
-            $rank["nowCount"] = $count + 1;
+            $array["nowRank"] = $count + 1;
+        }
+        $before = DB::connection("mysql_user")->table("user_list")->where("score",">",$input)->orderBy("score","asc")->first();
+        $after = DB::connection("mysql_user")->table("user_list")->where("score","<",$input)->orderBy("score","desc")->first();
+        if(!is_null($before)){
+            $array["playerBefore"]["username"] = self::GetUserNickname($before->id);
+            $array["playerBefore"]["score"] = $before->score;
+        }else{
+            $array["playerBefore"] = [];
+        }
+        if(!is_null($after)){
+            $array["playerAfter"]["username"] = self::GetUserNickname($after->id);
+            $array["playerAfter"]["score"] = $after->score;
+        }else{
+            $array["playerAfter"] = [];
         }
 
-        return $rank;
+        return $array;
     }
 }
