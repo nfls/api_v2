@@ -716,7 +716,12 @@ class UserCenterController extends Controller
     }
 
     function updateScore($id,$input){
-        DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["score"=>$input,"lastPlayed"=> date('Y-m-d H:i:s')]);
-        return true;
+        $rank = $this->getRank($id);
+        if($rank["score"]<$input){
+            DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["score"=>$input,"lastPlayed"=> date('Y-m-d H:i:s')]);
+            return $this->getRank($id);
+        }else{
+            return rank;
+        }
     }
 }
