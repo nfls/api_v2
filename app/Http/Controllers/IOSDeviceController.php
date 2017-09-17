@@ -134,7 +134,7 @@ class IOSDeviceController extends Controller
             $message = new ApnsPHP_Message($device->device_id);
             $message->setCustomIdentifier("Message-Badge-3");
             $message->setBadge(3);
-            $message->setText('新版本APP已经发布，修复了大量闪退BUG，添加了许多新功能，请尽快更新！老版本App将于本周六停用！');
+            $message->setText('Flappy IBO(Illegal Business Organization) 已经正式发布！更多老师头像，全校排名！请在"国际部"版块内体验！');
             $message->setSound();
             $message->setExpiry(30);
             $push->add($message);
