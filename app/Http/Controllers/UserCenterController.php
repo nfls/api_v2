@@ -712,7 +712,7 @@ class UserCenterController extends Controller
             foreach($after as $single){
                 $count ++;
                 if($single->score == $last){
-                     
+
                 }else{
                     $rank = $count;
                     $last = $single->score;
@@ -722,7 +722,7 @@ class UserCenterController extends Controller
                 array_push($ranks,$rank);
 
             }
-            return $after;
+            return array("names"=>$names,"ranks"=>$ranks,"scores"=>$scores);
         } else {
             return array("count"=>$count+1,"score"=>$user->score);
         }
