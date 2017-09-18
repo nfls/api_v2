@@ -160,7 +160,7 @@ class UserCenterController extends Controller
                 break;
             case "rank":
                 if($request->isMethod("get")){
-                    $info = $this->getRank(self::GetUserId(Cookie::get("token")));
+                    $info = $this->getRank(self::GetUserId(Cookie::get("token"),true));
                 }else if($request->isMethod("post") && $request->has("score")){
                     $info = $this->updateScore(self::GetUserId(Cookie::get("token")),$request->input("score"));
                 }
@@ -702,7 +702,7 @@ class UserCenterController extends Controller
         $count = DB::connection("mysql_user")->table("user_list")->where("score",">",$user->score)->get();
         $count = count($count);
         if($retrieve){
-            $after = $this->getUserNameList(DB::connection("mysql_user")->table("user_list")->select(["id","score"])->whereNotNull("lastPlayed")->orderBy("score","desc")->limit(10)->get());
+            $after = DB::connection("mysql_user")->table("user_list")->select(["id","score"])->whereNotNull("lastPlayed")->orderBy("score","desc")->limit(10)->get();
             $ranks = array();
             $names = array();
             $scores = array();
@@ -727,16 +727,6 @@ class UserCenterController extends Controller
             return array("count"=>$count+1,"score"=>$user->score);
         }
 
-    }
-
-    function getUserNameList($array){
-        $o = array();
-
-        foreach($array as $single){
-            $single->username = self::GetUserNickname($single->id);
-            array_push($o,$single);
-        }
-        return $o;
     }
 
     function updateScore($id,$input){
