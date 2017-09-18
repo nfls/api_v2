@@ -702,9 +702,27 @@ class UserCenterController extends Controller
         $count = DB::connection("mysql_user")->table("user_list")->where("score",">",$user->score)->get();
         $count = count($count);
         if($retrieve){
-            $before = $this->getUserNameList(DB::connection("mysql_user")->table("user_list")->select(["id","score"])->where("score",">",$user->score)->orderBy("score")->limit(10)->get());
-            $after = $this->getUserNameList(DB::connection("mysql_user")->table("user_list")->select(["id","score"])->where("score","<",$user->score)->whereNotNull("lastPlayed")->orderBy("score","desc")->limit(10)->get());
-            return array("before"=>$before,"after"=>$after,"count"=>$count+1,"score"=>$user->score);
+            $after = $this->getUserNameList(DB::connection("mysql_user")->table("user_list")->select(["id","score"])->whereNotNull("lastPlayed")->orderBy("score","desc")->limit(10)->get());
+            $ranks = array();
+            $names = array();
+            $scores = array();
+            $rank = 0;
+            $last = 0;
+            $count = 0;
+            foreach($after as $single){
+                $count ++;
+                if($single->score == $last){
+                     
+                }else{
+                    $rank = $count;
+                    $last = $single->score;
+                }
+                array_push($names,$single->username = self::GetUserNickname($single->id));
+                array_push($scores,$single->score);
+                array_push($ranks,$rank);
+
+            }
+            return $after;
         } else {
             return array("count"=>$count+1,"score"=>$user->score);
         }
@@ -713,6 +731,7 @@ class UserCenterController extends Controller
 
     function getUserNameList($array){
         $o = array();
+
         foreach($array as $single){
             $single->username = self::GetUserNickname($single->id);
             array_push($o,$single);
