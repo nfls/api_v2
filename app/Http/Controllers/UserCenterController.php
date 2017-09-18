@@ -169,7 +169,7 @@ class UserCenterController extends Controller
                 break;
         }
         $json_mes = array();
-        if (!is_int($info) && (@is_null($info) || empty($info))) {
+        if (!@is_int($info) && (@is_null($info) || @empty($info))) {
             $json_mes['code'] = 403;
             $json_mes['status'] = "error";
             return Response::json($json_mes, 403);
