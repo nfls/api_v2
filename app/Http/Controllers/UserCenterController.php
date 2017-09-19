@@ -288,7 +288,8 @@ class UserCenterController extends Controller
             $clientInfo = $dd->getClient(); // holds information about browser, feed reader, media player, ...
             if ($clientInfo["type"] != "browser") {
                 $allow = false;
-                $message = "请使用浏览器访问本页（微信可右上角然后使用浏览器打开）。";
+
+                $message = "请使用浏览器访问本页（可右上角然后使用浏览器打开）。Please use the browser to open this page. (For wechat, you can click the right top button and choose open with browser";
             } else {
                 $osInfo = $dd->getOs();
                 $device = $dd->getDevice();
@@ -296,13 +297,13 @@ class UserCenterController extends Controller
                 $model = $dd->getModel();
                 if ($osInfo['name'] == "iOS") {
                     $allow = false;
-                    $message = "iOS用户请使用我们的<a href='https://app.nfls.io'>客户端</a>进行访问。";
+                    $message = "iOS用户请使用我们的<a href='https://app.nfls.io'>客户端</a>进行访问。 For iOS devices, please use our <a href='https://app.nfls.io'>app</a> to access our website.";
                 } else {
                     if ($clientInfo['name'] != "Chrome" && $clientInfo['name'] != "Chrome Mobile") {
-                        $message = "本站建议使用Chrome进行访问，不保证对于其他浏览器完全兼容。";
+                        $message = "本站建议使用Chrome进行访问，不保证对于其他浏览器完全兼容。 We suggest using Chrome to access our website, and we do not guarantee it is compatible on any other browsers";
                     } else {
                         if (version_compare($clientInfo['version'], "54.0", "<")) {
-                            $message = "Chrome版本过老！请考虑升级。";
+                            $message = "Chrome版本过老！请考虑升级。 Your Chrome version is very old! Please consider upgrading.";
                         }
                     }
                 }
