@@ -303,7 +303,7 @@ class UserCenterController extends Controller
                         $message = "本站建议使用Chrome进行访问，不保证对于其他浏览器完全兼容。 <br/>We suggest using Chrome to access our website, and we do not guarantee it is compatible on any other browsers";
                     } else {
                         if (version_compare($clientInfo['version'], "54.0", "<")) {
-                            $message = "Chrome版本过老！请考虑升级。 <br/>Your Chrome version is very old! Please consider upgrading.";
+                            $message = "Chrome版本过老！请考虑升级。 <br/>Your Chrome version is outdated! Please consider upgrading.";
                         }
                     }
                 }
