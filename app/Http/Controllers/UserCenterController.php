@@ -310,7 +310,7 @@ class UserCenterController extends Controller
             }
 
         }
-        return array("allow" => $allow, "message" => "宣传8号，Vote For Us!（南外国际部IB&AL限定）<br/>" . $message);
+        return array("allow" => $allow, "message" =>  $message);
     }
 
 

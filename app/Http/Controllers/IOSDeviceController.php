@@ -134,7 +134,7 @@ class IOSDeviceController extends Controller
             $message = new ApnsPHP_Message($device->device_id);
             $message->setCustomIdentifier("Message-Badge-3");
             $message->setBadge(3);
-            $message->setText('Flappy IBO现已支持排行榜，在游戏启动界面上即可查看。');
+            $message->setText('宣传8号！记得给我们投票！（国际部限定，0点过后就换风格了哦）');
             $message->setSound();
             $message->setExpiry(30);
             $push->add($message);
