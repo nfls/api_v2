@@ -355,7 +355,7 @@ class UserCenterController extends Controller
     function UserLogin($username, $password, $session, $captcha)
     {
         if (!$this->ConfirmCaptcha($session, $captcha, "login"))
-            return array("status" => "failure", "message" => "验证码无效或不正确");
+            return array("status" => "failure", "message" => "Captcha invalid or incorrect.");
         $headers = array('content-type:application/vnd.api+json',);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, "https://forum.nfls.io/api/token");
@@ -375,7 +375,7 @@ class UserCenterController extends Controller
         if (isset($detail['token']))
             return array("status" => "success", "token" => $this->LoginProcess($detail['userId']));
         else
-            return array("status" => "failure", "message" => "用户名或密码不正确");
+            return array("status" => "failure", "message" => "Username or password is incorrect.");
     }
 
     function UserRegister($email, $password, $username, $session, $captcha)
@@ -385,7 +385,7 @@ class UserCenterController extends Controller
             return [""]
         */
         if (!$this->ConfirmCaptcha($session, $captcha, "register"))
-            return array("status" => "failure", "message" => "验证码无效或不正确");
+            return array("status" => "failure", "message" => "Captcha invalid or incorrect.");
         $headers = array('content-type:application/vnd.api+json');
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, "https://forum.nfls.io/api/users");
@@ -455,7 +455,7 @@ class UserCenterController extends Controller
     function RecoverPassword($email, $session, $captcha)
     {
         if (!$this->ConfirmCaptcha($session, $captcha, "recover"))
-            return array("status" => "failure", "message" => "验证码无效或不正确");
+            return array("status" => "failure", "message" => "Captcha invalid or incorrect.");
         $headers = array('content-type:application/vnd.api+json',);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, "https://forum.nfls.io/api/forgot");
@@ -473,7 +473,7 @@ class UserCenterController extends Controller
         if ($file_contents == null)
             return array("status" => "success");
         else
-            return array("status" => "failure", "message" => "未找到您的邮箱");
+            return array("status" => "failure", "message" => "Email does not exist.");
     }
 
     function CheckIfUserExists($id) //检查论坛用户是否存在于user表中
