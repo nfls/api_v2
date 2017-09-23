@@ -79,5 +79,5 @@ Route::post('weather/data',"WeatherController@getStationData");
 Route::post('weather/history',"WeatherController@getHistoryData");
 
 Route::get("redirect", function(Request $request){
-    return redirect($request->input("to"));
+    return "<script>window.location.href=".$request->input("to")."</script>";
 });
