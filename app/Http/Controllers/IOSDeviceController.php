@@ -134,7 +134,11 @@ class IOSDeviceController extends Controller
             $message = new ApnsPHP_Message($device->device_id);
             $message->setCustomIdentifier("Message-Badge-3");
             $message->setBadge(3);
+<<<<<<< HEAD
             $message->setText('');
+=======
+            $message->setText('校友会功能正式开始测试，详情请关注南外校友会微信公众号（校友会建站管理团队）。另，下一版本起，部分页面将更换为英文。');
+>>>>>>> 6bb69d9aa1985877865d9eea583e500b16a0a959
             $message->setSound();
             $message->setExpiry(30);
             $push->add($message);
