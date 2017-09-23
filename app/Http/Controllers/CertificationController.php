@@ -1040,14 +1040,8 @@ class CertificationController extends Controller
                 }
             } else {
                 if (@$this->emptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message)) {
-                    try {
-                        $phone_validate = \libphonenumber\PhoneNumberUtil::getInstance();
-                        $phone_number = $phone_validate->parse($info->phone_international, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
-                        if ($phone_validate->isValidNumber($phone_number)) {
-                            array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
-                        }
-                    } catch (NumberParseException $e) {
-                        array_push($message, '国外手机号码不正确！请检查国际区号或者手机号码是否正确。');
+                    if (!preg_match('\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)\d{1,14}$', (string)($info->phone_domestic))) {
+                        array_push($message, '国外手机号码不正确！');
                     }
                 }
             }
