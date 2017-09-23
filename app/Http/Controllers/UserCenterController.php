@@ -12,7 +12,7 @@ use Gregwar\Captcha\PhraseBuilder;
 use DeviceDetector\DeviceDetector;
 use DeviceDetector\Parser\Device\DeviceParserAbstract;
 use PragmaRX\Google2FA\Google2FA;
-
+use Illuminate\Support\Facades\Log;
 
 class UserCenterController extends Controller
 {
@@ -53,6 +53,7 @@ class UserCenterController extends Controller
 
     function requestHandler(Request $request, $type)
     {
+        Log::Info(Cookie::get("token").":".$type);
         switch ($type) {
             case "login":
                 if ($request->only(['username', 'password', 'session', 'captcha'] && $request->isMethod("post")))
