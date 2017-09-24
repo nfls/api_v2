@@ -1040,7 +1040,7 @@ class CertificationController extends Controller
                 }
             } else {
                 if (@$this->emptyCheck(self::OTHER, $info->phone_international, '手机号码（国外）', $message)) {
-                    
+
                 }
             }
         }

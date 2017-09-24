@@ -124,6 +124,7 @@ class IOSDeviceController extends Controller
     }
 
     function pushAMessage(){
+        $sandbox_list = array();
         $list = DB::connection("mysql_user")->table("user_device")->get();
         $push = new ApnsPHP_Push(
             ApnsPHP_Abstract::ENVIRONMENT_PRODUCTION,
@@ -134,7 +135,7 @@ class IOSDeviceController extends Controller
             $message = new ApnsPHP_Message($device->device_id);
             $message->setCustomIdentifier("Message-Badge-3");
             $message->setBadge(3);
-            $message->setText('');
+            $message->setText('Flappy IBO教师阵容现已更新至24人，另从周二起支持离线游戏。（我知道你们都睡了，于是发个推送看看有多少人醒着）【胡清阳】');
             $message->setSound();
             $message->setExpiry(30);
             $push->add($message);
