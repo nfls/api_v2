@@ -135,7 +135,7 @@ class IOSDeviceController extends Controller
             $message = new ApnsPHP_Message($device->device_id);
             $message->setCustomIdentifier("Message-Badge-3");
             $message->setBadge(3);
-            $message->setText('Flappy IBO教师阵容现已更新至24人，另从周二起支持离线游戏。（我知道你们都睡了，于是发个推送看看有多少人醒着）【胡清阳】');
+            $message->setText('iOS客户端现已更新！支持在离线状态下进行Flappy IBO游戏！请在App Store中下载更新！【胡清阳】');
             $message->setSound();
             $message->setExpiry(30);
             $push->add($message);
