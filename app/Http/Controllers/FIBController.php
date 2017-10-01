@@ -13,7 +13,7 @@ class FIBController extends Controller
     private $table = "fib_userdata";
 
     function request2048Handler(Request $request, $type){
-        $table = "2048_userdata";
+        $this->table = "2048_userdata";
         return $this->requestHandler($request,$type);
     }
     
