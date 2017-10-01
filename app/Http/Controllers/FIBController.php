@@ -51,7 +51,7 @@ class FIBController extends Controller
     }
 
     function checkScoreExpiration(){
-        DB::connection("mysql_game")->table("fib_userdata")->where(["lastPlayed","<",date('Y-m-d H:i:s',strtotime("-1 week"))])->delete();
+        DB::connection("mysql_game")->table("fib_userdata")->where("lastPlayed","<",date('Y-m-d H:i:s',strtotime("-1 week")))->delete();
     }
 
     function getRank($id,$retrieve = true){
