@@ -14,7 +14,7 @@ class FIBController extends Controller
 
     function request2048Handler(Request $request, $type){
         $table = "2048_userdata";
-        $this->requestHandler($request,$type);
+        return $this->requestHandler($request,$type);
     }
     
     function requestHandler(Request $request, $type)
