@@ -95,7 +95,7 @@ class FIBController extends Controller
             if($input != 0){
                 $array["nowRank"] = $array["bestRank"];
             }else{
-                $count = DB::connection("mysql_user")->table("fib_userdata")->where("score",">",$input)->get();
+                $count = DB::connection("mysql_game")->table("fib_userdata")->where("score",">",$input)->get();
                 $count = count($count);
                 $array["nowRank"] = $count + 1;
 
