@@ -10,6 +10,13 @@ use Cookie;
 
 class FIBController extends Controller
 {
+    private $table = "fib_userdata";
+
+    function request2048Handler(Request $request, $type){
+        $table = "2048_userdata";
+        $this->requestHandler($request,$type);
+    }
+    
     function requestHandler(Request $request, $type)
     {
         Log::Info(Cookie::get("token").":".$type);
@@ -44,22 +51,22 @@ class FIBController extends Controller
 
         $id = UserCenterController::GetUserId($token);
         $this->checkScoreExpiration();
-        $user = DB::connection('mysql_game')->table('fib_userdata')->where('id', $id)->first();
+        $user = DB::connection('mysql_game')->table($this->table)->where('id', $id)->first();
         if (is_null($user))
-            DB::connection('mysql_game')->table('fib_userdata')->insert(['id' => $id]);
+            DB::connection('mysql_game')->table($this->table)->insert(['id' => $id]);
         return $id;
     }
 
     function checkScoreExpiration(){
-        DB::connection("mysql_game")->table("fib_userdata")->where("lastPlayed","<",date('Y-m-d H:i:s',strtotime("-1 week")))->delete();
+        DB::connection("mysql_game")->table($this->table)->where("lastPlayed","<",date('Y-m-d H:i:s',strtotime("-1 week")))->delete();
     }
 
     function getRank($id,$retrieve = true){
-        $user = DB::connection("mysql_game")->table("fib_userdata")->where(["id"=>$id])->first();
-        $count = DB::connection("mysql_game")->table("fib_userdata")->where("score",">",$user->score)->get();
+        $user = DB::connection("mysql_game")->table($this->table)->where(["id"=>$id])->first();
+        $count = DB::connection("mysql_game")->table($this->table)->where("score",">",$user->score)->get();
         $count = count($count);
         if($retrieve){
-            $after = DB::connection("mysql_game")->table("fib_userdata")->select(["id","score"])->whereNotNull("lastPlayed")->orderBy("score","desc")->limit(10)->get();
+            $after = DB::connection("mysql_game")->table($this->table)->select(["id","score"])->whereNotNull("lastPlayed")->orderBy("score","desc")->limit(10)->get();
             $ranks = array();
             $names = array();
             $scores = array();
@@ -92,24 +99,24 @@ class FIBController extends Controller
         $array["playerAfter"] = null;
         if($rank["score"] / 2 <= $input || $input == 0){
             if($input>$rank["score"]){
-                DB::connection("mysql_game")->table("fib_userdata")->where(["id"=>$id])->update(["score"=>$input,"lastPlayed"=> date('Y-m-d H:i:s'),"ip"=>$_SERVER["REMOTE_ADDR"]]);
+                DB::connection("mysql_game")->table($this->table)->where(["id"=>$id])->update(["score"=>$input,"lastPlayed"=> date('Y-m-d H:i:s'),"ip"=>$_SERVER["REMOTE_ADDR"]]);
                 $rank = $this->getRank($id,false);
             }else if($rank["score"] / 2 <= $input){
-                DB::connection("mysql_game")->table("fib_userdata")->where(["id"=>$id])->update(["lastPlayed"=> date('Y-m-d H:i:s'),"ip"=>$_SERVER["REMOTE_ADDR"]]);
+                DB::connection("mysql_game")->table($this->table)->where(["id"=>$id])->update(["lastPlayed"=> date('Y-m-d H:i:s'),"ip"=>$_SERVER["REMOTE_ADDR"]]);
             }
             $array["bestScore"] = $rank["score"];
             $array["bestRank"] = $rank["count"];
             if($input != 0){
                 $array["nowRank"] = $array["bestRank"];
             }else{
-                $count = DB::connection("mysql_game")->table("fib_userdata")->where("score",">",$input)->get();
+                $count = DB::connection("mysql_game")->table($this->table)->where("score",">",$input)->get();
                 $count = count($count);
                 $array["nowRank"] = $count + 1;
 
             }
 
-            $before = DB::connection("mysql_game")->table("fib_userdata")->where("score",">",$rank["score"])->orderBy("score","asc")->first();
-            $after = DB::connection("mysql_game")->table("fib_userdata")->where("score","<",$rank["score"])->orderBy("score","desc")->first();
+            $before = DB::connection("mysql_game")->table($this->table)->where("score",">",$rank["score"])->orderBy("score","asc")->first();
+            $after = DB::connection("mysql_game")->table($this->table)->where("score","<",$rank["score"])->orderBy("score","desc")->first();
             if(!is_null($before)){
                 $array["playerBefore"]["username"] = UserCenterController::GetUserNickname($before->id);
                 $array["playerBefore"]["score"] = $before->score;
@@ -128,7 +135,7 @@ class FIBController extends Controller
             $array["bestScore"] = $rank["score"];
             $array["bestRank"] = $rank["count"];
             $array["expired"] = $rank["expired"];
-            $count = DB::connection("mysql_game")->table("fib_userdata")->where("score",">",$input)->get();
+            $count = DB::connection("mysql_game")->table($this->table)->where("score",">",$input)->get();
             $count = count($count);
             $array["nowRank"] = $count + 1;
 
