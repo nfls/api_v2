@@ -123,11 +123,11 @@ class FIBController extends Controller
             }else{
                 $array["playerAfter"] = [];
             }
-            $time =
-            $array["expiredAt"] =
+            $array["expired"] = $rank["expired"];
         } else {
             $array["bestScore"] = $rank["score"];
             $array["bestRank"] = $rank["count"];
+            $array["expired"] = $rank["expired"];
             $count = DB::connection("mysql_game")->table("fib_userdata")->where("score",">",$input)->get();
             $count = count($count);
             $array["nowRank"] = $count + 1;
