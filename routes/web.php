@@ -78,6 +78,8 @@ Route::get('weather/list',"WeatherController@getStationList");
 Route::post('weather/data',"WeatherController@getStationData");
 Route::post('weather/history',"WeatherController@getHistoryData");
 
+Route::any('game/fib/{type}',"FIBController@requestHandler");
+
 Route::get("redirect", function(Request $request){
     return "Service Unavailable.";
     //return "<script>window.location.href='".$request->input("to")."'</script>";
