@@ -24,7 +24,7 @@ class GameListController extends Controller
     }
 
     function getList(){
-        DB::connection("mysql_user")->table("user_list")->first();
+        DB::connection("mysql_game")->table("_list")->first();
         $game_name = DB::connection("mysql_game")->table("_list")->get();
         $count = 0;
         foreach ($game_name as $name) {
