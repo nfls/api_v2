@@ -159,13 +159,6 @@ class UserCenterController extends Controller
                     $info = $this->getFirstMessage(self::GetUserId(Cookie::get("token")));
                 }
                 break;
-            case "rank":
-                if($request->isMethod("get")){
-                    $info = $this->getRank(self::GetUserId(Cookie::get("token"),true));
-                }else if($request->isMethod("post") && $request->has("score")){
-                    $info = $this->updateScore(self::GetUserId(Cookie::get("token")),$request->input("score"));
-                }
-                break;
             default:
                 break;
         }
@@ -698,81 +691,5 @@ class UserCenterController extends Controller
         return count($message);
     }
 
-    function getRank($id,$retrieve = true){
-        $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
-        $count = DB::connection("mysql_user")->table("user_list")->where("score",">",$user->score)->get();
-        $count = count($count);
-        if($retrieve){
-            $after = DB::connection("mysql_user")->table("user_list")->select(["id","score"])->whereNotNull("lastPlayed")->orderBy("score","desc")->limit(10)->get();
-            $ranks = array();
-            $names = array();
-            $scores = array();
-            $rank = 0;
-            $last = 0;
-            $count = 0;
-            foreach($after as $single){
-                $count ++;
-                if($single->score == $last){
 
-                }else{
-                    $rank = $count;
-                    $last = $single->score;
-                }
-                array_push($names,$single->username = self::GetUserNickname($single->id));
-                array_push($scores,$single->score);
-                array_push($ranks,$rank);
-
-            }
-            return array("names"=>$names,"ranks"=>$ranks,"scores"=>$scores);
-        } else {
-            return array("count"=>$count+1,"score"=>$user->score);
-        }
-
-    }
-
-    function updateScore($id,$input){
-        $rank = $this->getRank($id,false);
-        $array["playerBefore"] = null;
-        $array["playerAfter"] = null;
-        if($rank["score"]<$input || $input == 0){
-            if($input>0){
-                DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update(["score"=>$input,"lastPlayed"=> date('Y-m-d H:i:s')]);
-                $rank = $this->getRank($id,false);
-            }
-            $array["bestScore"] = $rank["score"];
-            $array["bestRank"] = $rank["count"];
-            if($input != 0){
-                $array["nowRank"] = $array["bestRank"];
-            }else{
-                $count = DB::connection("mysql_user")->table("user_list")->where("score",">",$input)->get();
-                $count = count($count);
-                $array["nowRank"] = $count + 1;
-
-            }
-
-            $before = DB::connection("mysql_user")->table("user_list")->where("score",">",$rank["score"])->orderBy("score","asc")->first();
-            $after = DB::connection("mysql_user")->table("user_list")->where("score","<",$rank["score"])->orderBy("score","desc")->first();
-            if(!is_null($before)){
-                $array["playerBefore"]["username"] = self::GetUserNickname($before->id);
-                $array["playerBefore"]["score"] = $before->score;
-            }else{
-                $array["playerBefore"]["username"] = "";
-                $array["playerBefore"]["score"] = "";
-            }
-            if(!is_null($after)){
-                $array["playerAfter"]["username"] = self::GetUserNickname($after->id);
-                $array["playerAfter"]["score"] = $after->score;
-            }else{
-                $array["playerAfter"] = [];
-            }
-        } else {
-            $array["bestScore"] = $rank["score"];
-            $array["bestRank"] = $rank["count"];
-            $count = DB::connection("mysql_user")->table("user_list")->where("score",">",$input)->get();
-            $count = count($count);
-            $array["nowRank"] = $count + 1;
-
-        }
-        return $array;
-    }
 }

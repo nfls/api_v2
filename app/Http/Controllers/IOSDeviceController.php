@@ -133,9 +133,9 @@ class IOSDeviceController extends Controller
         $push->setRootCertificationAuthority('/etc/cert/entrust.pem');
         foreach ($list as $device){
             $message = new ApnsPHP_Message($device->device_id);
-            $message->setCustomIdentifier("Message-Badge-3");
+            $message->setCustomIdentifier("Message-Badge-1");
             $message->setBadge(3);
-            $message->setText('今天是Flappy IBO侯子康日活动！今日只能使用侯子康头像，同时可获得五倍分数！');
+            $message->setText('国庆节快乐！另外祝考SAT的同学都上1600！');
             $message->setSound();
             $message->setExpiry(30);
             $push->add($message);
