@@ -24,20 +24,9 @@ class GameListController extends Controller
     }
 
     function getList(){
-        DB::connection("mysql_game")->table("_list")->first();
-        $game_name = DB::connection("mysql_game")->table("_list")->get();
-        $count = 0;
-        foreach ($game_name as $name) {
-            $info[$count]['id'] = $name->id;
-            $info[$count]['name'] = $name->name;
-            $info[$count]['description'] = $name->description;
-            $info[$count]['icon'] = $name->icon;
-            $info[$count]['url'] = $name->url;
-            $count++;
-        }
+        $game_list = DB::connection("mysql_game")->table("_list")->select("id","name","description","icon","url")->get();
         $json_mes['code'] = 200;
-        $json_mes['status'] = "succeed";
-        $json_mes['info'] = $info;
+        $json_mes['info'] = $game_list;
         return Response::json($json_mes, 200);
     }
 
