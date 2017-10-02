@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Response;
 use Cookie;
 
-class GameListController extends controller
+class GameListController extends Controller
 {
     function test(){
         $message = "We're Mr Tunnel's Lonely Hearts Computing Club, We hope you will enjoy the bugs";
