@@ -80,6 +80,7 @@ Route::post('weather/history',"WeatherController@getHistoryData");
 
 Route::any('game/fib/{type}',"FIBController@requestHandler");
 Route::any('game/2048/{type}',"FIBController@request2048Handler");
+Route::any('game/test',"GameListController@test");
 
 Route::get("redirect", function(Request $request){
     //return "Service Unavailable.";
