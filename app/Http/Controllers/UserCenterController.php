@@ -690,7 +690,7 @@ class UserCenterController extends Controller
             $info[$count]['type'] = $this->GetNoticeType($message->type);
             $info[$count]['detail'] = $message->detail;
             $info[$count]['conf'] = $message->conf;
-            $info[$count]['img'] = $messages->img;
+            $info[$count]['img'] = $message->img;
             $count++;
         }
         return $info;
