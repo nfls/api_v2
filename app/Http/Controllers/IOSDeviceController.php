@@ -135,7 +135,7 @@ class IOSDeviceController extends Controller
             $message = new ApnsPHP_Message($device->device_id);
             $message->setCustomIdentifier("Message-Badge-1");
             $message->setBadge(3);
-            $message->setText('国庆节快乐！另外祝考SAT的同学都上1600！');
+            $message->setText('南京外国语学校国际部在线开发社招新！具体请见首页公告。2048将于下一个版本启支持，预计于6-7号发布，敬请期待！');
             $message->setSound();
             $message->setExpiry(30);
             $push->add($message);
