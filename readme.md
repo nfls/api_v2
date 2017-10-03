@@ -1,6 +1,8 @@
-## This is the source code of api server of nfls.io.
+Server APIs for nfls.io
+===
 
-### Usage
+This is the source code of api server of nfls.io.
 
-POST : /alumni/{id}/update
-GET : /alumni/{id}/query
+## Usage
+
+See routes/web.php yourself ;)
