@@ -696,8 +696,9 @@ class UserCenterController extends Controller
     }
 
     function getFirstMessage($id){
-        DB::connection("mysql_user")->table("user_list")->where(["id" => $id])->first();
-        $message = DB::connection("mysql_user")->table("system_message")->where(["receiver" => $id])->orWhere(["receiver" => -1])->orderBy("id","desc")->first();
+        $message = DB::connection("mysql_user")->table("system_message")->where(["place"=>1])->where(function ($query) use($id) {
+            $query->where(["receiver" => $id])->orWhere(["receiver" => -1]);
+        })->first();
         $info['id'] = $message->id;
         $info['title'] = $message->title;
         $info['text'] = $message->detail;
