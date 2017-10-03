@@ -710,7 +710,7 @@ class UserCenterController extends Controller
     function getUnreadCount($id){
         $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
         $last = $user->last_sysmessage_read;
-        $message = DB::connection("mysql_user")->table("system_message")->where("id",">",$last)->where(function($query) use($id){
+        $message = DB::connection("mysql_user")->table("system_message")->where("id",">",$last)->where(["place"=>1])->where(function($query) use($id){
             $query->where(["receiver" => $id])->orWhere(["receiver" => -1]);
         })->get();
         return count($message);
