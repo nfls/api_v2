@@ -124,7 +124,7 @@ class IOSDeviceController extends Controller
     }
 
     function pushAMessage(){
-        $sandbox_list = array();
+        $str = DB::connection("mysql_user")->table("system_message")->where(["place"=>2])->orderBy("id","desc")->first()->detail;
         $list = DB::connection("mysql_user")->table("user_device")->get();
         $push = new ApnsPHP_Push(
             ApnsPHP_Abstract::ENVIRONMENT_PRODUCTION,
@@ -133,15 +133,17 @@ class IOSDeviceController extends Controller
         $push->setRootCertificationAuthority('/etc/cert/entrust.pem');
         foreach ($list as $device){
             $message = new ApnsPHP_Message($device->device_id);
-            $message->setCustomIdentifier("Message-Badge-1");
-            $message->setBadge(3);
-            $message->setText('南京外国语学校国际部在线开发社招新！具体请见首页公告。2048将于下一个版本启支持，预计于6-7号发布，敬请期待！');
+            //$message->setCustomIdentifier("Message-Badge-1");
+            //$message->setBadge(3);
+            $message->setText($str);
             $message->setSound();
-            $message->setExpiry(30);
+            //$message->setExpiry(30);
             $push->add($message);
         }
         $push->connect();
         $push->send();
         $push->disconnect();
     }
+
+
 }

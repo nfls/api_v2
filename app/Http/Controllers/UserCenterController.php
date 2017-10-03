@@ -159,6 +159,11 @@ class UserCenterController extends Controller
                     $info = $this->getFirstMessage(self::GetUserId(Cookie::get("token")));
                 }
                 break;
+            case "news":
+                if($request->isMethod("get")){
+                    $info = $this->getNews(self::GetUserId(Cookie::get("token")));
+                }
+                break;
             default:
                 break;
         }
@@ -648,8 +653,9 @@ class UserCenterController extends Controller
 
     function GetSystemNoticeById($id)//获取主站通知或推送，并根据Token记录已读信息
     {
-        DB::connection("mysql_user")->table("user_list")->where(["id" => $id])->first();
-        $messages = DB::connection("mysql_user")->table("system_message")->where(["receiver" => $id])->orWhere(["receiver" => -1])->get();
+        $messages = DB::connection("mysql_user")->table("system_message")->where(["place"=>1])->where(function ($query) use($id) {
+            $query->where(["receiver" => $id])->orWhere(["receiver" => -1]);
+        })->get();
         $user = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first();
         $last = $user->last_sysmessage_read;
         $count = 0;
@@ -669,6 +675,23 @@ class UserCenterController extends Controller
             $count++;
         }
         DB::connection("mysql_user")->table("user_list")->where(["id" => $id])->update(["last_sysmessage_read"=>$c]);
+        return $info;
+    }
+
+    function getNews($id){
+        $messages = DB::connection("mysql_user")->table("system_message")->where(["place"=>3])->where(function ($query) use($id) {
+            $query->where(["receiver" => $id])->orWhere(["receiver" => -1]);
+        })->orderBy("id","desc")->limit(10)->select("type","title","detail","image","conf")->get();
+        $info = array();
+        $count = 0;
+        foreach ($messages as $message) {
+            $info[$count]['time'] = $message->time;
+            $info[$count]['title'] = $message->title;
+            $info[$count]['type'] = $this->GetNoticeType($message->type);
+            $info[$count]['detail'] = $message->detail;
+            $info[$count]['conf'] = $message->conf;
+            $count++;
+        }
         return $info;
     }
 
