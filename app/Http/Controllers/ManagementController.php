@@ -13,8 +13,9 @@ class ManagementController extends Controller
     const IS_ROOT = 1;
     const MESSAGE_EDIT = 2;
     const MESSAGE_ADMIN = 3;
-    function checkPermission($id,$permission){
-        return true;
+    function checkPermission($id,$bit){
+        $permission = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first()->permissions;
+        return $permission & (1<<$bit);
     }
 
     function getAllMessages(Request $request){
@@ -53,6 +54,9 @@ class ManagementController extends Controller
             }
             if($request->has("site") && $request->input("site") != "none")
                 $array["conf"] = json_encode(array("site"=>$request->input("site"),"url"=>$request->input("url"),"place"=>$request->input("place")));
+            else if($request->has("url")){
+                $array["conf"] = $request->input("url");
+            }
             if($this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_ADMIN)){
                 if($request->has("receiver"))
                     $array["receiver"] = $request->input("receiver");
