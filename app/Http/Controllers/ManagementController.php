@@ -54,7 +54,7 @@ class ManagementController extends Controller
             } else {
                 $startWith = 0;
             }
-            $query = DB::connection("mysql_user")->table("app_stratup_pics")->orderBy("id","desc")->limit(10)->offset($startWith)->get();
+            $query = DB::connection("mysql_user")->table("app_startup_pics")->orderBy("id","desc")->limit(10)->offset($startWith)->get();
             $total = array();
 
             foreach($query as $single){
