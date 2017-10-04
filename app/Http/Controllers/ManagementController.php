@@ -53,6 +53,7 @@ class ManagementController extends Controller
                 else
                     abort(403);
             }
+            $array["place"] = $request->input("place");
             if($request->has("site") && $request->input("site") != "none")
                 $array["conf"] = json_encode(array("site"=>$request->input("site"),"url"=>$request->input("url"),"place"=>$request->input("place")));
             else if($request->has("url")){
