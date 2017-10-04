@@ -169,6 +169,7 @@ class UserCenterController extends Controller
             case "last":
                 if($request->isMethod("get")){
                     $info = $this->getFirstMessage(self::GetUserId(Cookie::get("token")));
+                    $this->LoginProcess(self::GetUserId(Cookie::get("token")));
                 }
                 break;
             case "news":
@@ -458,6 +459,8 @@ class UserCenterController extends Controller
 
     function LoginProcess($id)
     {
+        if($id<1)
+            return;
         if (!$this->CheckIfUserExists($id))
             $this->AddUser($id);
         $token = $this->CheckIfTokenExists($id);
