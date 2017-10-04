@@ -144,7 +144,8 @@ class ManagementController extends Controller
             $info["text"] = $single->text;
             $info["start"] = $single->valid_after;
             $info["end"] = $single->invalid_after;
-            return Response::json(array("code"=>200,"info"=>$single));
+            $info["url"] = $single->url;
+            return Response::json(array("code"=>200,"info"=>$info));
         }
     }
 
