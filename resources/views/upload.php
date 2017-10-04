@@ -1,13 +1,4 @@
-<html>
-<body>
-
-    <?php
-    echo Form::open(array('url' => '/admin/upload','files'=>'true'));
-    echo 'Select the file to upload.';
-    echo Form::file('image');
-    echo Form::submit('Upload File');
-    echo Form::close();
-    ?>
-
-</body>
-</html>
+<form action="/admin/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="file">
+    <input type="submit">
+</form>
