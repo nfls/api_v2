@@ -13,6 +13,7 @@ class ManagementController extends Controller
     const IS_ROOT = 1;
     const MESSAGE_EDIT = 2;
     const MESSAGE_ADMIN = 3;
+    const PICTURES_EDIT = 4;
     function checkPermission($id,$bit){
         $permission = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first()->permissions;
         return $permission & (1<<$bit);
@@ -40,6 +41,30 @@ class ManagementController extends Controller
                 $info["receiver"] = $this->getGropus($single->receiver);
                 $info["title"] = $single->title;
                 $info["place"] = $single->place;
+                array_push($total,$info);
+            }
+            Return Response::json(array("code"=>200,"info"=>$total));
+        }
+    }
+
+    function getAllPictures(Request $request){
+        if($this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::PICTURES_EDIT)){
+            if ($request->has("startFrom")) {
+                $startWith = (int)($request->input("startFrom"));
+            } else {
+                $startWith = 0;
+            }
+            $query = DB::connection("mysql_user")->table("app_stratup_pics")->orderBy("id","desc")->limit(10)->offset($startWith)->get();
+            $total = array();
+
+            foreach($query as $single){
+                $info = array();
+                $info["id"] = $single->id;
+                $info["time"] = $single->update_time;
+                $info["receiver"] = $this->getGropus($single->groups);
+                $info["text"] = $single->text;
+                $info["start"] = $single->valid_after;
+                $info["end"] = $single->invalid_after;
                 array_push($total,$info);
             }
             Return Response::json(array("code"=>200,"info"=>$total));
