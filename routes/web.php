@@ -59,7 +59,7 @@ Route::get("admin/auth/instructions","CertificationManagementController@getInstr
 Route::post("admin/upload","ManagementController@uploadFile");
 Route::get("admin/uploads","ManagementController@uploadPage");
 Route::get("admin/message/get","ManagementController@getAllMessages");
-Route::get("admin/message/pictures","ManagementController@getAllPictures");
+Route::get("admin/picture/get","ManagementController@getAllPictures");
 Route::post("admin/message/detail","ManagementController@getAMessage");
 Route::post("admin/message/save","ManagementController@saveAMessage");
 Route::post("admin/message/remove","ManagementController@deleteAMessage");
