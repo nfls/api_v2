@@ -17,8 +17,6 @@ class AddAlumniAndIcUser extends Migration
         Schema::connection("mysql_user")->table("user_list", function (Blueprint $table) {
             $table->dropColumn("score");
             $table->dropColumn("lastPlayed");
-            $table->integer("alumni_account")->default(-1);
-            $table->integer("ic_account")->default(-1);
         });
     }
 
@@ -33,8 +31,6 @@ class AddAlumniAndIcUser extends Migration
         Schema::connection("mysql_user")->table("user_list", function (Blueprint $table) {
             $table->bigInteger("score")->default(0)->comment("游戏分数");
             $table->time("lastPlayed")->nullable()->comment("上次游戏时间");
-            $table->dropColumn("alumni_account");
-            $table->dropColumn("ic_account");
         });
 
     }
