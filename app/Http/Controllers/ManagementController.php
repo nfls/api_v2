@@ -122,6 +122,7 @@ class ManagementController extends Controller
     function uploadFile(Request $request){
         if(UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::Get("token")))){
             $path = $request->file('file')->store('public');
+            LogController::writeLog("file.upload","上传了名称为".$request->file('file')->getClientOriginalName()."的新文件，已存储于".$path,1);
             return "https://api.nfls.io/storage" . substr($path,6);
         }
 
