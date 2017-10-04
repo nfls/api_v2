@@ -125,6 +125,6 @@ class ManagementController extends Controller
     }
 
     function uploadPage(){
-        return view("upload.php");
+        return view("upload");
     }
 }
