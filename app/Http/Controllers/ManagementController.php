@@ -27,9 +27,9 @@ class ManagementController extends Controller
             }
             $query = DB::connection("mysql_user")->table("system_message")->orderBy("id","desc")->select("id","time","type","receiver","title","place")->limit(10)->offset($startWith);
             if($request->has("place") && $request->has("place")!=0){
-                $query->where(["place"=>$request->input("place")]);
+                $query = $query->where(["place"=>$request->input("place")]);
             }
-            $query->get();
+            $query = $query->get();
             $total = array();
 
             foreach($query as $single){
