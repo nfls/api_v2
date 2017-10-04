@@ -120,7 +120,7 @@ class ManagementController extends Controller
     }
 
     function uploadFile(Request $request){
-        $path = $request->file('image')->store('image');
+        $path = $request->file('file')->store('image');
         return $path;
     }
 
