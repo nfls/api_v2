@@ -1,5 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Main" type="PhpBuiltInWebServerConfigurationType" factoryName="PHP Built-in Web Server" singleton="true" document_root="$PROJECT_DIR$/public" host="127.0.0.1" port="8088" router_script="$PROJECT_DIR$/public/index.php" use_router_script="true">
-    <method />
-  </configuration>
-</component>
