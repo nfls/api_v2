@@ -35,6 +35,7 @@ class ManagementController extends Controller
                 $info["type"] = UserCenterController::GetNoticeType($single->type);
                 $info["receiver"] = $this->getGropus($single->receiver);
                 $info["title"] = $single->title;
+                $info["place"] = $single->place;
                 array_push($total,$info);
             }
             Return Response::json(array("code"=>200,"info"=>$total));
@@ -66,8 +67,10 @@ class ManagementController extends Controller
                 $array["receiver"] = UserCenterController::GetUserId(Cookie::get("token"));
             }
             if($request->has("id") && $request->input("id") > 0){
+                LogController::writeLog("message.edit","修改了id=".$request->input("id")."的消息",1);
                 $query->where(["id"=>$request->input("id")])->update($array);
             }else{
+                LogController::writeLog("message.add","添加了title=".$request->input("title")."的消息",1);
                 $query->insert($array);
             }
             return Response::json(array("code"=>200));
@@ -77,6 +80,7 @@ class ManagementController extends Controller
     function deleteAMessage(Request $request){
         if($request->has("id") && $this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_ADMIN)){
             DB::connection("mysql_user")->table("system_message")->where(["id"=>$request->input("id")])->delete();
+            LogController::writeLog("message.delete","删除了id=".$request->input("id")."的消息",1);
             return Response::json(array("code"=>200));
         }
     }
