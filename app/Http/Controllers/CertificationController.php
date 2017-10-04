@@ -850,6 +850,7 @@ class CertificationController extends Controller
         $j_enter = 0;
         $j_graduate = 0;
         $s_enter = 0;
+        /*
         if($primary->primary_school_no > 0){
             if(-$birth_year + $primary->primary_school_graduated_year > 15)
                 array_push($return_array,"小学毕业年份与生日差大于15年！");
@@ -872,6 +873,7 @@ class CertificationController extends Controller
                 array_push($return_array,"高中毕业年份与生日差小于18年！");
             $s_enter = $senior->senior_school_enter_year;
         }
+        */
         if($p_graduate!=0 && $j_enter!=0 && ($j_enter - $p_graduate > 1))
             array_push($return_array,"小学毕业与初中入学年份相差超过一年！");
         if($j_graduate!=0 && $s_enter!=0 && ($s_enter - $j_graduate > 1))
