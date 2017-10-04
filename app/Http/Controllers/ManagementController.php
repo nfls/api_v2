@@ -120,8 +120,11 @@ class ManagementController extends Controller
     }
 
     function uploadFile(Request $request){
-        $path = $request->file('file')->store('image');
-        return $path;
+        if(UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::Get("token")))){
+            $path = $request->file('file')->store('public');
+            return "https://api.nfls.io/storage" . substr($path,6);
+        }
+
     }
 
     function uploadPage(){
