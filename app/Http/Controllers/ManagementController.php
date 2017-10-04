@@ -47,7 +47,7 @@ class ManagementController extends Controller
         if($request->has(["title","detail","place","type"]) && $this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_EDIT)){
             $query = DB::connection("mysql_user")->table("system_message");
             $array = ["title"=>$request->input("title"),"detail"=>$request->input("detail"),"type"=>$request->input("type")];
-            if($request->input("place") == 2){
+            if($request->input("place") == 3){
                 if($request->has("img"))
                     $array["img"] = $request->input("img");
                 else
