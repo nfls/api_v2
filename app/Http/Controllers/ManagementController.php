@@ -136,7 +136,7 @@ class ManagementController extends Controller
 
     function getAPicture(Request $request){
         if($request->has("id") && $this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::PICTURES_EDIT)){
-            $single = DB::connection("mysql_user")->table("system_message")->where(["id"=>$request->input("id")])->first();
+            $single = DB::connection("mysql_user")->table("app_startup_pics")->where(["id"=>$request->input("id")])->first();
             $info = array();
             $info["id"] = $single->id;
             $info["time"] = $single->update_time;
