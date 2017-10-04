@@ -134,6 +134,20 @@ class ManagementController extends Controller
         }
     }
 
+    function getAPicture(Request $request){
+        if($request->has("id") && $this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::PICTURES_EDIT)){
+            $single = DB::connection("mysql_user")->table("system_message")->where(["id"=>$request->input("id")])->first();
+            $info = array();
+            $info["id"] = $single->id;
+            $info["time"] = $single->update_time;
+            $info["receiver"] = $single->groups;
+            $info["text"] = $single->text;
+            $info["start"] = $single->valid_after;
+            $info["end"] = $single->invalid_after;
+            return Response::json(array("code"=>200,"info"=>$single));
+        }
+    }
+
     function getGropus($id){
         switch ($id){
             case -1:
