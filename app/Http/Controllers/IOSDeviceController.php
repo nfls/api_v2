@@ -23,6 +23,8 @@ class IOSDeviceController extends Controller
             $device = DB::connection("mysql_user")->table("user_device")->where(["device_id"=>$device_id])->first();
             if(is_null(@$device->device_model)){
                 DB::connection("mysql_user")->table("user_device")->insert(["device_id" => $device_id, "device_model" => $device_model, "user_id"=>$user_id]);
+            }else{
+                DB::connection("mysql_user")->table("user_device")->where(["device_id"=>$device_id])->update(["device_model" => $device_model, "user_id"=>$user_id]);
             }
             return Response::json(array("code"=>200, "status"=>"succeed"));
         } else {

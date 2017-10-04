@@ -56,9 +56,14 @@ Route::post("admin/auth/accept","CertificationManagementController@acceptIdentit
 Route::post("admin/auth/deny","CertificationManagementController@denyIdentity");
 Route::post("admin/auth/ignore","CertificationManagementController@ignoreIdentity");
 Route::get("admin/auth/instructions","CertificationManagementController@getInstruction");
+Route::post("admin/upload","ManagementController@uploadFile");
+Route::get("admin/uploads","ManagementController@uploadPage");
 Route::get("admin/message/get","ManagementController@getAllMessages");
+Route::get("admin/picture/get","ManagementController@getAllPictures");
 Route::post("admin/message/detail","ManagementController@getAMessage");
+Route::post("admin/picture/detail","ManagementController@getAPicture");
 Route::post("admin/message/save","ManagementController@saveAMessage");
+Route::post("admin/picture/save","ManagementController@saveAPicture");
 Route::post("admin/message/remove","ManagementController@deleteAMessage");
 Route::get("admin/message/permission","ManagementController@getPermission");
 

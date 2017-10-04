@@ -77,6 +77,18 @@ class UserCenterController extends Controller
                     $info['status'] = "succeed";
                 }
                 break;
+            case "icRegister":
+                if ($request->isMethod("get")) {
+                    $this->RegisterTypechoAccounts(self::GetUserId(Cookie::get('token')),"ic");
+                    $info['status'] = "succeed";
+                }
+                break;
+            case "alumniRegister":
+                if ($request->isMethod("get")) {
+                    $this->RegisterTypechoAccounts(self::GetUserId(Cookie::get('token')),"alumni");
+                    $info['status'] = "succeed";
+                }
+                break;
             case "avatar":
                 if ($request->isMethod("get"))
                     $info['url'] = $this->GetAvatarById($this->GetUserId(Cookie::get('token')));
@@ -157,6 +169,7 @@ class UserCenterController extends Controller
             case "last":
                 if($request->isMethod("get")){
                     $info = $this->getFirstMessage(self::GetUserId(Cookie::get("token")));
+                    $this->LoginProcess(self::GetUserId(Cookie::get("token")));
                 }
                 break;
             case "news":
@@ -330,14 +343,19 @@ class UserCenterController extends Controller
 
     static function ConfirmCaptcha($session, $captcha, $operation)
     {
-        DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
-        $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => $operation, "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
-        if (@is_null($valid->id)) {
-            DB::connection("mysql_user")->table("user_session")->where(["session" => $session])->delete();
-            return false;
-        } else {
-            DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => $operation, "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
-            return true;
+        if(is_null($session) || $session == ""){
+            $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=6Lc0GTMUAAAAAN43IBOJp-hRdHAC5fVvf034twaJ&response='.$captcha);
+            return json_decode($verifyResponse)->success;
+        }else{
+            DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
+            $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => $operation, "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
+            if (@is_null($valid->id)) {
+                DB::connection("mysql_user")->table("user_session")->where(["session" => $session])->delete();
+                return false;
+            } else {
+                DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => $operation, "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
+                return true;
+            }
         }
     }
 
@@ -441,6 +459,8 @@ class UserCenterController extends Controller
 
     function LoginProcess($id)
     {
+        if($id<1)
+            return;
         if (!$this->CheckIfUserExists($id))
             $this->AddUser($id);
         $token = $this->CheckIfTokenExists($id);
@@ -448,6 +468,10 @@ class UserCenterController extends Controller
             $token = $this->GenerateToken($id);
         if ($this->GetUserAssociatedIdById($id,"wiki") == -1)
             $this->CreateWikiAccountById($id);
+        if ($this->GetUserAssociatedIdById($id,"ic") == -1)
+            $this->RegisterTypechoAccounts($id,"ic");
+        if ($this->GetUserAssociatedIdById($id,"alumni") == -1)
+            $this->RegisterTypechoAccounts($id,"alumni");
         return ($token);
     }
 
@@ -605,8 +629,16 @@ class UserCenterController extends Controller
         switch ($service) {
             case "wiki":
                 return $user->wiki_account;
+                break;
+            case 'ic':
+                return $user->ib_account;
+                break;
+            case 'alumni':
+                return $user->alumni_account;
+                break;
             default:
                 abort(403);
+                break;
         }
     }
 
@@ -625,6 +657,26 @@ class UserCenterController extends Controller
         DB::connection("mysql_user")->table("user_list")->where(["id" => $id])->update(["wiki_account" => $user->user_id]);
         return array("status" => "success");
     }
+
+    function RegisterTypechoAccounts($id,$place){
+        if($this->GetUserAssociatedIdById($id,$place) != -1)
+            abort(403);
+        if($place == "alumni"){
+            $db = "mysql_alumni";
+            $ac = "alumni_account";
+        }else{
+            $db = "mysql_ic";
+            $ac = "ib_account";
+        }
+        $info = $this->GetPersonalGeneralInfoById($id);
+        $username = $info['username'];
+        $email = $info['email'];
+        DB::connection($db)->table("typecho_users")->insert(["mail"=>$email,"screenName"=>$username,"name"=>$username,"group"=>"visitor","created"=>time()]);
+        $user = DB::connection($db)->table("typecho_users")->where(["name"=>$username])->first();
+        DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->update([$ac=>$user->uid]);
+        return array("status" => "success");
+    }
+
 
 
     static function GetNoticeType($type)//获取通知类型
