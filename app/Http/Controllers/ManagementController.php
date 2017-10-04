@@ -14,6 +14,7 @@ class ManagementController extends Controller
     const MESSAGE_EDIT = 2;
     const MESSAGE_ADMIN = 3;
     const PICTURES_EDIT = 4;
+    const PICTURES_ADMIN = 5;
     function checkPermission($id,$bit){
         $permission = DB::connection("mysql_user")->table("user_list")->where(["id"=>$id])->first()->permissions;
         return $permission & (1<<$bit);
@@ -101,6 +102,30 @@ class ManagementController extends Controller
                 $query->where(["id"=>$request->input("id")])->update($array);
             }else{
                 LogController::writeLog("message.add","添加了title=".$request->input("title")."的消息",1);
+                $query->insert($array);
+            }
+            return Response::json(array("code"=>200));
+        }
+    }
+
+    function saveAPicture(Request $request){
+
+        if($request->has(["title","url"]) && $this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_EDIT)){
+            $query = DB::connection("mysql_user")->table("app_startup_pics");
+            $array = ["text"=>$request->input("title"),"url"=>$request->input("url"),"valid_after"=>$request->input("start"),"invalid_after"=>$request->input("end")];
+            if($this->checkPermission(UserCenterController::GetUserId(Cookie::get("token")),self::MESSAGE_ADMIN)){
+                if($request->has("receiver") && $request->input("receiver") == -1)
+                    $array["receiver"] = -1;
+                else
+                    $array["receiver"] = 0;
+            }else{
+                $array["receiver"] = 0;
+            }
+            if($request->has("id") && $request->input("id") > 0){
+                LogController::writeLog("picture.edit","修改了id=".$request->input("id")."的启动图片",1);
+                $query->where(["id"=>$request->input("id")])->update($array);
+            }else{
+                LogController::writeLog("picture.add","添加了title=".$request->input("title")."的启动图片",1);
                 $query->insert($array);
             }
             return Response::json(array("code"=>200));

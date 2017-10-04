@@ -63,6 +63,7 @@ Route::get("admin/picture/get","ManagementController@getAllPictures");
 Route::post("admin/message/detail","ManagementController@getAMessage");
 Route::post("admin/picture/detail","ManagementController@getAPicture");
 Route::post("admin/message/save","ManagementController@saveAMessage");
+Route::post("admin/picture/save","ManagementController@saveAPicture");
 Route::post("admin/message/remove","ManagementController@deleteAMessage");
 Route::get("admin/message/permission","ManagementController@getPermission");
 
