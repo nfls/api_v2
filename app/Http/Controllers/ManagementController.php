@@ -25,7 +25,7 @@ class ManagementController extends Controller
             } else {
                 $startWith = 0;
             }
-            $query = DB::connection("mysql_user")->table("system_message")->orderBy("id","desc")->select("id","time","type","receiver","title","place")->limit(10)->offset($startWith)
+            $query = DB::connection("mysql_user")->table("system_message")->orderBy("id","desc")->select("id","time","type","receiver","title","place")->limit(10)->offset($startWith);
             if($request->has("place") && $request->has("place")!=0){
                 $query->where(["place"=>$request->input("place")]);
             }
