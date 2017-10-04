@@ -118,4 +118,13 @@ class ManagementController extends Controller
                 break;
         }
     }
+
+    function uploadFile(Request $request){
+        $path = $request->file('avatar')->store('avatars');
+        return $path;
+    }
+
+    function uploadPage(){
+        return view("upload.php");
+    }
 }
