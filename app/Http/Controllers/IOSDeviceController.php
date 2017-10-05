@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use Illuminate\Http\Request;
 use Cookie;
 use Illuminate\Pagination\PaginationServiceProvider;
@@ -125,7 +126,10 @@ class IOSDeviceController extends Controller
         return Response::json($array);
     }
 
-    function pushAMessage(){
+    function pushAMessage(Request $request){
+        if(!UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token")))){
+            return "Permission Error!";
+        }
         $str = DB::connection("mysql_user")->table("system_message")->where(["place"=>2])->orderBy("id","desc")->first()->detail;
         $list = DB::connection("mysql_user")->table("user_device")->get();
         $push = new ApnsPHP_Push(
