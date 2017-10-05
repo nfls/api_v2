@@ -85,7 +85,7 @@ class ManagementController extends Controller
             }
             $array["place"] = $request->input("place");
             if($request->input("place") != 3)
-                $array["conf"] = json_encode(array("site"=>$request->input("site"),"url"=>$request->input("url")));
+                $array["conf"] = json_encode(array("type"=>$request->input("site"),"url"=>$request->input("url")));
             else if($request->has("url")){
                 $array["conf"] = $request->input("url");
             }
