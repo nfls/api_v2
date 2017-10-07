@@ -346,15 +346,19 @@ class UserCenterController extends Controller
         if(is_null($session) || $session == ""){
             $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=6Lc0GTMUAAAAAN43IBOJp-hRdHAC5fVvf034twaJ&response='.$captcha);
             return json_decode($verifyResponse)->success;
+        }else if($session == "ios") {
+            $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=6LdzGDMUAAAAALILp7gVw6nPDVWCKyt-3Puc0YRL&response='.$captcha);
+            return json_decode($verifyResponse)->success;
         }else{
-            DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
-            $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => $operation, "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
-            if (@is_null($valid->id)) {
-                DB::connection("mysql_user")->table("user_session")->where(["session" => $session])->delete();
-                return false;
-            } else {
-                DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => $operation, "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
-                return true;
+                DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
+                $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => $operation, "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->first();
+                if (@is_null($valid->id)) {
+                    DB::connection("mysql_user")->table("user_session")->where(["session" => $session])->delete();
+                    return false;
+                } else {
+                    DB::connection("mysql_user")->table("user_session")->where(["session" => $session, "operation" => $operation, "phrase" => $captcha, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
+                    return true;
+                }
             }
         }
     }
