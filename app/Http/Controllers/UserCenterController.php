@@ -347,7 +347,7 @@ class UserCenterController extends Controller
             $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=6Lc0GTMUAAAAAN43IBOJp-hRdHAC5fVvf034twaJ&response='.$captcha);
             return json_decode($verifyResponse)->success;
         }else if($session == "ios") {
-            $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=6LdzGDMUAAAAALILp7gVw6nPDVWCKyt-3Puc0YRL&response='.$captcha);
+            $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=6Ld0GzMUAAAAAL5gbLv3LoIFs6SrDkXqnvxUJqRS&response='.$captcha);
             return json_decode($verifyResponse)->success;
         }else{
             DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
