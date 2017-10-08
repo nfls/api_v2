@@ -873,7 +873,7 @@ class CertificationController extends Controller
                 array_push($return_array,"高中毕业年份与生日差小于18年！");
             $s_enter = $senior->senior_school_enter_year;
         }
-        */
+
         if($p_graduate!=0 && $j_enter!=0 && ($j_enter - $p_graduate > 1))
             array_push($return_array,"小学毕业与初中入学年份相差超过一年！");
         if($j_graduate!=0 && $s_enter!=0 && ($s_enter - $j_graduate > 1))
@@ -885,7 +885,7 @@ class CertificationController extends Controller
         if($j_graduate==0 && $p_graduate==0 && $s_enter==0)
             array_push($return_array,"本服务仅限在南外校友使用！");
 
-
+        */
         //$user->
         return $return_array;
 
