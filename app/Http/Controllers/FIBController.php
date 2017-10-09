@@ -29,6 +29,13 @@ class FIBController extends Controller
                     $info = $this->updateScore($id,$request->input("score"));
                 }
                 break;
+            case "purchase":
+                if($request->isMethod("get")){
+                    $info = array("doublePack"=>0,"recoverPack"=>0);
+                }else if($request->isMethod("post") && $request->has("pack")){
+                    $info = array("process"=>true,"doublePack"=>0,"recoverPack"=>0);
+                }
+                break;
             default:
                 break;
         }
@@ -48,7 +55,6 @@ class FIBController extends Controller
 
     function getUser($token)
     {
-
         $id = UserCenterController::GetUserId($token);
         $this->checkScoreExpiration();
         $user = DB::connection('mysql_game')->table($this->table)->where('id', $id)->first();
