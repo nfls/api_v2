@@ -31,7 +31,7 @@ class FIBController extends Controller
                 break;
             case "purchase":
                 if($request->isMethod("get")){
-                    $info = array("doublePack"=>0,"recoverPack"=>0);
+                    $info = array("doublePack"=>1,"recoverPack"=>1);
                 }else if($request->isMethod("post") && $request->has("pack")){
                     $info = array("process"=>true,"doublePack"=>0,"recoverPack"=>0);
                 }
