@@ -33,7 +33,7 @@ class GameListController extends Controller
     function purchaseManager($userId,$productId,$transactionId,$env="sandbox"){
         if($productId<1000)
             return;
-        if(count(DB::connection("mysql_game")->table("_purchase")->select(["transaction_id"=>$transactionId])->get()) == 0){
+        if(count(DB::connection("mysql_game")->table("_purchase")->where(["transaction_id"=>$transactionId])->get()) == 0){
             DB::connection("mysql_game")->table("_purchase")->insert(["user_id"=>$userId,"product_id"=>$productId,"transaction_id"=>$transactionId,"environment"=>$env]);
             $gameId = $productId / 10 % 10;
             switch($gameId){
