@@ -30,4 +30,21 @@ class GameListController extends Controller
         return Response::json($json_mes, 200);
     }
 
+    function purchaseManager($userId,$productId,$transactionId,$env="sandbox"){
+        if($productId<1000)
+            return;
+        if(count(DB::connection("mysql_game")->table("_purchase")->select(["transaction_id"=>$transactionId])->get()) == 0){
+            DB::connection("mysql_game")->table("_purchase")->insert(["user_id"=>$userId,"product_id"=>$productId,"transaction_id"=>$transactionId,"environment"=>$env]);
+            $gameId = $productId / 10 % 10;
+            switch($gameId){
+                case 1:
+                    $fib = new FIBController();
+                    $fib->purchaseHandler($userId,$productId);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
 }

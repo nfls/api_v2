@@ -180,6 +180,11 @@ class FIBController extends Controller
         $info["recoverPack"] = $data->recoverPack;
         $info["doublePack"] = $data->doublePack;
         return $info;
+    }
+
+    function purchaseHandler($id,$product){
 
     }
+
+
 }

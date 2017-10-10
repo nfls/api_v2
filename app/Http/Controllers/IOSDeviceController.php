@@ -43,39 +43,35 @@ class IOSDeviceController extends Controller
             curl_setopt ($ch, CURLOPT_URL, "https://buy.itunes.apple.com/verifyReceipt");
             curl_setopt ($ch, CURLOPT_POST, 1);
             $post_data = '{"receipt-data":"'.$receipt.'"}';
-            if($post_data != ''){curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);}
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
             curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 120);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($ch, CURLOPT_HEADER, false);
             $file_contents = curl_exec($ch);
             curl_close($ch);
-            $production=(array)json_decode($file_contents,true);
-            unset($ch);
-            if($production["status"] != 0) {
-                $ch = curl_init();
+            $data=(array)json_decode($file_contents,true);
+            if($data["status"] != 0) {
                 curl_setopt($ch, CURLOPT_URL, "https://sandbox.itunes.apple.com/verifyReceipt");
-                curl_setopt($ch, CURLOPT_POST, 1);
-                $post_data = '{"receipt-data":"' . $receipt . '"}';
-                if ($post_data != '') {
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
-                }
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 120);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($ch, CURLOPT_HEADER, false);
                 $file_contents = curl_exec($ch);
                 curl_close($ch);
-                $sandbox = (array)json_decode($file_contents, true);
-                if ($sandbox["status"] != 0) {
-                    return Response::json(array("code"=>403, "status"=>"failed", "sandbox" => $sandbox["status"], "prodcution" => $production["status"]));
+                $data = (array)json_decode($file_contents, true);
+                if ($data["status"] != 0) {
+                    return Response::json(array("code"=>403, "status"=>"failed"));
                 } else {
-                    DB::connection("mysql_user")->table("user_purchase")->insert(["user_id"=>$user_id, "receipt"=>$receipt,"authorize_data"=>$file_contents,"environment"=>"sandbox","price"=>30]);
+                    $env = "sandbox";
                 }
             } else {
-                DB::connection("mysql_user")->table("user_purchase")->insert(["user_id"=>$user_id, "receipt"=>$receipt,"authorize_data"=>$file_contents,"environment"=>"production","price"=>30]);
+                $env = "production";
             }
-
+            $products = $data["in_app"];
+            foreach($products as $product){
+                $id = $product["product_id"];
+                $transaction_id = $product["transaction_id"];
+                $game = new GameListController();
+                $game->purchaseManager($user_id,$id,$transaction_id,$env);
+            }
+            DB::connection("mysql_user")->table("user_purchase")->insert(["user_id"=>$user_id, "receipt"=>$receipt,"authorize_data"=>$file_contents,"environment"=>$env,"price"=>0]);
             return Response::json(array("code"=>200, "status"=>"succeed"));
         } else {
             abort(404);
