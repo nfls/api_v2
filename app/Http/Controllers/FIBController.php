@@ -31,9 +31,9 @@ class FIBController extends Controller
                 break;
             case "purchase":
                 if($request->isMethod("get")){
-                    $info = array("doublePack"=>1,"recoverPack"=>1);
+                    $info = $this->getPack($id);
                 }else if($request->isMethod("post") && $request->has("pack")){
-                    $info = array("process"=>true,"doublePack"=>0,"recoverPack"=>0);
+                    $info = $this->getPack($id,$request->input("pack"));
                 }
                 break;
             default:
@@ -149,5 +149,37 @@ class FIBController extends Controller
 
         }
         return $array;
+    }
+
+    function getPack($id,$used = null){
+        if($this->table != "fib_userdata")
+            abort(403);
+        $data = DB::connection("mysql_game")->table($this->table)->select("doublePack","recoverPack")->where(["id"=>$id])->first();
+        $info = array();
+        if(!is_null($used)){
+            switch($used){
+                case "double":
+                    if($data->doublePack > 0){
+                        DB::connection("mysql_game")->table($this->table)->update(["doublePack"=>$data->doublePack - 1])->where(["id"=>$id]);
+                        $info["process"] = true;
+                    }else{
+                        $info["process"] = false;
+                    }
+                    break;
+                case "recover":
+                    if($data->recoverPack > 0){
+                        DB::connection("mysql_game")->table($this->table)->update(["recoverPack"=>$data->recoverPack - 1])->where(["id"=>$id]);
+                        $info["process"] = true;
+                    }else{
+                        $info["process"] = false;
+                    }
+                    break;
+            }
+            $data = DB::connection("mysql_game")->table($this->table)->select("doublePack","recoverPack")->where(["id"=>$id])->first();
+        }
+        $info["recoverPack"] = $data->recoverPack;
+        $info["doublePack"] = $data->doublePack;
+        return array($info);
+
     }
 }
