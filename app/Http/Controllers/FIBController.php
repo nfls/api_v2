@@ -183,7 +183,24 @@ class FIBController extends Controller
     }
 
     function purchaseHandler($id,$product){
-
+        $data = DB::connection("mysql_game")->table($this->table)->select("doublePack","recoverPack")->where(["id"=>$id])->first();
+        $doublePack = $data->doublePack;
+        $recoverPack = $data->recoverPack;
+        switch($product){
+            case 1011:
+                $recoverPack += 2;
+                break;
+            case 1012:
+                $recoverPack += 5;
+                break;
+            case 1013:
+                $recoverPack += 2;
+                break;
+            case 1014:
+                $recoverPack += 5;
+                break;
+        }
+        DB::connection("mysql_game")->table($this->table)->where(["id"=>$id])->update(["recoverPack"=>$recoverPack,"doublePack"=>$doublePack]);
     }
 
 

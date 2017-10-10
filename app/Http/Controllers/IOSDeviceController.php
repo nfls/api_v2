@@ -78,7 +78,6 @@ class IOSDeviceController extends Controller
             foreach($products as $product){
                 $id = $product["product_id"];
                 $transaction_id = $product["transaction_id"];
-
                 $game->purchaseManager($user_id,$id,$transaction_id,$env);
             }
             return Response::json(array("code"=>200, "status"=>"succeed"));
