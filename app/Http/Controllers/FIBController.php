@@ -160,7 +160,7 @@ class FIBController extends Controller
             switch($used){
                 case "double":
                     if($data->doublePack > 0){
-                        DB::connection("mysql_game")->table($this->table)->update(["doublePack"=>$data->doublePack - 1])->where(["id"=>$id]);
+                        DB::connection("mysql_game")->table($this->table)->where(["id"=>$id])->update(["doublePack"=>$data->doublePack - 1]);
                         $info["process"] = true;
                     }else{
                         $info["process"] = false;
@@ -168,7 +168,7 @@ class FIBController extends Controller
                     break;
                 case "recover":
                     if($data->recoverPack > 0){
-                        DB::connection("mysql_game")->table($this->table)->update(["recoverPack"=>$data->recoverPack - 1])->where(["id"=>$id]);
+                        DB::connection("mysql_game")->table($this->table)->where(["id"=>$id])->update(["recoverPack"=>$data->recoverPack - 1]);
                         $info["process"] = true;
                     }else{
                         $info["process"] = false;
