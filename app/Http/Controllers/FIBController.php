@@ -194,10 +194,10 @@ class FIBController extends Controller
                 $recoverPack += 5;
                 break;
             case 1013:
-                $recoverPack += 2;
+                $doublePack += 2;
                 break;
             case 1014:
-                $recoverPack += 5;
+                $doublePack += 5;
                 break;
         }
         DB::connection("mysql_game")->table($this->table)->where(["id"=>$id])->update(["recoverPack"=>$recoverPack,"doublePack"=>$doublePack]);
