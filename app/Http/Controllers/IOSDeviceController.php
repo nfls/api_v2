@@ -72,14 +72,14 @@ class IOSDeviceController extends Controller
             } else {
                 $env = "production";
             }
-            $products = $data["in_app"];
+            DB::connection("mysql_user")->table("user_purchase")->insert(["user_id"=>$user_id, "receipt"=>$receipt,"authorize_data"=>$file_contents,"environment"=>$env,"price"=>0]);
+            $products = $data["receipt"]["in_app"];
             foreach($products as $product){
                 $id = $product["product_id"];
                 $transaction_id = $product["transaction_id"];
                 $game = new GameListController();
                 $game->purchaseManager($user_id,$id,$transaction_id,$env);
             }
-            DB::connection("mysql_user")->table("user_purchase")->insert(["user_id"=>$user_id, "receipt"=>$receipt,"authorize_data"=>$file_contents,"environment"=>$env,"price"=>0]);
             return Response::json(array("code"=>200, "status"=>"succeed"));
         } else {
             abort(404);
