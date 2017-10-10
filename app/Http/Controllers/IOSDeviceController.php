@@ -52,7 +52,15 @@ class IOSDeviceController extends Controller
             curl_close($ch);
             $data=(array)json_decode($file_contents,true);
             if($data["status"] != 0) {
+                $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, "https://sandbox.itunes.apple.com/verifyReceipt");
+                curl_setopt ($ch, CURLOPT_POST, 1);
+                $post_data = '{"receipt-data":"'.$receipt.'"}';
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+                curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 120);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_HEADER, false);
                 $file_contents = curl_exec($ch);
                 curl_close($ch);
                 $data = (array)json_decode($file_contents, true);
