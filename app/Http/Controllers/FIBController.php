@@ -179,7 +179,7 @@ class FIBController extends Controller
         }
         $info["recoverPack"] = $data->recoverPack;
         $info["doublePack"] = $data->doublePack;
-        return array($info);
+        return $info;
 
     }
 }
