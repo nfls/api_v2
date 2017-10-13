@@ -419,6 +419,7 @@ class UserCenterController extends Controller
         curl_setopt($ch, CURLOPT_HEADER, false);
         $file_contents = curl_exec($ch);
         curl_close($ch);
+        die($file_contents);
         $detail = (array)json_decode($file_contents, true);
         if (isset($detail['data'])) {
             return array("status" => "success");
