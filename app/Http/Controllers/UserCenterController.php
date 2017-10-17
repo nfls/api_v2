@@ -14,7 +14,7 @@ use DeviceDetector\Parser\Device\DeviceParserAbstract;
 use PragmaRX\Google2FA\Google2FA;
 use Illuminate\Support\Facades\Log;
 
-require_once dirname(__DIR__) . '/usr/share/php/api_sdk/vendor/autoload.php';
+require_once '/usr/share/php/api_sdk/vendor/autoload.php';
 
 use Aliyun\Core\Config;
 use Aliyun\Core\Profile\DefaultProfile;
