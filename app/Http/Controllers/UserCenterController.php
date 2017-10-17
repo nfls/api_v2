@@ -246,6 +246,7 @@ class UserCenterController extends Controller
         $array["chnName"] = $info->chnName;
         $array["engName"] = $info->engName;
         $array["enabled"] = $info->enabled;
+        $array["submitted"] = $info->submitted;
         if($info->enabled){
             $array["tmpClass"] = $info->year ." 届 ";
             switch($info->class){
