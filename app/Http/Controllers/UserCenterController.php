@@ -190,6 +190,7 @@ class UserCenterController extends Controller
                     return "aa";
                     $info = $this->ConfirmPhone($request->input("phone"),self::GetUserId(Cookie::get("token")),$request->input("code"),$request->input("captcha"));
                 }else{
+                    return "aaa";
                     $info = $this->PhoneCaptcha($request->input("phone"),self::GetUserId(Cookie::get("token")),$request->input("captcha"));
                 }
                 break;
