@@ -186,11 +186,9 @@ class UserCenterController extends Controller
                 }
                 break;
             case "phone":
-                if($request->has["code"] && $request->isMethod("post")){
-                    return "aa";
+                if($request->has("code") && $request->isMethod("post")){
                     $info = $this->ConfirmPhone($request->input("phone"),self::GetUserId(Cookie::get("token")),$request->input("code"),$request->input("captcha"));
                 }else{
-                    return "aaa";
                     $info = $this->PhoneCaptcha($request->input("phone"),self::GetUserId(Cookie::get("token")),$request->input("captcha"));
                 }
                 break;
@@ -392,13 +390,10 @@ class UserCenterController extends Controller
         }
     }
     function ConfirmPhone($phone,$userId,$code,$captcha){
-        Log::Info($phone.$userId.$code.$captcha);
         $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=6Lc0GTMUAAAAAN43IBOJp-hRdHAC5fVvf034twaJ&response='.$captcha);
         if(json_decode($verifyResponse)->success){
             DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
-            DB::connection("mysql_user")->enableQueryLog();
             $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $userId, "operation" => $phone, "phrase" => $code, "ip" => $_SERVER['REMOTE_ADDR']])->first();
-            die(DB::connection("mysql_user")->getQueryLog());
             if(!is_null($valid)){
                 DB::connection("mysql_user")->table("user_session")->where(["session" => $userId, "operation" => $phone, "phrase" => $code, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
                 DB::connection("mysql_user")->table("user_list")->where(["id"=>$userId])->update(["phone"=>$phone]);
