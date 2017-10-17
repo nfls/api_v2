@@ -219,7 +219,7 @@ class UserCenterController extends Controller
             $info["phone"] = true;
         else
             $info["phone"] = false;
-        $ic = DB::connection("mysql_ic")->table("user_list")->where(["id" => $id])->first();
+        $ic = DB::connection("mysql_ic")->table("typecho_users")->where(["id" => $id])->first();
         if(is_null($ic)){
             $info["ic"] = false;
         }else{
