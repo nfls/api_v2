@@ -187,6 +187,7 @@ class UserCenterController extends Controller
                 break;
             case "phone":
                 if($request->has["code"] && $request->isMethod("post")){
+                    die("aa");
                     $info = $this->ConfirmPhone($request->input("phone"),self::GetUserId(Cookie::get("token")),$request->input("code"),$request->input("captcha"));
                 }else{
                     $info = $this->PhoneCaptcha($request->input("phone"),self::GetUserId(Cookie::get("token")),$request->input("captcha"));
