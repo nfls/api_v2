@@ -396,7 +396,7 @@ class UserCenterController extends Controller
             DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
             DB::connection("mysql_user")->enableQueryLog();
             $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $userId, "operation" => $phone, "phrase" => $code, "ip" => $_SERVER['REMOTE_ADDR']])->first();
-            Log::Info(DB::connection("mysql_user")->getQueryLog());
+            die(DB::connection("mysql_user")->getQueryLog());
             if(!is_null($valid)){
                 DB::connection("mysql_user")->table("user_session")->where(["session" => $userId, "operation" => $phone, "phrase" => $code, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
                 DB::connection("mysql_user")->table("user_list")->where(["id"=>$userId])->update(["phone"=>$phone]);
