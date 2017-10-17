@@ -187,7 +187,7 @@ class UserCenterController extends Controller
                 break;
             case "phone":
                 if($request->has["code"] && $request->isMethod("post")){
-                    $info = self::ConfirmPhone($request->input("phone"),self::GetUserId(Cookie::get("token")),$request->input("code"),$request->input("captcha"));
+                    $info = $this->ConfirmPhone($request->input("phone"),self::GetUserId(Cookie::get("token")),$request->input("code"),$request->input("captcha"));
                 }else{
                     $info = $this->PhoneCaptcha($request->input("phone"),self::GetUserId(Cookie::get("token")),$request->input("captcha"));
                 }
@@ -389,7 +389,7 @@ class UserCenterController extends Controller
             }
         }
     }
-    static function ConfirmPhone($phone,$userId,$code,$captcha){
+    function ConfirmPhone($phone,$userId,$code,$captcha){
         Log::Info($phone.$userId.$code.$captcha);
         $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=6Lc0GTMUAAAAAN43IBOJp-hRdHAC5fVvf034twaJ&response='.$captcha);
         if(json_decode($verifyResponse)->success){
