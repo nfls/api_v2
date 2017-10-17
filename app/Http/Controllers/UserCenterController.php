@@ -189,7 +189,7 @@ class UserCenterController extends Controller
                 if($request->has["code"] && $request->isMethod("post")){
                     $info = self::ConfirmPhone($request->input("phone"),self::GetUserId(Cookie::get("token")),$request->input("code"),$request->input("captcha"));
                 }else{
-                    $info =  $this->PhoneCaptcha($request->input("phone"),self::GetUserId(Cookie::get("token")),$request->input("captcha"));
+                    $info = $this->PhoneCaptcha($request->input("phone"),self::GetUserId(Cookie::get("token")),$request->input("captcha"));
                 }
                 break;
             default:
@@ -390,11 +390,15 @@ class UserCenterController extends Controller
         }
     }
     static function ConfirmPhone($phone,$userId,$code,$captcha){
+        Log::info($phone.$userId.$code.$captcha);
         $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=6Lc0GTMUAAAAAN43IBOJp-hRdHAC5fVvf034twaJ&response='.$captcha);
         if(json_decode($verifyResponse)->success){
             DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
+            DB::connection("mysql_user")->enableQueryLog();
             $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $userId, "operation" => $phone, "phrase" => $code, "ip" => $_SERVER['REMOTE_ADDR']])->first();
+            Log::info(DB::connection("mysql_user")->getQueryLog());
             if(!is_null($valid)){
+                DB::connection("mysql_user")->table("user_session")->where(["session" => $userId, "operation" => $phone, "phrase" => $code, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
                 DB::connection("mysql_user")->table("user_list")->where(["id"=>$userId])->update(["phone"=>$phone]);
                 return true;
             }else{
@@ -403,7 +407,6 @@ class UserCenterController extends Controller
         }else{
             return false;
         }
-
     }
 
     static function random_str($length, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
