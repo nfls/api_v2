@@ -197,6 +197,13 @@ class UserCenterController extends Controller
                     $info = $this->getStatus(self::GetUserId($request->input("token")));
                 }
                 break;
+            case "realname":
+                if($request->isMethod("get")){
+                    $info = $this->ICInfo(self::GetUserId(Cookie::get("token")));
+                }else{
+                    $info = $this->ICInfo(self::GetUserId(Cookie::get("token")),$request->input("chnName"),$request->input("engName"),$request->input("tmpClass"));
+                }
+                break;
             default:
                 break;
         }
@@ -226,6 +233,43 @@ class UserCenterController extends Controller
             $info["ic"] = $ic->submitted;
         }
         return $info;
+    }
+
+    function ICInfo($id,$chnName = null,$engName = null, $tmpClass= null){
+        $preload = DB::connection("mysql_ic")->table("ic_auth")->where(["id"=>$id])->first();
+        if(is_null($preload)){
+            DB::connection("mysql_ic")->table("ic_auth")->insert(["id"=>$id]);
+        }else if(!is_null($chnName) && !$preload->enabled){
+            DB::connection("mysql_ic")->table("ic_auth")->where(["id"=>$id])->update(["chnName"=>$chnName,"engName"=>$engName,"tmpClass"=>$tmpClass]);
+        }
+        $info = DB::connection("mysql_ic")->table("ic_auth")->where(["id"=>$id])->first();
+        $array["chnName"] = $info->chnName;
+        $array["engName"] = $info->engName;
+        $array["enabled"] = $info->enabled;
+        if($info->enabled){
+            $array["tmpClass"] = $info->year ." 届 ";
+            switch($info->class){
+                case 1:
+                    $class = "IB1班";
+                    break;
+                case 2:
+                    $class = "IB2班";
+                    break;
+                case 3:
+                    $class = "剑桥1班";
+                    break;
+                case 4:
+                    $class = "剑桥2班";
+                    break;
+                default:
+                    $class = "老师";
+                    break;
+            }
+            $array["tmpClass"] = $array["tmpClass"] . $class;
+        }else{
+            $array["tmpClass"] = $info->tmpClass;
+        }
+        return $array;
     }
     function getRenameCardCount($id)
     {
