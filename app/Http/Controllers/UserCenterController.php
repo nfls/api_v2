@@ -194,7 +194,7 @@ class UserCenterController extends Controller
                 break;
             case "auth":
                 if($request->has("token")){
-                    $info = $this->getStatus(Cookie::get("token"));
+                    $info = $this->getStatus(self::GetUserId($request->input("token")));
                 }
                 break;
             default:
@@ -219,7 +219,7 @@ class UserCenterController extends Controller
             $info["phone"] = true;
         else
             $info["phone"] = false;
-        $ic = DB::connection("mysql_ic")->table("user_list")->where(["id" => $id])->first();]
+        $ic = DB::connection("mysql_ic")->table("user_list")->where(["id" => $id])->first();
         if(is_null($ic)){
             $info["ic"] = false;
         }else{
