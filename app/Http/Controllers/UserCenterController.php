@@ -192,6 +192,11 @@ class UserCenterController extends Controller
                     $info = $this->PhoneCaptcha($request->input("phone"),self::GetUserId(Cookie::get("token")),$request->input("captcha"));
                 }
                 break;
+            case "auth":
+                if($request->has("token")){
+                    $info = $this->getStatus(Cookie::get("token"));
+                }
+                break;
             default:
                 break;
         }
@@ -208,7 +213,20 @@ class UserCenterController extends Controller
         }
 
     }
-
+    function getStatus($id){
+        $info = array();
+        if(DB::connection("mysql_user")->table("user_list")->where(["id" => $id])->first()->mobile == 0)
+            $info["phone"] = true;
+        else
+            $info["phone"] = false;
+        $ic = DB::connection("mysql_ic")->table("user_list")->where(["id" => $id])->first();]
+        if(is_null($ic)){
+            $info["ic"] = false;
+        }else{
+            $info["ic"] = $ic->submitted;
+        }
+        return $info;
+    }
     function getRenameCardCount($id)
     {
         return DB::connection("mysql_user")->table("user_list")->select("rename_cards")->where(["id" => $id])->first();
@@ -357,6 +375,9 @@ class UserCenterController extends Controller
     }
 
     function PhoneCaptcha($phone,$userId,$captcha){
+        if(DB::connection("mysql_user")->table("user_session")->where(["id"=>$userId])->first()-> phone != 0){
+            return false;
+        }
         DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
         $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=6Lc0GTMUAAAAAN43IBOJp-hRdHAC5fVvf034twaJ&response='.$captcha);
         if(json_decode($verifyResponse)->success){
@@ -390,6 +411,9 @@ class UserCenterController extends Controller
         }
     }
     function ConfirmPhone($phone,$userId,$code,$captcha){
+        if(DB::connection("mysql_user")->table("user_session")->where(["id"=>$userId])->first()-> phone != 0){
+            return false;
+        }
         $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=6Lc0GTMUAAAAAN43IBOJp-hRdHAC5fVvf034twaJ&response='.$captcha);
         if(json_decode($verifyResponse)->success){
             DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
