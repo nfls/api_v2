@@ -216,9 +216,9 @@ class UserCenterController extends Controller
     function getStatus($id){
         $info = array();
         if(DB::connection("mysql_user")->table("user_list")->where(["id" => $id])->first()->phone == 0)
-            $info["phone"] = true;
-        else
             $info["phone"] = false;
+        else
+            $info["phone"] = true;
         $ic = DB::connection("mysql_ic")->table("ic_auth")->where(["id" => $id])->first();
         if(is_null($ic)){
             $info["ic"] = false;
