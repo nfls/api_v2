@@ -240,7 +240,7 @@ class UserCenterController extends Controller
         if(is_null($preload)){
             DB::connection("mysql_ic")->table("ic_auth")->insert(["id"=>$id]);
         }else if(!is_null($chnName) && !$preload->enabled){
-            DB::connection("mysql_ic")->table("ic_auth")->where(["id"=>$id])->update(["chnName"=>$chnName,"engName"=>$engName,"tmpClass"=>$tmpClass]);
+            DB::connection("mysql_ic")->table("ic_auth")->where(["id"=>$id])->update(["submitted"=>true,"chnName"=>$chnName,"engName"=>$engName,"tmpClass"=>$tmpClass]);
         }
         $info = DB::connection("mysql_ic")->table("ic_auth")->where(["id"=>$id])->first();
         $array["chnName"] = $info->chnName;
@@ -420,6 +420,9 @@ class UserCenterController extends Controller
 
     function PhoneCaptcha($phone,$userId,$captcha){
         if(DB::connection("mysql_user")->table("user_list")->where(["id"=>$userId])->first()-> phone != 0){
+            return false;
+        }
+        if(count(DB::connection("mysql_user")->table("user_list")->where(["phone"=>$phone])-get())>0){
             return false;
         }
         DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
