@@ -423,7 +423,10 @@ class UserCenterController extends Controller
         if(DB::connection("mysql_user")->table("user_list")->where(["id"=>$userId])->first()-> phone != 0){
             return false;
         }
-        if(count(DB::connection("mysql_user")->table("user_list")->where(["phone"=>$phone])-get())>0){
+        if(count(DB::connection("mysql_user")->table("user_list")->where(["phone"=>$phone])->get())>0){
+            return false;
+        }
+        if(!is_int($phone)){
             return false;
         }
         DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
@@ -460,6 +463,12 @@ class UserCenterController extends Controller
     }
     function ConfirmPhone($phone,$userId,$code,$captcha){
         if(DB::connection("mysql_user")->table("user_list")->where(["id"=>$userId])->first()-> phone != 0){
+            return false;
+        }
+        if(count(DB::connection("mysql_user")->table("user_list")->where(["phone"=>$phone])->get())>0){
+            return false;
+        }
+        if(!is_int($phone)){
             return false;
         }
         $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=6Lc0GTMUAAAAAN43IBOJp-hRdHAC5fVvf034twaJ&response='.$captcha);
