@@ -426,7 +426,7 @@ class UserCenterController extends Controller
         if(count(DB::connection("mysql_user")->table("user_list")->where(["phone"=>$phone])->get())>0){
             return false;
         }
-        if(!is_int($phone)){
+        if(!is_numeric($phone)){
             return false;
         }
         DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
@@ -468,7 +468,7 @@ class UserCenterController extends Controller
         if(count(DB::connection("mysql_user")->table("user_list")->where(["phone"=>$phone])->get())>0){
             return false;
         }
-        if(!is_int($phone)){
+        if(!is_numeric($phone)){
             return false;
         }
         $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=6Lc0GTMUAAAAAN43IBOJp-hRdHAC5fVvf034twaJ&response='.$captcha);
