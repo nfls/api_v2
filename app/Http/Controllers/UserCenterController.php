@@ -474,9 +474,9 @@ class UserCenterController extends Controller
         $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=6Lc0GTMUAAAAAN43IBOJp-hRdHAC5fVvf034twaJ&response='.$captcha);
         if(json_decode($verifyResponse)->success || $captcha == "app"){
             DB::connection("mysql_user")->table("user_session")->where("valid_before", "<", date('Y-m-d H:i:s'))->delete();
-            $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => $userId, "operation" => $phone, "phrase" => $code, "ip" => $_SERVER['REMOTE_ADDR']])->first();
+            $valid = DB::connection("mysql_user")->table("user_session")->where(["session" => (string)$userId, "operation" => $phone, "phrase" => $code, "ip" => $_SERVER['REMOTE_ADDR']])->first();
             if(!is_null($valid)){
-                DB::connection("mysql_user")->table("user_session")->where(["session" => $userId, "operation" => $phone, "phrase" => $code, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
+                DB::connection("mysql_user")->table("user_session")->where(["session" => (string)$userId, "operation" => $phone, "phrase" => $code, "ip" => $_SERVER['REMOTE_ADDR']])->delete();
                 DB::connection("mysql_user")->table("user_list")->where(["id"=>$userId])->update(["phone"=>$phone]);
                 return true;
             }else{
