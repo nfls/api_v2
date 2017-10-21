@@ -121,6 +121,20 @@ class IOSDeviceController extends Controller
         }
     }
 
+    function compareAndroidAppVersion(Request $request){
+        if($request->only("version") && $request->has("version")){
+            $recommand_version = "0.0.2";
+            $require_version = "0.0.2";
+            if(version_compare($request->get("version"),$recommand_version,">=")){
+                return Response::json(array("code"=>200));
+            } else if(version_compare($request->get("version"),$require_version,">=")){
+                return Response::json(array("code"=>201));
+            } else {
+                return Response::json(array("code"=>202));
+            }
+        }
+    }
+
 
     function getStartUpPictures(){
         $query = DB::connection("mysql_user")->table("app_startup_pics")->where(function($query){
