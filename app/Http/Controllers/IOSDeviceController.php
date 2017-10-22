@@ -128,9 +128,9 @@ class IOSDeviceController extends Controller
             if(version_compare($request->get("version"),$recommand_version,">=")){
                 return Response::json(array("code"=>200));
             } else if(version_compare($request->get("version"),$require_version,">=")){
-                return Response::json(array("code"=>201));
+                return Response::json(array("code"=>201,"info"=>"https://app.nfls.io/android/". $recommand_version .".apk"));
             } else {
-                return Response::json(array("code"=>202));
+                return Response::json(array("code"=>202,"info"=>"https://app.nfls.io/android/". $recommand_version .".apk"));
             }
         }
     }
