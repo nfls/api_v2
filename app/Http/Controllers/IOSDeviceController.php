@@ -88,12 +88,17 @@ class IOSDeviceController extends Controller
     }
 
     function confirmLoggedIn(){
-        $id = UserCenterController::GetUserId(Cookie::get("token"));
-        return Response::json(array("code"=>200,"id"=>$id));
+        if(stripos($_SERVER['HTTP_USER_AGENT'],'1.2.3')===true || (stripos($_SERVER['HTTP_USER_AGENT'],'1.2.4')===true)){
+            $id = UserCenterController::GetUserId(Cookie::get("token"));
+            return Response::json(array("code"=>200,"id"=>$id));
+        }else{
+            abort(403);
+        }
+
     }
 
     function getNotice(){
-        return Response::json(array("code"=>200,"info"=>array("id"=>200,"title"=>"更新通知","text"=>"新版本客户端已经发布，请在App Store中下载更新！此版本在本周六（16号）凌晨0点将彻底停用。")));
+        return "";//Response::json(array("code"=>200,"info"=>array("id"=>200,"title"=>"更新通知","text"=>"新版本客户端已经发布，请在App Store中下载更新！此版本在本周六（16号）凌晨0点将彻底停用。")));
     }
 
     function compareAuthDatabase(Request $request){
