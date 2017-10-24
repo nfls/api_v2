@@ -88,7 +88,7 @@ class IOSDeviceController extends Controller
     }
 
     function confirmLoggedIn(){
-        if(stripos($_SERVER['HTTP_USER_AGENT'],'1.2.3')===true || (stripos($_SERVER['HTTP_USER_AGENT'],'1.2.4')===true)){
+        if(!(stripos($_SERVER['HTTP_USER_AGENT'],'1.2.3')===false) || !(stripos($_SERVER['HTTP_USER_AGENT'],'1.2.4')===false)){
             $id = UserCenterController::GetUserId(Cookie::get("token"));
             return Response::json(array("code"=>200,"id"=>$id));
         }else{
