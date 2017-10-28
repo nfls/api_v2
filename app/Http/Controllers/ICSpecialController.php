@@ -14,10 +14,10 @@ class ICSpecialController extends Controller
     function generatePass(Request $request)
     {
         $id = UserCenterController::GetUserId(Cookie::get("token"));
-        $info = DB::connection("mysql_ic")->table("ic_activity")->where(["user_id"=>$id])->get();
+        $info = DB::connection("mysql_ic")->table("ic_activity")->where(["user_id"=>$id])->first();
         if(is_null($info->auth_code))
             abort(403);
-        $name = DB::connection("mysql_ic")->table("ic_auth")->where(["id"=>$id])->get();
+        $name = DB::connection("mysql_ic")->table("ic_auth")->where(["id"=>$id])->first();
         if(is_null($name->chnName))
             abort(403);
         $pass = new PKPass('/etc/cert/pkpass.p12', '');
