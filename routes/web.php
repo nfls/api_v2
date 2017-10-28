@@ -89,6 +89,8 @@ Route::any('game/fib/{type}',"FIBController@requestHandler");
 Route::any('game/2048/{type}',"FIBController@request2048Handler");
 Route::get('game/list',"GameListController@getList");
 
+Route::get('ic/ticket',"ICSpecialController@generatePass");
+
 Route::get("redirect", function(Request $request){
     //return "Service Unavailable.";
     return "<script>window.location.href='".$request->input("to")."'</script>";
