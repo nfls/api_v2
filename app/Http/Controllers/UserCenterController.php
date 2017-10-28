@@ -388,6 +388,8 @@ class UserCenterController extends Controller
                 if ($osInfo['name'] == "iOS") {
                     $allow = false;
                     $message = "iOS用户请使用我们的<a href='https://app.nfls.io'>客户端</a>进行访问。 <br/>For iOS devices, please use our <a href='https://app.nfls.io'>app</a> to access our website.";
+                } else if ($osInfo['name'] == "Android"){
+                    $message = "<a href='https://app.nfls.io'>安卓版客户端</a>现已上线，支持往卷下载功能！";
                 } else {
                     if ($clientInfo['name'] != "Chrome" && $clientInfo['name'] != "Chrome Mobile") {
                         $message = "本站建议使用Chrome进行访问，不保证对于其他浏览器完全兼容。 <br/>We suggest using Chrome to access our website, and we do not guarantee it is compatible on any other browsers";
@@ -397,6 +399,7 @@ class UserCenterController extends Controller
                         }
                     }
                 }
+
             }
 
         }
