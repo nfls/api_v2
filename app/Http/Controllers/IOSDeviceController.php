@@ -164,6 +164,7 @@ class IOSDeviceController extends Controller
     }
 
     function pushAMessage(Request $request){
+        print("<plaintext>");
         if(!UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token")))){
             return "Permission Error!";
         }
@@ -176,16 +177,28 @@ class IOSDeviceController extends Controller
         $push->setRootCertificationAuthority('/etc/cert/entrust.pem');
         foreach ($list as $device){
             $message = new ApnsPHP_Message($device->device_id);
-            //$message->setCustomIdentifier("Message-Badge-1");
-            //$message->setBadge(3);
             $message->setText($str);
             $message->setSound();
-            //$message->setExpiry(30);
             $push->add($message);
         }
         $push->connect();
         $push->send();
         $push->disconnect();
+        
+        $push = new ApnsPHP_Push(
+            ApnsPHP_Abstract::ENVIRONMENT_SANDBOX,
+            '/etc/cert/push.pem'
+        );
+        foreach ($list as $device){
+            $message = new ApnsPHP_Message($device->device_id);
+            $message->setText($str);
+            $message->setSound();
+            $push->add($message);
+        }
+        $push->connect();
+        $push->send();
+        $push->disconnect();
+        print("</plaintext");
     }
 
 
