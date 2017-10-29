@@ -220,7 +220,7 @@ class ManagementController extends Controller
             foreach($devices as $device){
                 $model = $model.$device->device_model."; ";
             }
-            $str = $str."<tr><th>$id</th><th>$username</th><th>$name</th><th>$class</th><th>$phone</th><th>$devices</th>";
+            $str = $str."<tr><th>$id</th><th>$username</th><th>$name</th><th>$class</th><th>$phone</th><th>$model</th>";
         }
         $str = $str."</table>";
         return $str;
