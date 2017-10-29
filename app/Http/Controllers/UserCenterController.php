@@ -38,6 +38,12 @@ class UserCenterController extends Controller
         return $user->username;
     }
 
+    public static function GetUserMobile($id)
+    {
+        $user = DB::connection("mysql_forum")->table("nfls_users")->where("id", $id)->first();
+        return $user->phone;
+    }
+
     public static function GetUserEmail($id)
     {
         $user = DB::connection("mysql_forum")->table("nfls_users")->where("id", $id)->first();
