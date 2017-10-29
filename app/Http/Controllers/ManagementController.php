@@ -216,10 +216,14 @@ class ManagementController extends Controller
             $class = $info["tmpClass"];
             $id = $user->id;
             $devices = DB::connection("mysql_user")->table("user_device")->where(["user_id"=>$user->id])->get();
-            $model = "";
+            $model = count($devices);
+            if($model == 0)
+                $model = "无";
+            /*
             foreach($devices as $device){
                 $model = $model.$device->device_model."; ";
             }
+            */
             $str = $str."<tr><th>$id</th><th>$username</th><th>$name</th><th>$class</th><th>$phone</th><th>$model</th>";
         }
         $str = $str."</table>";
