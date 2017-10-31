@@ -104,8 +104,8 @@ class ICSpecialController extends Controller
         $pass->setData($data);
         $pass->addFile('/usr/share/halloween/icon.png','icon.png');
         $pass->addFile('/usr/share/halloween/icon@2x.png','icon@2x.png');
-        $pass->addFile('/usr/share/halloween/logo.png','logo.png');
-        $pass->addFile('/usr/share/halloween/logo@2x.png','logo@2x.png');
+        //$pass->addFile('/usr/share/halloween/logo.png','logo.png');
+        //$pass->addFile('/usr/share/halloween/logo@2x.png','logo@2x.png');
         $pass->addFile('/usr/share/halloween/thumbnail.png','thumbnail.png');
         $pass->addFile('/usr/share/halloween/thumbnail@2x.png','thumbnail@2x.png');
         $pass->addFile('/usr/share/halloween/background.png','background.png');

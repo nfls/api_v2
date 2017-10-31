@@ -184,7 +184,7 @@ class IOSDeviceController extends Controller
         $push->connect();
         $push->send();
         $push->disconnect();
-        
+
         $push = new ApnsPHP_Push(
             ApnsPHP_Abstract::ENVIRONMENT_SANDBOX,
             '/etc/cert/push.pem'
