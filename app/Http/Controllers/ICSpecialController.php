@@ -90,14 +90,7 @@ class ICSpecialController extends Controller
                                     'label' => '检票',
                                     'value' => '请在入场的检票处出示票面上的二维码，由于二维码会随时间变化，请不要截图并打印',
                                     'attributedValue' => '请在入场的检票处出示票面上的二维码，由于二维码会随时间变化，请不要截图并打印',
-                                ),
-                            1 =>
-                                array(
-                                    'key' => 'ticket-details',
-                                    'label' => '赞助商',
-                                    'value' => '新东方出国留学',
-                                    'attributedValue' => '<a href="http://qm.qq.com/cgi-bin/qm/qr?k=ztTC0Ll6_XiziEl4psbMP5j3Btf-q_vu">新东方出国留学</a> 电话：025-56337788<br/>地址：秦淮区中山南路98号天安国际大厦十层<br>',
-                                ),
+                                )
                         ),
                 ),
         );
