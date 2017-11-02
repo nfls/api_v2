@@ -91,8 +91,8 @@ class ICSpecialController extends Controller
                                 array(
                                     'key' => 'class',
                                     'label' => '个人',
-                                    'value' => '您的班级：'.$name->tmpClass,' ；您的英文名：'.$name->engName,
-                                    'attributedValue' => '您的班级：'.$name->tmpClass,' ；您的英文名：'.$name->engName
+                                    'value' => '您的班级：'.$name[0]->tmpClass,' ；您的英文名：'.$name[0]->engName,
+                                    'attributedValue' => '您的班级：'.$name[0]->tmpClass,' ；您的英文名：'.$name[0]->engName
                                 ),
                             1 =>
                                 array(
