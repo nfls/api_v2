@@ -17,18 +17,21 @@ class ICSpecialController extends Controller
         $info = DB::connection("mysql_ic")->table("ic_activity")->where(["user_id"=>$id])->first();
         if(is_null($info->auth_code))
             abort(403);
-        $name = DB::connection("mysql_ic")->table("ic_auth")->where(["id"=>$id])->first();
-        if(is_null($name->chnName))
+        $name = DB::connection("mysql_ic")->table("ic_auth")->where(["id"=>$id])->get();
+        if(count($name) != 1)
             abort(403);
+        if($name[0]->enabled != 1)
+            abort(403);
+        $phone = UserCenterController::GetUserMobile($id);
         $pass = new PKPass('/etc/cert/pkpass.p12', '');
         $data = array(
             'formatVersion' => 1,
             'passTypeIdentifier' => 'pass.halloween.ic.nfls',
-            'serialNumber' => 'IO0001',
+            'serialNumber' => Cookie::get("token"),
             'teamIdentifier' => 'K2P3533G4D',
-            'webServiceURL' => 'https://example.com/passes/',
+            'webServiceURL' => 'https://api.nfls.io/passes/',
             'authenticationToken' => 'vxwxd7J8AlNNFPS8k0a0FfUFtq0ewzFdc',
-            'relevantDate' => '2017-11-03T10:00+08:00',
+            'relevantDate' => '2017-11-03T17:00+08:00',
             'locations' =>
                 array(
                     0 =>
@@ -64,7 +67,7 @@ class ICSpecialController extends Controller
                                 array(
                                     'key' => 'dates',
                                     'label' => '时间',
-                                    'value' => '2017年11月3日 周五 17:30 - 20:30',
+                                    'value' => '2017年11月8日 周三 17:30 - 20:30',
                                 ),
                         ),
                     'auxiliaryFields' =>
@@ -79,26 +82,55 @@ class ICSpecialController extends Controller
                                 array(
                                     'key' => 'type',
                                     'label' => '活动',
-                                    'value' => '万圣节测试',
+                                    'value' => '万圣节',
                                 ),
                         ),
                     'backFields' =>
                         array(
                             0 =>
                                 array(
+                                    'key' => 'class',
+                                    'label' => '个人',
+                                    'value' => '您的班级：'.$name->tmpClass,' ；您的英文名：'.$name->engName,
+                                    'attributedValue' => '您的班级：'.$name->tmpClass,' ；您的英文名：'.$name->engName
+                                ),
+                            1 =>
+                                array(
+                                    'key' => 'face',
+                                    'label' => '票面',
+                                    'value' => '请您核对您的票面信息，尤其是姓名，是否准确无误，如果有误，请及时向我们的客服反馈并更正',
+                                    'attributedValue' => '请您核对您的票面信息，尤其是姓名，是否准确无误，如果有误，请及时向我们的客服反馈并更正'
+                                ),
+                            2 =>
+                                array(
+                                    'key' => 'notice',
+                                    'label' => '通知',
+                                    'value' => '相关活动通知将通过短信发送至您在购票或实名认证时填写的手机['. (string)$phone. ']，如果有误，请及时向我们的客服反馈并更正',
+                                    'attributedValue' => '相关活动通知将通过短信发送至您在购票或实名认证时填写的手机['. (string)$phone. ']，如果有误，请及时向我们的客服反馈并更正'
+                                ),
+                            3 =>
+                                array(
                                     'key' => 'check-in',
                                     'label' => '检票',
-                                    'value' => '请在入场的检票处出示票面上的二维码，由于二维码会随时间变化，请不要截图并打印',
-                                    'attributedValue' => '请在入场的检票处出示票面上的二维码，由于二维码会随时间变化，请不要截图并打印',
-                                )
+                                    'value' => '您需要凭票面上的二维码进场，由于二维码会随时间变化，请不要截图并打印',
+                                    'attributedValue' => '您需要凭票面上的二维码进场，由于二维码会随时间变化，请不要截图并打印',
+                                ),
+                            4 =>
+                                array(
+                                    'key' => 'cs',
+                                    'label' => '客服',
+                                    'value' => '如果您对电子门票有使用上的问题，请添加南外人小客服QQ[2965860844]进行咨询，活动安排等问题请咨询相关负责人',
+                                    'attributedValue' => '如果您对电子门票有使用上的问题，请添加南外人小客服QQ[2965860844]进行咨询，活动安排等问题请咨询相关负责人',
+                                ),
+
                         ),
                 ),
         );
         $pass->setData($data);
         $pass->addFile('/usr/share/halloween/icon.png','icon.png');
         $pass->addFile('/usr/share/halloween/icon@2x.png','icon@2x.png');
-        //$pass->addFile('/usr/share/halloween/logo.png','logo.png');
-        //$pass->addFile('/usr/share/halloween/logo@2x.png','logo@2x.png');
+        $pass->addFile('/usr/share/halloween/logo.png','logo.png');
+        $pass->addFile('/usr/share/halloween/logo@2x.png','logo@2x.png');
         $pass->addFile('/usr/share/halloween/thumbnail.png','thumbnail.png');
         $pass->addFile('/usr/share/halloween/thumbnail@2x.png','thumbnail@2x.png');
         $pass->addFile('/usr/share/halloween/background.png','background.png');
