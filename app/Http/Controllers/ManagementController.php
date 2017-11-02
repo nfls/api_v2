@@ -236,8 +236,9 @@ class ManagementController extends Controller
         $token = $request->input("token");
         if($request->isMethod("get")){
             $user = DB::connection("mysql_ic")->table("ic_activity")->where(["auth_code"=>$token])->get();
-            if(count($user) == 0)
+            if(count($user) != 1)
                 abort(403);
+            $user = $user[0];
             $user_id = $user->user_id;
             $used_time = $user->used_time;
             $auth = new UserCenterController();
