@@ -229,4 +229,21 @@ class ManagementController extends Controller
         $str = $str."</table>";
         return $str;
     }
+
+    function getTicketInfo(Request $request){
+        if($request->isMethod("get")){
+            $token = $request->input("token");
+            $user = DB::connection("mysql_ic")->table("ic_auth")->where(["auth_code"=>$token])->first();
+            $user_id = $user->user_id;
+            $used_time = $user->used_time;
+            $auth = new UserCenterController();
+            $username = UserCenterController::GetUserNickname($user_id);
+            $phone = UserCenterController::GetUserMobile($user_id);
+            $info = $auth->ICInfo($user_id);
+            $chnName = $info["chnName"];
+            $engName = $info["engName"];
+            $class = $info["tmpClass"];
+            return array("chnName"=>$chnName,"engName"=>$engName,"class"=>$class,"phone"=>$phone,"username"=>$username,"used_time"=>$used_time);
+        }
+    }
 }
