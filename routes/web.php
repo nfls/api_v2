@@ -67,6 +67,7 @@ Route::post("admin/picture/save","ManagementController@saveAPicture");
 Route::post("admin/message/remove","ManagementController@deleteAMessage");
 Route::get("admin/message/permission","ManagementController@getPermission");
 Route::get("admin/list","ManagementController@getAuthList");
+Route::any("admin/tikect","ManagementController@getTicketInfo");
 
 Route::post('device/register',"IOSDeviceController@registerDevice");
 Route::post('device/purchase',"IOSDeviceController@iapPurchase");
