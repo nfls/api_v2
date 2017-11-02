@@ -31,7 +31,7 @@ class ICSpecialController extends Controller
             'teamIdentifier' => 'K2P3533G4D',
             'webServiceURL' => 'https://api.nfls.io/passes/',
             'authenticationToken' => 'vxwxd7J8AlNNFPS8k0a0FfUFtq0ewzFdc',
-            'relevantDate' => '2017-11-03T17:00+08:00',
+            'relevantDate' => '2017-11-08T17:00+08:00',
             'locations' =>
                 array(
                     0 =>
