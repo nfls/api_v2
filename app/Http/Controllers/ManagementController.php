@@ -247,7 +247,6 @@ class ManagementController extends Controller
             $chnName = $info["chnName"];
             $engName = $info["engName"];
             $class = $info["tmpClass"];
-            return array("chnName"=>$chnName,"engName"=>$engName,"class"=>$class,"phone"=>$phone,"username"=>$username,"used_time"=>$used_time);
             return array("code"=>200,"info"=>array("chnName"=>$chnName,"engName"=>$engName,"class"=>$class,"phone"=>$phone,"username"=>$username,"used_time"=>$used_time));
         }else{
             DB::connection("mysql_ic")->table("ic_activity")->where(["auth_code"=>$token])->update(["used_time"=>date('Y-m-d H:i:s')]);
