@@ -24,6 +24,8 @@ class ICSpecialController extends Controller
             abort(403);
         $phone = UserCenterController::GetUserMobile($id);
         $pass = new PKPass('/etc/cert/pkpass.p12', '');
+        $auth = new UserCenterController();
+        $info = $auth->ICInfo($id);
         $data = array(
             'formatVersion' => 1,
             'passTypeIdentifier' => 'pass.halloween.ic.nfls',
@@ -91,22 +93,22 @@ class ICSpecialController extends Controller
                                 array(
                                     'key' => 'class',
                                     'label' => '个人',
-                                    'value' => '您的班级：'.$name[0]->tmpClass . ' ；您的英文名：'.$name[0]->engName,
-                                    'attributedValue' => '您的班级：'.$name[0]->tmpClass . ' ；您的英文名：'.$name[0]->engName
+                                    'value' => '您的班级：'.$info["tmpClass"] . ' ；您的英文名：'.$name[0]->engName,
+                                    'attributedValue' => '您的班级：'.$info["tmpClass"] . ' ；您的英文名：'.$name[0]->engName
                                 ),
                             1 =>
                                 array(
                                     'key' => 'face',
                                     'label' => '票面',
-                                    'value' => '请您核对您的票面信息，尤其是姓名和上方的班级信息，是否准确无误，如果有误，请及时向我们的客服反馈并更正',
-                                    'attributedValue' => '请您核对您的票面信息，尤其是姓名和上方的班级信息，是否准确无误，如果有误，请及时向我们的客服反馈并更正'
+                                    'value' => '请您核对您的票面信息，尤其是姓名、班级信息以及手机号，是否准确无误，如果有误，请及时向我们的客服反馈并更正',
+                                    'attributedValue' => '请您核对您的票面信息，尤其是姓名、班级信息以及手机号，是否准确无误，如果有误，请及时向我们的客服反馈并更正'
                                 ),
                             2 =>
                                 array(
                                     'key' => 'notice',
                                     'label' => '通知',
-                                    'value' => '相关活动通知将通过短信发送至您在购票或实名认证时填写的手机['. (string)$phone. ']，如果有误，请及时向我们的客服反馈并更正',
-                                    'attributedValue' => '相关活动通知将通过短信发送至您在购票或实名认证时填写的手机['. (string)$phone. ']，如果有误，请及时向我们的客服反馈并更正'
+                                    'value' => '相关活动通知将通过短信发送至您在购票或实名认证时填写的手机['. (string)$phone. ']',
+                                    'attributedValue' => '相关活动通知将通过短信发送至您在购票或实名认证时填写的手机['. (string)$phone. ']'
                                 ),
                             3 =>
                                 array(
