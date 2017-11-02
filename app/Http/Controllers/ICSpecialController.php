@@ -58,7 +58,7 @@ class ICSpecialController extends Controller
                                 array(
                                     'key' => 'attendee',
                                     'label' => '姓名',
-                                    'value' => $name->chnName,
+                                    'value' => $name[0]->chnName,
                                 ),
                         ),
                     'secondaryFields' =>
