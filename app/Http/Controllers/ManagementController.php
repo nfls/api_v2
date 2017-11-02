@@ -233,7 +233,10 @@ class ManagementController extends Controller
     function getTicketInfo(Request $request){
         if($request->isMethod("get")){
             $token = $request->input("token");
-            $user = DB::connection("mysql_ic")->table("ic_auth")->where(["auth_code"=>$token])->first();
+            $user = DB::connection("mysql_ic")->table("ic_activity")->where(["auth_code"=>$token])->first();
+            if(is_null($user->user_id)){
+                abort(403);
+            }
             $user_id = $user->user_id;
             $used_time = $user->used_time;
             $auth = new UserCenterController();
