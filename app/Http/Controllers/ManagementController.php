@@ -231,12 +231,13 @@ class ManagementController extends Controller
     }
 
     function getTicketInfo(Request $request){
+        if(!$request->has("token"))
+            abort(403);
+        $token = $request->input("token");
         if($request->isMethod("get")){
-            $token = $request->input("token");
-            $user = DB::connection("mysql_ic")->table("ic_activity")->where(["auth_code"=>$token])->first();
-            if(is_null($user->user_id)){
+            $user = DB::connection("mysql_ic")->table("ic_activity")->where(["auth_code"=>$token])->get();
+            if(is_null($user))
                 abort(403);
-            }
             $user_id = $user->user_id;
             $used_time = $user->used_time;
             $auth = new UserCenterController();
@@ -247,6 +248,10 @@ class ManagementController extends Controller
             $engName = $info["engName"];
             $class = $info["tmpClass"];
             return array("chnName"=>$chnName,"engName"=>$engName,"class"=>$class,"phone"=>$phone,"username"=>$username,"used_time"=>$used_time);
+            return array("code"=>200,"info"=>array("chnName"=>$chnName,"engName"=>$engName,"class"=>$class,"phone"=>$phone,"username"=>$username,"used_time"=>$used_time));
+        }else{
+            DB::connection("mysql_ic")->table("ic_activity")->where(["auth_code"=>$token])->update(["used_time"=>date('Y-m-d H:i:s')]);
+            return array("code"=>200);
         }
     }
 }
