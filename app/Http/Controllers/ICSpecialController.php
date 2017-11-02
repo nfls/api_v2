@@ -25,7 +25,7 @@ class ICSpecialController extends Controller
         $phone = UserCenterController::GetUserMobile($id);
         $pass = new PKPass('/etc/cert/pkpass.p12', '');
         $auth = new UserCenterController();
-        $info = $auth->ICInfo($id);
+        $aInfo = $auth->ICInfo($id);
         $data = array(
             'formatVersion' => 1,
             'passTypeIdentifier' => 'pass.halloween.ic.nfls',
@@ -93,8 +93,8 @@ class ICSpecialController extends Controller
                                 array(
                                     'key' => 'class',
                                     'label' => '个人',
-                                    'value' => '您的班级：'.$info["tmpClass"] . ' ；您的英文名：'.$name[0]->engName,
-                                    'attributedValue' => '您的班级：'.$info["tmpClass"] . ' ；您的英文名：'.$name[0]->engName
+                                    'value' => '您的班级：'.$aInfo["tmpClass"] . ' ；您的英文名：'.$name[0]->engName,
+                                    'attributedValue' => '您的班级：'.$aInfo["tmpClass"] . ' ；您的英文名：'.$name[0]->engName
                                 ),
                             1 =>
                                 array(
