@@ -241,10 +241,13 @@ class UserCenterController extends Controller
         return $info;
     }
 
-    function ICInfo($id,$chnName = null,$engName = null, $tmpClass= null){
+    function ICInfo($id,$chnName = null,$engName = null, $tmpClass= null, $added = true){
         $preload = DB::connection("mysql_ic")->table("ic_auth")->where(["id"=>$id])->first();
         if(is_null($preload)){
-            DB::connection("mysql_ic")->table("ic_auth")->insert(["id"=>$id]);
+            if($added)
+                DB::connection("mysql_ic")->table("ic_auth")->insert(["id"=>$id]);
+            else
+                return array("chnName"=>"","engName"=>"","enabled"=>0,"tmpClass"=>"","submitted"=>0);
         }else if(!is_null($chnName) && !$preload->enabled){
             DB::connection("mysql_ic")->table("ic_auth")->where(["id"=>$id])->update(["submitted"=>true,"chnName"=>$chnName,"engName"=>$engName,"tmpClass"=>$tmpClass]);
         }
@@ -269,7 +272,8 @@ class UserCenterController extends Controller
                     $class = "剑桥2班";
                     break;
                 default:
-                    $class = "老师";
+                    $array["tmpClass"] = "老师";
+                    $class = "";
                     break;
             }
             $array["tmpClass"] = $array["tmpClass"] . $class;

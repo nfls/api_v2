@@ -201,17 +201,21 @@ class ManagementController extends Controller
         return view("upload");
     }
 
-    function getAuthList(){
+    function getAuthList(Request $request){
         if(!UserCenterController::checkAdmin(UserCenterController::GetUserId(Cookie::get("token")))){
             return "Permission Error!";
         }
+        $all = $request->has("all");
         $str = '<table><tr><th>ID</th><th>用户名</th><th>姓名</th><th>班级</th><th>手机号</th><th>推送设备</th></tr>';
-        $users = DB::connection("mysql_ic")->table("ic_auth")->where(["enabled"=>1])->get();
+        if($all)
+            $users = DB::connection("mysql_user")->table("user_list")->where("phone","!=","0")->get();
+        else
+            $users = DB::connection("mysql_ic")->table("ic_auth")->where(["enabled"=>1])->get();
         $auth = new UserCenterController();
         foreach($users as $user){
             $username = UserCenterController::GetUserNickname($user->id);
             $phone = UserCenterController::GetUserMobile($user->id);
-            $info = $auth->ICInfo($user->id);
+            $info = $auth->ICInfo($user->id,null,null,null,false);
             $name = $info["chnName"];
             $class = $info["tmpClass"];
             $id = $user->id;
