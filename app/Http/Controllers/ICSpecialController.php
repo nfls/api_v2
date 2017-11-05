@@ -44,7 +44,7 @@ class ICSpecialController extends Controller
                 ),
             'barcode' =>
                 array(
-                    'message' => $info->auth_code,
+                    'message' => $this->safeEncrypt($info->auth_code,"GPDCNZ"),
                     'format' => 'PKBarcodeFormatPDF417',
                     'messageEncoding' => 'iso-8859-1',
                 ),
@@ -141,5 +141,20 @@ class ICSpecialController extends Controller
             return 'Error: ' . $pass->getError();
         }
         return;
+    }
+    function safeEncrypt($message, $key)
+    {
+        $nonce = \Sodium\randombytes_buf(
+            \Sodium\CRYPTO_SECRETBOX_NONCEBYTES
+        );
+
+        return base64_encode(
+            $nonce.
+            \Sodium\crypto_secretbox(
+                $message,
+                $nonce,
+                $key
+            )
+        );
     }
 }
