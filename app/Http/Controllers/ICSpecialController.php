@@ -26,6 +26,7 @@ class ICSpecialController extends Controller
         $pass = new PKPass('/etc/cert/pkpass.p12', '');
         $auth = new UserCenterController();
         $aInfo = $auth->ICInfo($id);
+        $nonce = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
         $data = array(
             'formatVersion' => 1,
             'passTypeIdentifier' => 'pass.halloween.ic.nfls',
@@ -44,7 +45,7 @@ class ICSpecialController extends Controller
                 ),
             'barcode' =>
                 array(
-                    'message' => $this->safeEncrypt($info->auth_code,"GPDCNZ"),
+                    'message' => sodium_crypto_secretbox($info->auth_code,$nonce,"gpdcnz"),
                     'format' => 'PKBarcodeFormatPDF417',
                     'messageEncoding' => 'iso-8859-1',
                 ),
@@ -141,20 +142,5 @@ class ICSpecialController extends Controller
             return 'Error: ' . $pass->getError();
         }
         return;
-    }
-    function safeEncrypt($message, $key)
-    {
-        $nonce = \Sodium\randombytes_buf(
-            \Sodium\CRYPTO_SECRETBOX_NONCEBYTES
-        );
-
-        return base64_encode(
-            $nonce.
-            \Sodium\crypto_secretbox(
-                $message,
-                $nonce,
-                $key
-            )
-        );
     }
 }
