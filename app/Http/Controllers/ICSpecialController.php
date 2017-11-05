@@ -45,7 +45,7 @@ class ICSpecialController extends Controller
                 ),
             'barcode' =>
                 array(
-                    'message' => sodium_crypto_secretbox($info->auth_code,$nonce,sodium_crypto_secretbox_keygen()),
+                    'message' => base64_encode(sodium_crypto_secretbox($info->auth_code,$nonce,sodium_crypto_secretbox_keygen())),
                     'format' => 'PKBarcodeFormatPDF417',
                     'messageEncoding' => 'iso-8859-1',
                 ),
