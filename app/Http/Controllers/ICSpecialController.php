@@ -26,7 +26,6 @@ class ICSpecialController extends Controller
         $pass = new PKPass('/etc/cert/pkpass.p12', '');
         $auth = new UserCenterController();
         $aInfo = $auth->ICInfo($id);
-        $nonce = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
         $data = array(
             'formatVersion' => 1,
             'passTypeIdentifier' => 'pass.halloween.ic.nfls',
@@ -45,7 +44,7 @@ class ICSpecialController extends Controller
                 ),
             'barcode' =>
                 array(
-                    'message' => base64_encode(sodium_crypto_secretbox($info->auth_code,$nonce,sodium_crypto_secretbox_keygen())),
+                    'message' => $info->auth_code,
                     'format' => 'PKBarcodeFormatPDF417',
                     'messageEncoding' => 'iso-8859-1',
                 ),
