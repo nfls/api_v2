@@ -128,8 +128,8 @@ class IOSDeviceController extends Controller
 
     function compareAndroidAppVersion(Request $request){
         if($request->only("version") && $request->has("version")){
-            $recommand_version = "0.0.9";
-            $require_version = "0.0.9";
+            $recommand_version = "0.1.0";
+            $require_version = "0.1.0";
             if(version_compare($request->get("version"),$recommand_version,">=")){
                 return Response::json(array("code"=>200));
             } else if(version_compare($request->get("version"),$require_version,">=")){
