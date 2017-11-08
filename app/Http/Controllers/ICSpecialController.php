@@ -14,9 +14,10 @@ class ICSpecialController extends Controller
     function generatePass(Request $request)
     {
         if($request->has("token"))
-            $id = UserCenterController::GetUserId($request->input("token"));
+            $token = $request->input("token");
         else
-            $id = UserCenterController::GetUserId(Cookie::get("token"));
+            $token = Cookie::get("token");
+        $id = UserCenterController::GetUserId($token);
 
         $info = DB::connection("mysql_ic")->table("ic_activity")->where(["user_id"=>$id])->first();
         if(is_null($info->auth_code))
@@ -33,7 +34,7 @@ class ICSpecialController extends Controller
         $data = array(
             'formatVersion' => 1,
             'passTypeIdentifier' => 'pass.halloween.ic.nfls',
-            'serialNumber' => Cookie::get("token"),
+            'serialNumber' => $token,
             'teamIdentifier' => 'K2P3533G4D',
             'webServiceURL' => 'https://api.nfls.io/passes/',
             'authenticationToken' => 'vxwxd7J8AlNNFPS8k0a0FfUFtq0ewzFdc',
