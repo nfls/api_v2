@@ -864,15 +864,24 @@ class UserCenterController extends Controller
     }
 
     function getNews($id){
+
         $messages = DB::connection("mysql_user")->table("system_message")->where(["place"=>3])->where(function ($query) use($id) {
             $query->where(["receiver" => $id])->orWhere(["receiver" => -1]);
         })->orderBy("id","desc")->limit(10)->select("type","title","detail","img","conf","time")->get();
         $info = array();
         $count = 0;
         foreach ($messages as $message) {
+            if($message->type == 4){
+                $info = DB::connection("mysql_ic")->table("ic_activity")->where(["user_id"=>$id])->get();
+                if(count($info) != 1)
+                    continue;
+                else
+                    $info[$count]['type'] = "活动";
+            }else{
+                $info[$count]['type'] = $this->GetNoticeType($message->type);
+            }
             $info[$count]['time'] = $message->time;
             $info[$count]['title'] = $message->title;
-            $info[$count]['type'] = $this->GetNoticeType($message->type);
             $info[$count]['detail'] = $message->detail;
             $info[$count]['conf'] = $message->conf;
             $info[$count]['img'] = $message->img;
