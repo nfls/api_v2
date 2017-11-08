@@ -13,7 +13,11 @@ class ICSpecialController extends Controller
     //
     function generatePass(Request $request)
     {
-        $id = UserCenterController::GetUserId(Cookie::get("token"));
+        if($request->has("token"))
+            $id = UserCenterController::GetUserId($request->input("token"));
+        else
+            $id = UserCenterController::GetUserId(Cookie::get("token"));
+
         $info = DB::connection("mysql_ic")->table("ic_activity")->where(["user_id"=>$id])->first();
         if(is_null($info->auth_code))
             abort(403);
