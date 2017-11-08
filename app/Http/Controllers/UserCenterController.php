@@ -871,9 +871,9 @@ class UserCenterController extends Controller
         $info = array();
         $count = 0;
         foreach ($messages as $message) {
-            if($message->type == 4){
-                $info = DB::connection("mysql_ic")->table("ic_activity")->where(["user_id"=>$id])->get();
-                if(count($info) != 1)
+            if($message->type == -1){
+                $exist = DB::connection("mysql_ic")->table("ic_activity")->where(["user_id"=>$id])->get();
+                if(count($exist) != 1)
                     continue;
                 else
                     $info[$count]['type'] = "活动";
