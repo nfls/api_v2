@@ -867,7 +867,7 @@ class UserCenterController extends Controller
 
         $messages = DB::connection("mysql_user")->table("system_message")->where(["place"=>3])->where(function ($query) use($id) {
             $query->where(["receiver" => $id])->orWhere(["receiver" => -1]);
-        })->orderBy("id","desc")->limit(10)->select("type","title","detail","img","conf","time")->get();
+        })->orderBy("priority","desc")->orderBy("id","desc")->limit(10)->select("type","title","detail","img","conf","time")->get();
         $info = array();
         $count = 0;
         foreach ($messages as $message) {
