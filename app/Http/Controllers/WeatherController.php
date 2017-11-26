@@ -103,6 +103,9 @@ class WeatherController extends Controller
                 } else {
                     $info["isOnline"] = false;
                 }
+                $info["latitude"] = $station->latitude;
+                $info["longitude"] = $station->longitude;
+                $info["altitude"] = $station->altitude;
                 array_push($return_array, $info);
             }
         }
