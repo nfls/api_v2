@@ -302,7 +302,8 @@ class ManagementController extends Controller
     function deployGit($content){
         switch($content){
             case "blog_hqy":
-                exec("cd /var/www/hqy_blog && git pull && bundler exec jekyll build");
+                exec("cd /var/www/hqy_blog && git pull && bundler exec jekyll build",$output);
+                dump($output);
                 break;
             case "api":
                 exec("cd /var/www/nfls-api && git pull");
