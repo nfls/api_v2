@@ -110,7 +110,7 @@ Route::get("test/page", function(Request $request){
     return view("form");
 });
 
-Route::get("test/post", function(Request $request){
+Route::post("test/post", function(Request $request){
     //return "Service Unavailable.";
     return "Your data: " . $request->input("text");
 });
