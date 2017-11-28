@@ -299,4 +299,16 @@ class ManagementController extends Controller
             $key
         );
     }
+    function deployGit($content){
+        switch($content){
+            case "blog_hqy":
+                exec("cd /var/www/hqy_blog && git pull && bundler exec jekyll build");
+                break;
+            case "api":
+                exec("cd /var/www/nfls-api && git pull");
+                break;
+            default:
+                break;
+        }
+    }
 }
