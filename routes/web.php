@@ -105,3 +105,13 @@ Route::get("test", function(Request $request){
     return "123";
 });
 
+Route::get("test/page", function(Request $request){
+    //return "Service Unavailable.";
+    return view("form");
+});
+
+Route::get("test/post", function(Request $request){
+    //return "Service Unavailable.";
+    return "Your data: " . $request->input("text");
+});
+
