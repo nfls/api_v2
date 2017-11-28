@@ -303,12 +303,14 @@ class ManagementController extends Controller
         switch($content){
             case "blog_hqy":
                 exec("cd /var/www/hqy_blog && git pull && bundler exec jekyll build",$output);
-                dump($output);
+                return json_encode($output);
                 break;
             case "api":
-                exec("cd /var/www/nfls-api && git pull");
+                exec("cd /var/www/nfls-api && git pull",$output);
+                return json_encode($output);
                 break;
             default:
+                return "nothing";
                 break;
         }
     }
