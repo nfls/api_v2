@@ -99,3 +99,9 @@ Route::get("redirect", function(Request $request){
     //return "Service Unavailable.";
     return "<script>window.location.href='".$request->input("to")."'</script>";
 });
+
+Route::get("test", function(Request $request){
+    //return "Service Unavailable.";
+    return "123";
+});
+
