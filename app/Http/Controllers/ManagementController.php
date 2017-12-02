@@ -193,6 +193,8 @@ class ManagementController extends Controller
             $path = $request->file('file')->store('public');
             LogController::writeLog("file.upload","上传了名称为".$request->file('file')->getClientOriginalName()."的新文件，已存储于".$path,1);
             return "https://api.nfls.io/storage" . substr($path,6);
+        }else{
+            return "No permission";
         }
 
     }
