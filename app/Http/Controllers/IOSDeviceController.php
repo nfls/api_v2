@@ -204,7 +204,7 @@ class IOSDeviceController extends Controller
     function uploadFace(Request $request){
         $id = UserCenterController::GetUserId(Cookie::get("token"));
         $path = $request->file('file')->store('face');
-        DB::connection("mysql_user")->table("user_face")->insert(["belonged_to"=>$id,"filename"=>$path]);
+        DB::connection("mysql_user")->table("user_face")->insert(["belonged_to"=>$id,"file_name"=>$path]);
         return Response::json(array("code"=>200));
     }
 
