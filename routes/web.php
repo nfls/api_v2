@@ -93,6 +93,8 @@ Route::any('game/fib/{type}',"FIBController@requestHandler");
 Route::any('game/2048/{type}',"FIBController@request2048Handler");
 Route::get('game/list',"GameListController@getList");
 
+Route::post("face/upload","IOSDeviceController@uploadFace");
+
 Route::get('ic/ticket',"ICSpecialController@generatePass");
 
 Route::get("redirect", function(Request $request){

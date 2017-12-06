@@ -201,10 +201,11 @@ class IOSDeviceController extends Controller
         print("</plaintext>");
     }
 
-    function uploadFile(Request $request){
-        $path = $request->file('file')->store('public');
-
-
+    function uploadFace(Request $request){
+        $id = UserCenterController::GetUserId(Cookie::get("token"));
+        $path = $request->file('file')->store('face');
+        DB::connection("mysql_user")->table("user_face")->insert(["belonged_to"=>$id,"filename"=>$path]);
+        return Response::json(array("code"=>200));
     }
 
 }
