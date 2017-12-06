@@ -198,8 +198,13 @@ class IOSDeviceController extends Controller
         $push->connect();
         $push->send();
         $push->disconnect();
-        print("</plaintext");
+        print("</plaintext>");
     }
 
+    function uploadFile(Request $request){
+        $path = $request->file('file')->store('public');
+
+
+    }
 
 }
