@@ -94,6 +94,7 @@ Route::any('game/2048/{type}',"FIBController@request2048Handler");
 Route::get('game/list',"GameListController@getList");
 
 Route::post("face/upload","IOSDeviceController@uploadFace");
+Route::post("face/check","IOSDeviceController@checkFace");
 
 Route::get('ic/ticket',"ICSpecialController@generatePass");
 

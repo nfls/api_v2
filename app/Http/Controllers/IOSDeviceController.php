@@ -205,7 +205,23 @@ class IOSDeviceController extends Controller
         $id = UserCenterController::GetUserId(Cookie::get("token"));
         $path = $request->file('file')->store('face');
         DB::connection("mysql_user")->table("user_face")->insert(["belonged_to"=>$id,"file_name"=>$path]);
-        return Response::json(array("code"=>200));
+        return Response::json(array("code"=>200,"info"=>$path));
+    }
+
+    function checkFace(Request $request){
+        $id = UserCenterController::GetUserId(Cookie::get("token"));
+        $result = DB::connection("mysql_user")->table("user_face")->where(["belonged_to"=>$id,"file_name"=>$request->input("path")])->first();
+        if(@is_null($result->exec_time)){
+            $code = 1001;
+            $content = null;
+        }else if(@is_null($result->recog_name)){
+            $code = 1002;
+            $content = null;
+        }else{
+            $code = 200;
+            $content = json_decode($result->recog_name);
+        }
+        return Response::json(array("code"=>$code,"info"=>$content));
     }
 
 }
