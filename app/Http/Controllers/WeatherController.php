@@ -70,12 +70,12 @@ class WeatherController extends Controller
                             $flag = true;
                         }
                     }
-                    if(!$flag){
+                    if(!$flag) {
                         abort(404.1);
                     }
-                    if(count($final_data) != count($configuration)){
-                        return Response::json(array("code"=>403,"info"=>count($final_data)),403);
-                    }
+                }
+                if(count($final_data) != count($configuration)){
+                    return Response::json(array("code"=>403,"info"=>count($final_data)),403);
                 }
                 $conf_id = DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->first()->current_configuration;
                 DB::connection("mysql_user")->table("weather_history")->insert(["update_time"=>date('Y-m-d h:i:s'),
