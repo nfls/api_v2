@@ -62,31 +62,31 @@ class WeatherController extends Controller
                 return Response::json(array("code"=>403,"info"=>count($data_asoc)),403);
             $final_data = array();
             foreach ($configurations as $index => $configuration){
-                if($configuration["isEnabled"] == true){
+                if($configuration["isEnabled"] == true) {
                     $flag = false;
-                    foreach ($data_asoc as $key=>$value){
-                        if($configuration["identification"] == $key){
-                            array_push($final_data,$value);
+                    foreach ($data_asoc as $key => $value) {
+                        if ($configuration["identification"] == $key) {
+                            array_push($final_data, $value);
                             $flag = true;
                         }
                     }
-                    if(!$flag) {
+                    if (!$flag) {
                         abort(404.1);
                     }
                 }
-                if(count($final_data) != count($configuration)){
-                    return Response::json(array("code"=>403,"info"=>count($final_data)),403);
-                }
-                $conf_id = DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->first()->current_configuration;
-                DB::connection("mysql_user")->table("weather_history")->insert(["update_time"=>date('Y-m-d h:i:s'),
-                    "update_ip"=>$_SERVER['REMOTE_ADDR'],
-                    "station_id"=>$id,
-                    "configuration_id"=>$conf_id,
-                    "data"=>json_encode($final_data)]);
-                DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->update(["lastupdate"=>date('Y-m-d h:i:s'),
-                    "lastupdate_ip"=>$_SERVER['REMOTE_ADDR'],
-                    "data"=>json_encode($final_data)]);
             }
+            if(count($final_data) != count($configuration)){
+                return Response::json(array("code"=>403,"info"=>count($final_data)),403);
+            }
+            $conf_id = DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->first()->current_configuration;
+            DB::connection("mysql_user")->table("weather_history")->insert(["update_time"=>date('Y-m-d h:i:s'),
+                "update_ip"=>$_SERVER['REMOTE_ADDR'],
+                "station_id"=>$id,
+                "configuration_id"=>$conf_id,
+                "data"=>json_encode($final_data)]);
+            DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->update(["lastupdate"=>date('Y-m-d h:i:s'),
+                "lastupdate_ip"=>$_SERVER['REMOTE_ADDR'],
+                "data"=>json_encode($final_data)]);
             return Response::json(array("code"=>200));
         } else {
             return(403);
