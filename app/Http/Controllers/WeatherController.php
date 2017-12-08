@@ -75,7 +75,7 @@ class WeatherController extends Controller
                     }
                 }
             }
-            if(count($final_data) != count($configuration)){
+            if(count($final_data) != count($configurations)){
                 return Response::json(array("code"=>403,"info"=>count($final_data)),403);
             }
             $conf_id = DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->first()->current_configuration;
