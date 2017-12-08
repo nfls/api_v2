@@ -59,7 +59,7 @@ class WeatherController extends Controller
             $id = $this->getStation($request->input("key"));
             $configurations = $this->getConfiguration($id);
             if(count($data_asoc) != count($configurations))
-                abort(1001);
+                return Response::json(array("code"=>403,"info"=>count($data_asoc)),403);
             $final_data = array();
             foreach ($configurations as $index => $configuration){
                 if($configuration["isEnabled"] == true){
