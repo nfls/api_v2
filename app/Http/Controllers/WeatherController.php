@@ -65,7 +65,7 @@ class WeatherController extends Controller
                 if($configuration["isEnabled"] == true){
                     $flag = false;
                     foreach ($data_asoc as $key=>$value){
-                        if($ins["identification"] = $key){
+                        if($ins["identification"] == $key){
                             array_push($final_data,$value);
                             $flag = true;
                         }
