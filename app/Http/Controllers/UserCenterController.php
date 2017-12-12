@@ -886,6 +886,7 @@ class UserCenterController extends Controller
             $info[$count]['conf'] = $message->conf;
             $info[$count]['img'] = $message->img;
             $count++;
+            break;//Note: Only show the first one.
         }
         return $info;
     }
