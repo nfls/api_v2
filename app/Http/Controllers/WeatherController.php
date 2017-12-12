@@ -79,12 +79,12 @@ class WeatherController extends Controller
                 return Response::json(array("code"=>403,"info"=>count($final_data)),403);
             }
             $conf_id = DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->first()->current_configuration;
-            DB::connection("mysql_user")->table("weather_history")->insert(["update_time"=>date('Y-m-d h:i:s'),
+            DB::connection("mysql_user")->table("weather_history")->insert(["update_time"=>date('Y-m-d H:i:s'),
                 "update_ip"=>$_SERVER['REMOTE_ADDR'],
                 "station_id"=>$id,
                 "configuration_id"=>$conf_id,
                 "data"=>json_encode($final_data)]);
-            DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->update(["lastupdate"=>date('Y-m-d h:i:s'),
+            DB::connection("mysql_user")->table("weather_station")->where(["id"=>$id])->update(["lastupdate"=>date('Y-m-d H:i:s'),
                 "lastupdate_ip"=>$_SERVER['REMOTE_ADDR'],
                 "data"=>json_encode($final_data)]);
             return Response::json(array("code"=>200));
