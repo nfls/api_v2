@@ -27,6 +27,7 @@ class GameListController extends Controller
         $game_list = DB::connection("mysql_game")->table("_list")->select("id","name","description","icon","url")->get();
         $json_mes['code'] = 200;
         $json_mes['info'] = $game_list;
+
         return Response::json($json_mes, 200);
     }
 
