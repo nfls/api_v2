@@ -99,8 +99,8 @@ Route::post("face/check","IOSDeviceController@checkFace");
 Route::get('ic/ticket',"ICSpecialController@generatePass");
 
 Route::get("redirect", function(Request $request){
-    //return "Service Unavailable.";
-    return "<script>window.location.href='".$request->input("to")."'</script>";
+    return "Service Unavailable.";
+    //return "<script>window.location.href='".$request->input("to")."'</script>";
 });
 
 Route::get("test", function(Request $request){

@@ -23,7 +23,8 @@ class GameListController extends Controller
         return Response::json(array("code"=>200,"info"=>$message));
     }
 
-    function getList(){
+    function getList(Request $request){
+        $id = UserCenterController::GetUserId(Cookie::get("token"));
         $game_list = DB::connection("mysql_game")->table("_list")->select("id","name","description","icon","url")->get();
         $json_mes['code'] = 200;
         $json_mes['info'] = $game_list;
