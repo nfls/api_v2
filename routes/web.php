@@ -1,5 +1,7 @@
 <?php
 use Illuminate\Http\Request;
+//use Symfony\Component\Routing\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,24 +20,24 @@ Route::get('alumni/auth/step',"CertificationController@getCurrentStep");
 Route::get('alumni/auth/status',"CertificationController@getCurrentStatus");
 Route::get('alumni/auth/instructions',"CertificationController@getInstructions");
 Route::get('alumni/auth/duration',"CertificationController@getDuration");
-Route::get('alumni/post/list',"AlumniWebsiteController@getPostList");
-Route::post('alumni/post/detail',"AlumniWebsiteController@getDetailPost");
+//Route::get('alumni/post/list',"AlumniWebsiteController@getPostList");
+//Route::post('alumni/post/detail',"AlumniWebsiteController@getDetailPost");
 
 Route::any('center/{type}',"UserCenterController@requestHandler");
 
-Route::get('media/gallery/list/{id}',"AlbumController@getPhotoList");
-Route::get('media/gallery/info/{id}',"AlbumController@getAlbumInfo");
-Route::get('media/gallery/getlist',"AlbumController@getAlbumList");
-Route::any('media/gallery/update',"AlbumController@updateAnAlbum");
+//Route::get('media/gallery/list/{id}',"AlbumController@getPhotoList");
+//Route::get('media/gallery/info/{id}',"AlbumController@getAlbumInfo");
+//Route::get('media/gallery/getlist',"AlbumController@getAlbumList");
+//Route::any('media/gallery/update',"AlbumController@updateAnAlbum");
 
 Route::get("live/list","LiveListController@getLiveList");
 Route::get("video/list","LiveListController@getVideoList");
 
-Route::post("student/query","StudentsListController@getNameList");
-Route::get("student/info","StudentsListController@getInfo");
-Route::post("student/use","StudentsListController@useName");
-Route::post("student/unuse","StudentsListController@unuseName");
-Route::get("student/list","StudentsListController@getUsedName");
+//Route::post("student/query","StudentsListController@getNameList");
+//Route::get("student/info","StudentsListController@getInfo");
+//Route::post("student/use","StudentsListController@useName");
+//Route::post("student/unuse","StudentsListController@unuseName");
+//Route::get("student/list","StudentsListController@getUsedName");
 
 Route::post("university/list","ClubsAndUniversitiesController@listUniversities");
 Route::post("university/get","ClubsAndUniversitiesController@getAUniversity");
@@ -59,11 +61,11 @@ Route::get("admin/auth/instructions","CertificationManagementController@getInstr
 Route::post("admin/upload","ManagementController@uploadFile");
 Route::get("admin/uploads","ManagementController@uploadPage");
 Route::get("admin/message/get","ManagementController@getAllMessages");
-Route::get("admin/picture/get","ManagementController@getAllPictures");
+//Route::get("admin/picture/get","ManagementController@getAllPictures");
 Route::post("admin/message/detail","ManagementController@getAMessage");
-Route::post("admin/picture/detail","ManagementController@getAPicture");
+//Route::post("admin/picture/detail","ManagementController@getAPicture");
 Route::post("admin/message/save","ManagementController@saveAMessage");
-Route::post("admin/picture/save","ManagementController@saveAPicture");
+//Route::post("admin/picture/save","ManagementController@saveAPicture");
 Route::post("admin/message/remove","ManagementController@deleteAMessage");
 Route::get("admin/message/permission","ManagementController@getPermission");
 Route::get("admin/list","ManagementController@getAuthList");
@@ -74,7 +76,7 @@ Route::any("admin/deploy/{content}","ManagementController@deployGit");
 Route::post('device/register',"IOSDeviceController@registerDevice");
 Route::post('device/purchase',"IOSDeviceController@iapPurchase");
 Route::get('device/status',"IOSDeviceController@confirmLoggedIn");
-Route::get('device/notice',"IOSDeviceController@getNotice");
+//Route::get('device/notice',"IOSDeviceController@getNotice");
 Route::post('device/auth',"IOSDeviceController@compareAuthDatabase");
 Route::get('device/pics',"IOSDeviceController@getStartUpPictures");
 Route::get('device/push',"IOSDeviceController@pushAMessage");

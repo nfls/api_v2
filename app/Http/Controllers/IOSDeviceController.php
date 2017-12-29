@@ -88,7 +88,7 @@ class IOSDeviceController extends Controller
     }
 
     function confirmLoggedIn(){
-        if(!(stripos($_SERVER['HTTP_USER_AGENT'],'1.2.3')===false) || !(stripos($_SERVER['HTTP_USER_AGENT'],'1.2.6')===false) || !(stripos($_SERVER['HTTP_USER_AGENT'],'1.2.5')===false) || !(stripos($_SERVER['HTTP_USER_AGENT'],'Nflsers-Android')===false)){
+        if(!(stripos($_SERVER['HTTP_USER_AGENT'],'1.2.7')===false) || !(stripos($_SERVER['HTTP_USER_AGENT'],'1.2.3')===false) || !(stripos($_SERVER['HTTP_USER_AGENT'],'1.2.6')===false) || !(stripos($_SERVER['HTTP_USER_AGENT'],'1.2.5')===false) || !(stripos($_SERVER['HTTP_USER_AGENT'],'Nflsers-Android')===false)){
             $id = UserCenterController::GetUserId(Cookie::get("token"));
             return Response::json(array("code"=>200,"id"=>$id));
         }else{
