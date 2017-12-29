@@ -413,7 +413,7 @@ class UserCenterController extends Controller
             }
 
         }
-        return array("allow" => $allow, "message" =>  $message." 安卓版<a href='https://app.nfls.io'>客户端</a>现已上线！");
+        return array("allow" => $allow, "message" =>  $message." 南外人2018年<a href='https://hqy.moe/2017/12/hello-2018/'>工作计划</a>");
     }
 
 
