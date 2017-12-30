@@ -11,8 +11,10 @@ use Cookie;
 class ICSpecialController extends Controller
 {
     //
+
     function generatePass(Request $request)
     {
+
         if($request->has("token"))
             $token = $request->input("token");
         else
@@ -146,6 +148,7 @@ class ICSpecialController extends Controller
             return 'Error: ' . $pass->getError();
         }
         return;
+
     }
 
     function getLaunchDetail(Request $request){
@@ -169,6 +172,7 @@ class ICSpecialController extends Controller
         $card_info = array();
         $card_info["code"] = $info->auth_code;
         $card_info["name"] = $name[0]->chnName;
+        $card_info["identifier"] = $name[0]->identifier;
         return Response::json(array("code"=>200,"info"=>$card_info));
     }
 }

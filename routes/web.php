@@ -98,7 +98,7 @@ Route::get('game/list',"GameListController@getList");
 Route::post("face/upload","IOSDeviceController@uploadFace");
 Route::post("face/check","IOSDeviceController@checkFace");
 
-Route::get('ic/ticket',"ICSpecialController@generatePass");
+//Route::get('ic/ticket',"ICSpecialController@generatePass");
 Route::get('ic/card',"ICSpecialController@getLaunchDetail");
 
 Route::get("redirect", function(Request $request){
