@@ -147,4 +147,28 @@ class ICSpecialController extends Controller
         }
         return;
     }
+
+    function getLaunchDetail(Request $request){
+        if($request->has("token"))
+            $token = $request->input("token");
+        else
+            $token = Cookie::get("token");
+        $id = UserCenterController::GetUserId($token);
+
+        $info = DB::connection("mysql_ic")->table("ic_activity")->where(["user_id"=>$id])->first();
+        if(is_null($info->auth_code))
+            abort(403);
+        $name = DB::connection("mysql_ic")->table("ic_auth")->where(["id"=>$id])->get();
+        if(count($name) != 1)
+            abort(403);
+        if($name[0]->enabled != 1)
+            abort(403);
+        $phone = UserCenterController::GetUserMobile($id);
+        $auth = new UserCenterController();
+        $aInfo = $auth->ICInfo($id);
+        $card_info = array();
+        $card_info["code"] = $info->auth_code;
+        $card_info["name"] = $name[0]->chnName;
+        return Response::json(array("code"=>200,"info"=>$card_info));
+    }
 }
