@@ -172,7 +172,7 @@ class ICSpecialController extends Controller
         $card_info = array();
         $card_info["code"] = $info->auth_code;
         $card_info["name"] = $name[0]->chnName;
-        $card_info["identifier"] = $name[0]->identifier;
+        $card_info["identifier"] = $info]->identifier;
         return Response::json(array("code"=>200,"info"=>$card_info));
     }
 }
