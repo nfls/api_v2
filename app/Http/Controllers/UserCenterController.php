@@ -503,8 +503,8 @@ class UserCenterController extends Controller
 
     function UserLogin($username, $password, $session, $captcha)
     {
-        if (!$this->ConfirmCaptcha($session, $captcha, "login"))
-            return array("status" => "failure", "message" => "Captcha invalid or incorrect.");
+        //if (!$this->ConfirmCaptcha($session, $captcha, "login"))
+            //return array("status" => "failure", "message" => "Captcha invalid or incorrect.");
         $headers = array('content-type:application/vnd.api+json',);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, "https://forum.nfls.io/api/token");
