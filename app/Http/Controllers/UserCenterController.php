@@ -524,7 +524,7 @@ class UserCenterController extends Controller
         if (isset($detail['token']))
             return array("status" => "success", "token" => $this->LoginProcess($detail['userId']));
         else
-            return array("status" => "failure", "message" => "Username or password is incorrect.");
+            return array("status" => "failure", "message" => "南外人相关服务已于2018年1月17日终止，具体请见网页版公告。Service Discontinued.");
     }
 
     function UserRegister($email, $password, $username, $session, $captcha)
